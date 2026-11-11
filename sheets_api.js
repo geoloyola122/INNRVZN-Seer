@@ -419,7 +419,12 @@
   async function addRecord(tab, values) {
     var sch = (await getSchema())[tab], name = values[sch.key] || '';
     if (!String(name).trim()) throw new Error('A name is required.');
-    var row = (await vals_("'" + tab + "'!" + sch.key + ':' + sch.key)).length + 1, data = [];
+    var row = (await vals_("'" + tab + "'!" + sch.key + ':' + sch.key)).length + 1, data = [], gen = CODE_COLS[tab];
+    if (gen) {                                   // project codes: blank = next free PLS number, typed = must be unused
+      var typed = String(values[gen[0]] || '').trim().toUpperCase(), used = await codeList_(tab);
+      if (typed && used.indexOf(typed) > -1) throw new Error('Code ' + typed + ' is already used. Leave it blank to get the next one.');
+      values = Object.assign({}, values); values[gen[0]] = typed || await nextCode_(tab);
+    }
     sch.cols.forEach(function (c) {
       var v = values[c.col];
       if (c.readonly || !(c.col in values) || v === '' || v == null) return;
@@ -429,8 +434,29 @@
       if (c.kind === 'bool' && !c.readonly && !(c.col in values)) data.push({ range: "'" + tab + "'!" + c.col + row, values: [[false]] });
     });
     await vBatch(data, 'USER_ENTERED');
-    return { ok: true, row: row };
+    if (gen) {                                   // two people adding at once could pick the same number: the later row takes the next one
+      var after = await codeList_(tab, true), mine = values[gen[0]];
+      if (mine && after.filter(function (x) { return x === mine; }).length > 1 && after.indexOf(mine) + 2 !== row) {
+        values[gen[0]] = await nextCode_(tab);
+        await vUpdate("'" + tab + "'!" + gen[0] + row, [[values[gen[0]]]], 'RAW');
+      }
+    }
+    return { ok: true, row: row, code: gen ? values[gen[0]] : '' };
   }
+
+  // ------------------------------------------------------------ project codes
+  var CODE_COLS = { 'CAMPAIGNS': ['D', 'PLS', 4] };
+  async function codeList_(tab, keepBlanks) {
+    var col = CODE_COLS[tab][0], rows = await vals_("'" + tab + "'!" + col + '2:' + col);
+    var all = rows.map(function (r) { return r && r.length ? pstr_(r[0]).trim().toUpperCase() : ''; });
+    return keepBlanks ? all : all.filter(function (x) { return x; });
+  }
+  async function nextCode_(tab) {                // highest existing PLS number + 1 (gaps stay: a used number is never reissued)
+    var g = CODE_COLS[tab], max = 0, re = new RegExp('^' + g[1] + '(\\d+)$', 'i');
+    (await codeList_(tab)).forEach(function (x) { var m = re.exec(x); if (m) max = Math.max(max, parseInt(m[1], 10)); });
+    return g[1] + String(max + 1).padStart(g[2], '0');
+  }
+  async function nextCode(tab) { tab = tab || 'CAMPAIGNS'; return { code: CODE_COLS[tab] ? await nextCode_(tab) : '' }; }
 
   // ------------------------------------------------------------ CRM
   async function ensureLogTab_() {
@@ -483,7 +509,7 @@
   // ------------------------------------------------------------ browser-side stand-ins for desktop calls
   var A = {
     getData: getData, addTask: addTask, completeTask: completeTask, snoozeTask: snoozeTask, setCampaignStatus: setCampaignStatus,
-    getSchema: getSchema, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
+    getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
     addLog: addLog, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
     getBackdrop: function () { return Promise.resolve({ mode: 'solid', theme: 'dark' }); },

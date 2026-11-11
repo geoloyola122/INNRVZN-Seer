@@ -378,14 +378,16 @@ function editRecord(tab,row,into){var box=document.getElementById(into||'ed');if
    .catch(function(e){if(box)box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'})}
 function newRecord(tab,title,defaults){run('getSchema').then(function(s){var sch=s[tab];ED={tab:tab,row:0,schema:sch,isNew:true};
   var vals=sch.cols.map(function(c){return(defaults&&defaults[c.col])||''});
-  openDr('<div class="m" style="color:var(--mute);font-size:12px">'+esc(tab)+'</div><h2>'+esc(title)+'</h2>'+editorHtml(sch,vals)+'<div class="bar" style="margin-top:12px"><button class="b" id="edcreate" style="border-color:var(--acc)">Create</button></div>')}).catch(function(e){toast(e.message)})}
+  openDr('<div class="m" style="color:var(--mute);font-size:12px">'+esc(tab)+'</div><h2>'+esc(title)+'</h2>'+editorHtml(sch,vals)+'<div class="bar" style="margin-top:12px"><button class="b" id="edcreate" style="border-color:var(--acc)">Create</button></div>');
+  var ci=sch.cols.findIndex(function(c){return/project code/i.test(c.label)});   // project codes number themselves: show the next one, blank = use it
+  if(ci>-1&&!sch.cols[ci].readonly)run('nextCode',tab).then(function(r){var el=document.getElementById('f'+ci);if(el&&r&&r.code)el.placeholder='Auto: '+r.code}).catch(function(){})}).catch(function(e){toast(e.message)})}
 function fieldVal(el,c){return c.kind==='bool'?el.checked:el.value}
 document.addEventListener('change',function(e){var el=e.target;if(!ED||ED.isNew||!/^f\d+$/.test(el.id))return;var i=+el.id.slice(1),c=ED.schema.cols[i],v=fieldVal(el,c);
   el.style.outline='1px solid var(--amber)';
   run('updateCell',ED.tab,ED.row,ED.key,c.col,v).then(function(){el.style.outline='1px solid var(--ok)';setTimeout(function(){el.style.outline=''},900);ED.values[i]=v;if(c.col===ED.schema.key)ED.key=v;toast('Saved '+c.label.replace(/[^\w\s]/g,'').trim());load()})
    .catch(function(err){el.style.outline='1px solid var(--red)';toast(err.message)})});
 document.addEventListener('click',function(e){if(e.target.id!=='edcreate'||!ED)return;var vals={};ED.schema.cols.forEach(function(c,i){var el=document.getElementById('f'+i);if(el&&!c.readonly){var v=fieldVal(el,c);if(v!==''&&v!==false)vals[c.col]=v}});
-  e.target.disabled=true;run('addRecord',ED.tab,vals).then(function(r){toast('Created');closeDr();load()}).catch(function(err){toast(err.message);e.target.disabled=false})});
+  e.target.disabled=true;run('addRecord',ED.tab,vals).then(function(r){toast(r&&r.code?'Created '+r.code:'Created');closeDr();load()}).catch(function(err){toast(err.message);e.target.disabled=false})});
 var COLD=14;
 // Matches the STATUS dropdown (strict validation) on both client tabs.
 var STAGES=['Prospect','Contacting','Pitching','Contracting','Active','Paused','Lost'];
