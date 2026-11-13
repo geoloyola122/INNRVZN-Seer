@@ -13,16 +13,20 @@
   var CFG = window.TRACKER_CONFIG || {};
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
-  var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email';
+  var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
+  var WEB_VERSION = '2026.11.13.0958';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   var LINK_COLS = {
-    'CAMPAIGNS': { L: 'master', M: 'deck', AD: 'infl', AO: 'bill' },
-    'PME CLIENTS': { Q: 'bill' },
-    'AGENCIES': { Z: 'bill' }
+    'CAMPAIGNS': { L: 'master', M: 'deck', AD: 'infl', AO: 'bill', AP: 'folder' },
+    'PME CLIENTS': { Q: 'bill', R: 'folder' },
+    'AGENCIES': { Z: 'bill', AA: 'folder' },
+    'CLIENTS & PARTNERSHIPS': { AE: 'folder' },
+    'BRAND OUTREACH CLIENTS': { AD: 'folder' }
   };
-  var LINK_LABEL = { master: 'Master file', deck: 'Deck', infl: 'Influencers', bill: 'Billing' };
+  var FOLDER_COL = { 'CAMPAIGNS': 'AP', 'PME CLIENTS': 'R', 'AGENCIES': 'AA', 'CLIENTS & PARTNERSHIPS': 'AE', 'BRAND OUTREACH CLIENTS': 'AD' };
+  var LINK_LABEL = { master: 'Master file', deck: 'Deck', infl: 'Influencers', bill: 'Billing', folder: 'Folder' };
   var EDIT_TABS = {
     'TASKS': ['C', ['E']],
     'CAMPAIGNS': ['E', ['O']],
@@ -190,7 +194,8 @@
   async function links_() {
     var out = {};
     try {
-      var specs = [['CAMPAIGNS', 'L2:M'], ['CAMPAIGNS', 'AD2:AD'], ['CAMPAIGNS', 'AO2:AO'], ['PME CLIENTS', 'Q2:Q'], ['AGENCIES', 'Z2:Z']];
+      var specs = [['CAMPAIGNS', 'L2:M'], ['CAMPAIGNS', 'AD2:AD'], ['CAMPAIGNS', 'AO2:AP'], ['PME CLIENTS', 'Q2:R'], ['AGENCIES', 'Z2:AA'],
+        ['CLIENTS & PARTNERSHIPS', 'AE2:AE'], ['BRAND OUTREACH CLIENTS', 'AD2:AD']];
       var res = await api('GET', '', {
         ranges: specs.map(function (s) { return "'" + s[0] + "'!" + s[1]; }), includeGridData: 'true',
         fields: 'sheets(properties.title,data(startRow,startColumn,rowData.values(formattedValue,hyperlink,chipRuns)))'
@@ -230,7 +235,7 @@
   }
 
   async function getData() {
-    var ranges = ['TASKS!A2:J', 'CAMPAIGNS!A2:U', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
+    var ranges = ['TASKS!A2:L', 'CAMPAIGNS!A2:U', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
       'MEETINGS!A2:J', "'ACCOUNT MANAGERS'!A2:K", "'PME CLIENTS'!A2:P", 'AGENCIES!A2:Y'];
     var q = { ranges: ranges, valueRenderOption: 'UNFORMATTED_VALUE', dateTimeRenderOption: 'SERIAL_NUMBER' };
     var all = await Promise.all([api('GET', '/values:batchGet', q), links_(), readLog_()]);
@@ -243,13 +248,13 @@
       if (r[2]) clients.push({ src: 'Clients & Partnerships', kind: ty === 'client' ? 'Client' : ty === 'partner' ? 'Partner' : 'Prospect',
         sub: ty === 'partner' ? pstr_(r[8]) : '', row: i + 2, priority: pstr_(r[1]), name: pstr_(r[2]),
         tier: pstr_(r[4]), am: pstr_(r[5]), status: pstr_(r[6]) || 'No status', biz: pstr_(r[8]), deal: pstr_(r[9]), desc: pstr_(r[10]),
-        contact: pstr_(r[13]), contactInfo: pstr_(r[14]), projects: pstr_(r[15]), notes: pstr_(r[16]) });
+        contact: pstr_(r[13]), contactInfo: pstr_(r[14]), projects: pstr_(r[15]), notes: pstr_(r[16]), links: lk['CLIENTS & PARTNERSHIPS|' + (i + 2)] || {} });
     });
     bo.forEach(function (r, i) {
       r = pad_(r, 16);
       if (r[2]) clients.push({ src: 'Brand Outreach', kind: 'Prospect', row: i + 2, priority: pstr_(r[1]), name: pstr_(r[2]),
         tier: pstr_(r[3]), am: pstr_(r[4]), status: pstr_(r[5]) || 'No status', biz: pstr_(r[7]), deal: pstr_(r[8]), desc: pstr_(r[9]),
-        contact: pstr_(r[12]), contactInfo: pstr_(r[13]), projects: pstr_(r[14]) || pstr_(r[10]), notes: pstr_(r[15]) });
+        contact: pstr_(r[12]), contactInfo: pstr_(r[13]), projects: pstr_(r[14]) || pstr_(r[10]), notes: pstr_(r[15]), links: lk['BRAND OUTREACH CLIENTS|' + (i + 2)] || {} });
     });
     pme.forEach(function (r, i) {
       r = pad_(r, 16);
@@ -279,10 +284,10 @@
     });
     var tasks = [];
     t.forEach(function (r, i) {
-      r = pad_(r, 10);
+      r = pad_(r, 12);
       if (!r[2] || r[0] === true || r[1] === true) return;
       tasks.push({ row: i + 2, task: pstr_(r[2]), forName: pstr_(r[3]), type: pstr_(r[4]), owner: pstr_(r[5]), due: serialToIso_(r[6]),
-        dueTime: timeStr_(r[7]), notes: pstr_(r[8]), bump: /^bump/i.test(pstr_(r[2])) });
+        dueTime: timeStr_(r[7]), notes: pstr_(r[8]), bump: /^bump/i.test(pstr_(r[2])), deliv: r[10] === true, delivUrl: pstr_(r[11]).trim() });
     });
     var camps = [];
     c.forEach(function (r, i) {
@@ -309,13 +314,15 @@
       { range: 'TASKS!F' + row + ':J' + row, values: [[task.owner || '', task.due || '', task.dueTime || '', task.notes || '', added]] }], 'USER_ENTERED');
     return { ok: true, row: row };
   }
-  async function completeTask(row, expected) {
-    var r = await vals_('TASKS!A' + row + ':J' + row);
-    r = r.length ? pad_(r[0], 10).slice(0, 10) : [];
+  async function completeTask(row, expected, deliverable) {
+    var r = await vals_('TASKS!A' + row + ':L' + row);
+    r = r.length ? pad_(r[0], 12).slice(0, 12) : [];
     if (!r.length || pstr_(r[2]) !== expected) throw new Error('Rows moved. Refresh and try again.');
+    deliverable = String(deliverable || pstr_(r[11]) || '').trim();
+    if (r[10] === true && !deliverable) throw new Error('This task is deliverable-sensitive: submit the deliverable to complete it.');
     var who = (await meName_() || email || 'APP').toUpperCase(), due = serialToIso_(r[6]);
     if (/^\d{4}-\d\d-\d\d/.test(due)) due = dueFmt(due);
-    await vAppend('TASK HISTORY!A:I', [[stampNow(), who, r[2], r[3], 'TASKS', r[5], due, timeStr_(r[7]), '']], 'RAW');
+    await vAppend('TASK HISTORY!A:J', [[stampNow(), who, r[2], r[3], 'TASKS', r[5], due, timeStr_(r[7]), '', deliverable]], 'RAW');
     await sBatch([{ deleteDimension: { range: { sheetId: await sheetId_('TASKS'), dimension: 'ROWS', startIndex: row - 1, endIndex: row } } }]);
     return { ok: true };
   }
@@ -507,8 +514,144 @@
   }
 
   // ------------------------------------------------------------ browser-side stand-ins for desktop calls
+
+  // ---------------------------------------------------------------- Google Drive: settings, folders, deliverables (same rules as the desktop app)
+  var FOLDER_MIME = 'application/vnd.google-apps.folder';
+  async function drv(method, path, query, body, raw, retried) {
+    var t = await ensureToken();
+    var o = { method: method, headers: {} };
+    if (t) o.headers.Authorization = 'Bearer ' + t;
+    if (raw) { o.headers['Content-Type'] = raw.type; o.body = raw.body; }
+    else if (body) { o.headers['Content-Type'] = 'application/json'; o.body = JSON.stringify(body); }
+    var base = raw ? 'https://www.googleapis.com/upload/drive/v3' : 'https://www.googleapis.com/drive/v3';
+    var r = await fetch(base + path + qs(Object.assign({ supportsAllDrives: true }, query || {})), o);
+    if ((r.status === 401 || r.status === 403) && !retried) {          // old sign-in without Drive: ask again once
+      var j0 = null; try { j0 = await r.clone().json(); } catch (e) { }
+      if (r.status === 401 || /scope/i.test(JSON.stringify(j0 || ''))) { token = ''; return drv(method, path, query, body, raw, true); }
+    }
+    if (!r.ok) { var j = null; try { j = await r.json(); } catch (e) { } throw new Error((j && j.error && j.error.message) || ('Google Drive returned ' + r.status)); }
+    return r.json();
+  }
+  async function settings_() {
+    if (!((await sheetIds_())['SETTINGS'] >= 0)) return {};
+    var o = {};
+    (await vals_("'SETTINGS'!A2:B")).forEach(function (r) { if (r && pstr_(r[0]).trim()) o[pstr_(r[0]).trim()] = r.length > 1 ? pstr_(r[1]) : ''; });
+    return o;
+  }
+  async function setSetting_(key, value) {
+    if (!((await sheetIds_())['SETTINGS'] >= 0)) {
+      await sBatch([{ addSheet: { properties: { title: 'SETTINGS', gridProperties: { frozenRowCount: 1 } } } }]);
+      await vUpdate("'SETTINGS'!A1:C1", [['KEY', 'VALUE', 'NOTE']], 'RAW');
+    }
+    var keys = (await vals_("'SETTINGS'!A2:A")).map(function (r) { return r && r.length ? pstr_(r[0]).trim() : ''; });
+    var i = keys.indexOf(key), row = i > -1 ? i + 2 : keys.length + 2;
+    await vUpdate("'SETTINGS'!A" + row + ':C' + row, [[key, value, 'Set from INNRVZN Seer > More > Settings']], 'RAW');
+  }
+  function folderOut_(f) { return { id: f.id, name: f.name || '', url: f.webViewLink || 'https://drive.google.com/drive/folders/' + f.id, owner: ((f.owners || [{}])[0] || {}).emailAddress || '' }; }
+  function folderId_(s) {
+    s = String(s || '').trim();
+    var m = s.match(/\/folders\/([A-Za-z0-9_-]{10,})/) || s.match(/[?&]id=([A-Za-z0-9_-]{10,})/);
+    if (m) return m[1];
+    if (/^[A-Za-z0-9_-]{10,}$/.test(s)) return s;
+    throw new Error('Paste a Google Drive folder link.');
+  }
+  function q_(s) { var BS = String.fromCharCode(92); return String(s).split(BS).join('').split("'").join(BS + "'"); }
+  async function driveStatus() {
+    var rootId = (await settings_())['DRIVE_ROOT'] || '';
+    var out = { connected: true, web: true, email: '', root: null, rootId: rootId, error: '' };
+    try { out.email = (await drv('GET', '/about', { fields: 'user(emailAddress)' })).user.emailAddress; } catch (e) { }
+    if (rootId) {
+      try { var f = await drv('GET', '/files/' + rootId, { fields: 'id,name,webViewLink,owners(emailAddress),trashed' }); out.root = folderOut_(f); if (f.trashed) out.error = 'This folder is in the Drive trash.'; }
+      catch (e) { out.error = "This Google account can't open the saved folder. Ask its owner to share it with you."; }
+    }
+    return out;
+  }
+  async function driveFind(name) {
+    var r = await drv('GET', '/files', { q: "mimeType='" + FOLDER_MIME + "' and trashed=false and name='" + q_(name || 'INNRVZN Plus') + "'",
+      fields: 'files(id,name,webViewLink,owners(emailAddress))', pageSize: 20, includeItemsFromAllDrives: true });
+    return (r.files || []).map(folderOut_);
+  }
+  async function driveSetRoot(link) {
+    var id = folderId_(link), f;
+    try { f = await drv('GET', '/files/' + id, { fields: 'id,mimeType' }); } catch (e) { throw new Error("That folder can't be opened with this Google account."); }
+    if (f.mimeType !== FOLDER_MIME) throw new Error('That link is a file, not a folder.');
+    await setSetting_('DRIVE_ROOT', id);
+    return driveStatus();
+  }
+  async function driveCreateRoot(name) {
+    var f = await drv('POST', '/files', { fields: 'id' }, { name: String(name || '').trim() || 'INNRVZN Plus', mimeType: FOLDER_MIME });
+    await setSetting_('DRIVE_ROOT', f.id);
+    return driveStatus();
+  }
+  async function root_() {
+    var id = (await settings_())['DRIVE_ROOT'] || '';
+    if (!id) throw new Error('No main Drive folder is set. Choose one in More > Settings.');
+    return id;
+  }
+  async function sub_(parent, name) {
+    var r = await drv('GET', '/files', { q: "'" + parent + "' in parents and mimeType='" + FOLDER_MIME + "' and trashed=false and name='" + q_(name) + "'",
+      fields: 'files(id,webViewLink)', pageSize: 1, includeItemsFromAllDrives: true });
+    if (r.files && r.files.length) return r.files[0];
+    return drv('POST', '/files', { fields: 'id,webViewLink' }, { name: name, mimeType: FOLDER_MIME, parents: [parent] });
+  }
+  async function ensureFolder_(tab, row, expected) {
+    var col = FOLDER_COL[tab];
+    if (!col) throw new Error('This tab has no folder column.');
+    var root = await root_();
+    await check_("'" + tab + "'", row, EDIT_TABS[tab][0], expected);
+    var cur = (((await links_())[tab + '|' + row]) || {}).folder || {};
+    var m = String(cur.url || '').match(/\/folders\/([A-Za-z0-9_-]{10,})/);
+    if (m) return { id: m[1], url: cur.url, created: false };
+    var name, group;
+    if (tab === 'CAMPAIGNS') { var code = pstr_(((await vals_('CAMPAIGNS!D' + row))[0] || [''])[0]).trim(); name = (code ? code + ' · ' : '') + expected; group = 'Projects'; }
+    else { name = expected; group = 'Clients'; }
+    name = name.replace(/[\\\/]+/g, '-').trim();
+    var f = await sub_((await sub_(root, group)).id, name);
+    var url = f.webViewLink || 'https://drive.google.com/drive/folders/' + f.id;
+    await setLink(tab, row, expected, col, url);
+    return { id: f.id, url: url, created: true };
+  }
+  async function taskTarget_(forName) {
+    var n = String(forName || '').trim().toLowerCase();
+    if (!n) return null;
+    var d = await getData(), i;
+    for (i = 0; i < d.campaigns.length; i++) { var c = d.campaigns[i]; if (n === String(c.name || '').trim().toLowerCase() || n === String(c.code || '').trim().toLowerCase()) return ['CAMPAIGNS', c.row, c.name]; }
+    var tabs = { 'Clients & Partnerships': 'CLIENTS & PARTNERSHIPS', 'Brand Outreach': 'BRAND OUTREACH CLIENTS', 'PME': 'PME CLIENTS', 'Agencies': 'AGENCIES' };
+    for (i = 0; i < d.clients.length; i++) { var e = d.clients[i]; if (tabs[e.src] && n === String(e.name || '').trim().toLowerCase()) return [tabs[e.src], e.row, e.name]; }
+    return null;
+  }
+  async function submitDeliverable(row, expected, url) {
+    url = String(url || '').trim();
+    if (!/^https?:\/\//i.test(url)) throw new Error('Paste a full link starting with http:// or https://');
+    await check_('TASKS', row, 'C', expected);
+    await vUpdate('TASKS!L' + row, [[url]], 'RAW');
+    return completeTask(row, expected, url);
+  }
+  async function uploadDeliverableData(row, expected, name, mime, b64) {
+    var r = await vals_('TASKS!C' + row + ':D' + row);
+    r = r.length ? pad_(r[0], 2) : ['', ''];
+    if (pstr_(r[0]) !== expected) throw new Error('Rows moved. Refresh and try again.');
+    var t = await taskTarget_(pstr_(r[1])), parent;
+    if (t) parent = (await sub_((await ensureFolder_(t[0], t[1], t[2])).id, 'Deliverables')).id;
+    else parent = (await sub_((await sub_(await root_(), 'Deliverables')).id, 'Unassigned')).id;
+    var bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (var k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+    var bnd = 'seer' + Date.now();
+    var body = new Blob(['--' + bnd + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify({ name: name || 'deliverable', parents: [parent] }) +
+      '\r\n--' + bnd + '\r\nContent-Type: ' + (mime || 'application/octet-stream') + '\r\n\r\n', bytes, '\r\n--' + bnd + '--']);
+    var f = await drv('POST', '/files', { uploadType: 'multipart', fields: 'id,webViewLink' }, null, { type: 'multipart/related; boundary=' + bnd, body: body });
+    var url = f.webViewLink || 'https://drive.google.com/file/d/' + f.id + '/view';
+    var out = await submitDeliverable(row, expected, url);
+    out.url = url;
+    return out;
+  }
+
   var A = {
     getData: getData, addTask: addTask, completeTask: completeTask, snoozeTask: snoozeTask, setCampaignStatus: setCampaignStatus,
+    driveStatus: driveStatus, driveConnect: driveStatus, driveDisconnect: driveStatus, driveFind: driveFind, driveSetRoot: driveSetRoot,
+    driveCreateRoot: driveCreateRoot, createFolder: ensureFolder_, submitDeliverable: submitDeliverable, uploadDeliverableData: uploadDeliverableData,
+    appVersion: function () { return Promise.resolve({ version: WEB_VERSION, web: true }); },
+    checkUpdate: function () { return Promise.resolve({ newer: false }); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
     addLog: addLog, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
