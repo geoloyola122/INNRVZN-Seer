@@ -222,7 +222,30 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 /* side panel is always solid (no glass / blur) */
 #dr{background:var(--solid)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 .delbar{margin:22px 0 6px;padding-top:12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}.delb{color:#ff6b6b;border-color:rgba(255,90,90,.45)}
-#wsp,#wsm{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:var(--solid)}
+#login,#wsp,#wsm{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:var(--solid)}
+#wsm{overflow:auto}.mus{min-height:100%;display:flex;flex-direction:column}.mtop{display:flex;gap:8px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+#wsdd{position:fixed;z-index:70;display:none;min-width:200px;background:var(--solid);border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#wsdd button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);font:inherit;padding:8px 12px;border-radius:7px;cursor:pointer}#wsdd button:hover{background:var(--panel)}#wsdd button.on{color:var(--acc)}
+.gbtn{font-size:15px;padding:10px 18px;border-radius:10px}.gbtn b{color:var(--acc);margin-right:8px}.card.acct{display:flex;gap:8px;align-items:center;padding:12px 16px;margin-bottom:12px;max-width:820px}
+.wtag{font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-right:6px;color:var(--mute);vertical-align:1px}.wtag.mus{color:var(--acc);border-color:var(--acc)}
+.ph.mp,.prow.mp{grid-template-columns:18px minmax(170px,2fr) minmax(110px,1fr) 110px 160px 90px minmax(150px,1.6fr)}.ph.mu,.prow.mu{grid-template-columns:18px minmax(170px,2fr) 100px 110px 100px minmax(120px,1fr)}.prow.mq{grid-template-columns:18px 1fr 150px}
+.mbar{display:inline-block;vertical-align:middle;width:90px;flex:none}.mgrid{display:grid;grid-template-columns:260px 1fr;flex:1}.mgrid aside{border-right:1px solid var(--line);padding:12px}.mgrid main{padding:18px 22px;max-width:980px}
+.mart{padding:9px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-top:4px}.mart.on,.mart:hover{background:var(--panel)}
+.mproj{padding:7px 10px 7px 22px;border-radius:7px;cursor:pointer;display:flex;justify-content:space-between;font-size:13px}.mproj.on{color:var(--acc);background:var(--panel)}.mproj:hover{background:var(--panel)}
+.m{color:var(--mute);font-size:12px}.mhd{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}.mhd h2{margin:2px 0 0;font-size:20px}
+.mbar{flex:1;min-width:120px;height:6px;background:var(--panel);border-radius:4px;overflow:hidden}.mbar i{display:block;height:100%;background:var(--ok)}
+.mtask{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:7px}.mtask.od{border-color:rgba(255,90,95,.45)}
+.mtask.done .mtn b{text-decoration:line-through;opacity:.55}.mtn{flex:1;min-width:140px}.mtask input[type=checkbox]{width:18px;height:18px}
+.mtask input:not([type]),.madd input{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:5px 8px;font:inherit;width:130px}
+.mt1{display:flex;gap:10px;align-items:flex-start}.mt1 .mtn{flex:1;min-width:0;padding-top:1px}.mt1 .mtn b{font-weight:600}
+.mt2{display:flex;gap:6px;margin:8px 0 0 28px;flex-wrap:wrap}.mt2 select,.mt2 input{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:4px 8px;font:inherit;font-size:12px;height:28px}
+.mt2 input[data-mf=owner]{flex:1;min-width:90px}.mt2 input[type=date]{width:140px;color-scheme:dark}.mt2 input.late{border-color:var(--red);color:var(--red)}.mt3{margin:6px 0 0 28px}
+.mi{padding:2px 7px;font-size:12px;line-height:18px}.mt1 input[type=checkbox]{width:18px;height:18px;margin-top:1px;flex:none}
+.st-Done{color:var(--ok)!important}.st-InProgress{color:var(--acc)!important}.st-Waiting{color:var(--amber)!important}
+.mprog{display:flex;align-items:center;gap:10px;margin:6px 0 4px}.mprog .mbar{width:160px}
+#dr .madd input{height:32px}
+.madd{display:flex;gap:6px;margin-top:10px}.madd input{flex:1;width:auto}.mx{color:var(--mute)}a.b{text-decoration:none}
+@media(max-width:700px){.mgrid{grid-template-columns:1fr}.mgrid aside{border-right:0;border-bottom:1px solid var(--line)}.mtask{flex-wrap:wrap}}
 .wsbox{text-align:center;max-width:560px;padding:24px}.wslogo{width:200px;max-width:70%;height:auto;margin-bottom:16px}.wst{font-size:18px;font-weight:600;margin-bottom:18px}
 .wscards{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wscard{background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:22px 16px;color:var(--text);font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:6px;text-align:left}
 .wscard:hover{border-color:var(--acc)}.wscard b{font-size:15px}.wscard span{font-size:12px;color:var(--mute)}.wsbtn{font-size:12px;padding:3px 9px;margin-left:8px}
@@ -602,12 +625,22 @@ function calHtml(big){calInit();var all=big?UI.calAll:false,mm=calMeet(all),dm=(
 function renderCal(v){v.innerHTML='<div class="bar"><button class="chip'+(UI.calAll?' on':'')+'" data-calall>Everyone\'s meetings</button><button class="chip'+(UI.calTasks?' on':'')+'" data-caltasks>Task due dates</button></div><div class="pane">'+calHtml(true)+'</div>'}
 
 /* ---------- Dashboard: my tasks + my meetings calendar ---------- */
-function renderDash(v){var mt=D.tasks.filter(vis).filter(mine),g=buckets(mt),ks=Object.keys(g).filter(function(k){return g[k].length});
-  var left='<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s tasks":'All tasks')+'</b><span class="m">'+mt.length+' open · '+g.Overdue.length+' overdue</span></div>'+
-    (ks.length?ks.map(function(k){return'<h3>'+k+' ('+g[k].length+')</h3>'+g[k].map(taskHtml).join('')}).join(''):'<div class="empty">No open tasks.</div>')+'</div>';
-  v.innerHTML='<div class="dash">'+left+'<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s meetings":'Meetings')+'</b></div>'+calHtml(false)+'</div></div>'}
+function renderDash(v){
+  var pt=D?D.tasks.filter(vis).filter(mine).map(function(t){t._ws='plus';return t}):[],
+    mt=MUS?MUS.tasks.filter(function(t){return t.status!=='Done'&&(!who||has(t.owner,who))}).map(function(t){t._ws='music';return t}):[],
+    f=UI.dws||'all',all=(f==='music'?[]:pt).concat(f==='plus'?[]:mt),g=buckets(all),ks=Object.keys(g).filter(function(k){return g[k].length}),
+    row=function(t){return t._ws==='music'?mDashRow(t):taskHtml(t).replace('<div class="n">','<div class="n"><span class="wtag">Plus</span>')},
+    seg='<span class="seg">'+[['all','All'],['plus','Plus'],['music','Music']].map(function(x){return'<button class="chip'+(f===x[0]?' on':'')+'" data-dws="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</span>';
+  var left='<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s tasks":'All tasks')+'</b><span class="m">'+all.length+' open · '+g.Overdue.length+' overdue</span>'+seg+'</div>'+
+    (!D||!MUS?'<div class="m" style="padding:4px 2px">Loading '+(!D?'INNRVZN Plus':'INNRVZN Music')+'…</div>':'')+
+    (ks.length?ks.map(function(k){return'<h3>'+k+' ('+g[k].length+')</h3>'+g[k].map(row).join('')}).join(''):'<div class="empty">No open tasks.</div>')+'</div>';
+  v.innerHTML='<div class="dash">'+left+'<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s meetings":'Meetings')+'</b></div>'+(D?calHtml(false):'<div class="empty">Loading…</div>')+'</div></div>'}
+function mDashRow(t){var d=parseDue(t.due),od=d&&d<today();
+  return'<div class="t mtask'+(od?' od':'')+'" data-row="'+t.row+'" data-task="'+esc(t.task)+'"><input type="checkbox" data-mf="done" title="Complete"><div class="n"><span class="wtag mus">Music</span><span class="tn" data-mp="'+esc(t.artist)+'\u0001'+esc(t.project)+'" style="cursor:pointer">'+esc(t.task)+'</span>'+
+    '<div class="m">'+esc(t.artist)+' · '+esc(t.project)+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-dws]');if(!b)return;UI.dws=b.dataset.dws;render()});
 function setTone(){var p=(view==='tasks'&&UI.pmeProj)||(view==='clients'&&UI.pmeNet),r=document.documentElement;if(p!==(r.getAttribute('data-mode')==='pme')){if(p)r.setAttribute('data-mode','pme');else r.removeAttribute('data-mode');applyBD()}}
-function render(){setTone();var v=document.getElementById('v');if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
+function render(){setTone();var v=document.getElementById('v');if(view==='dash')return renderDash(v);if(WS==='music')return view==='more'?renderMore(v):renderMusic(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
   if(view==='clients')renderNet(v);else if(view==='tasks')renderProjects(v);else if(view==='cal')renderCal(v);else if(view==='dev')renderDev(v);else if(view==='more')renderMore(v);else renderDash(v)}
 var BL=null;
 function blHtml(){var out=[],open=0,done=0;BL.split('\n').forEach(function(l,i){var m=l.match(/^- \[( |x)\] (.*)$/i);
@@ -691,13 +724,13 @@ function parseQA(s){var o={task:'',owner:'',forName:'',due:''},words=[];
     if(e.key==='ArrowDown'){e.preventDefault();sel=(sel+1)%items.length;upd()}else if(e.key==='ArrowUp'){e.preventDefault();sel=(sel-1+items.length)%items.length;upd()}
     else if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();pick(sel)}else if(e.key==='Escape'){e.preventDefault();close()}},true);
   box.addEventListener('mousedown',function(e){var d=e.target.closest('[data-i]');if(d){e.preventDefault();pick(+d.dataset.i)}})})();
-document.getElementById('qa').onsubmit=function(e){e.preventDefault();var i=document.getElementById('qi');if(!i.value.trim()||!D)return;
+document.getElementById('qa').onsubmit=function(e){e.preventDefault();if(WS==='music')return;var i=document.getElementById('qi');if(!i.value.trim()||!D)return;
   try{var o=parseQA(i.value)}catch(err){toast(err.message);return}if(!o.task){toast('Task name missing');return}
   run('addTask',o).then(function(){toast('Added: '+o.task+(o.owner?' → '+o.owner:'')+(o.due?' · '+fmt(parseDue(o.due)):''));i.value='';load()}).catch(function(e){toast(e.message)})};
 document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.getElementById('qi').focus()}});
-document.querySelector('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;view=b.dataset.v;Q='';closeDr();[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});render()};
+document.querySelector('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;view=b.dataset.v;Q='';closeDr();MDR=null;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});render()};
 document.getElementById('who').onchange=function(){who=this.value;try{localStorage.setItem('ta_who',who)}catch(e){}render()};
-document.getElementById('rf').onclick=function(){load(true)};
+document.getElementById('rf').onclick=function(){if(WS!=='plus')musLoad();if(WS!=='music')load(true)};
 function navClick(e){var nb=e.target.closest('[data-new]');if(nb){newRecord(nb.dataset.new,nb.dataset.t,nb.dataset.date?{D:nb.dataset.date}:(nb.dataset.for?{D:nb.dataset.for}:(nb.dataset.new==='TASKS'?{}:null)));return true}
   var og=e.target.closest('[data-orph]');if(og){orphDr();return true}
   var tk=e.target.closest('[data-task]');if(tk){taskDr(+tk.dataset.task);return true}
@@ -777,23 +810,118 @@ function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 function hideSplash(){if(__sp)return;__sp=true;if(__vd)fadeSplash();else __go=fadeSplash}
 /* Workspaces: INNRVZN Plus = this tracker sheet. INNRVZN Music = placeholder until its sheet exists.
    The choice is remembered (Python side, workspace.json); the header button switches. */
-var WS='',WSN={plus:'INNRVZN Plus',music:'INNRVZN Music'};
+var WS='',WSN={dash:'Dashboard',music:'INNRVZN Music',plus:'INNRVZN Plus'};
 function wsLabel(){var b=document.getElementById('wsbtn');if(b)b.innerHTML=esc(WSN[WS]||'Workspace')+' <span style="opacity:.6">▾</span>'}
 function showPicker(){if(document.getElementById('splash')){setTimeout(showPicker,150);return} /* only once the splash is gone */
   var o=document.getElementById('wsp');if(!o){o=document.createElement('div');o.id='wsp';document.body.appendChild(o)}
   o.innerHTML='<div class="wsbox"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="wst">Choose a workspace</div><div class="wscards">'+
+    '<button class="wscard" data-ws="dash"><b>Dashboard</b><span>Your tasks across Plus and Music</span></button>'+
     '<button class="wscard" data-ws="plus"><b>INNRVZN Plus</b><span>Campaigns, network, tasks and CRM</span></button>'+
-    '<button class="wscard" data-ws="music"><b>INNRVZN Music</b><span>Coming soon</span></button></div></div>';o.style.display='flex'}
+    '<button class="wscard" data-ws="music"><b>INNRVZN Music</b><span>Artists, projects and tasks</span></button></div></div>';o.style.display='flex'}
 function enterWS(ws){WS=ws;wsLabel();var o=document.getElementById('wsp');if(o)o.style.display='none';var m=document.getElementById('wsm');
   if(ws==='music'&&document.getElementById('splash')){setTimeout(function(){enterWS(ws)},150);return Promise.resolve()}
-  if(ws==='music'){if(!m){m=document.createElement('div');m.id='wsm';document.body.appendChild(m)}
-    m.innerHTML='<div class="wsbox"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="wst">INNRVZN Music</div><p class="m">This workspace is not set up yet. It will open here once its Google Sheet exists.</p><button class="b" data-wsswitch="1">Switch workspace</button></div>';m.style.display='flex';return Promise.resolve()}
-  if(m)m.style.display='none';render();return load()}
-document.addEventListener('click',function(e){var c=e.target.closest('[data-ws]');if(c){run('setWorkspace',c.dataset.ws).catch(function(){});enterWS(c.dataset.ws);return}
-  if(e.target.closest('[data-wsswitch]')||e.target.closest('#wsbtn')){run('setWorkspace','').catch(function(){});var m=document.getElementById('wsm');if(m)m.style.display='none';showPicker()}});
+  if(m)m.style.display='none';closeDr();MDR=null;Q='';
+  var n=document.querySelector('nav');n.style.display=ws==='dash'?'none':'';
+  if(ws==='dash'){view='dash';render();musLoad();return load()}
+  if(ws==='music'){musNav(true);render();return musLoad()}
+  musNav(false);render();return load()}
+document.addEventListener('click',function(e){var c=e.target.closest('[data-ws]');if(c){var dd0=document.getElementById('wsdd');if(dd0)dd0.style.display='none';run('setWorkspace',c.dataset.ws).catch(function(){});enterWS(c.dataset.ws);return}
+  if(e.target.closest('#wsbtn')){var dd=document.getElementById('wsdd');if(!dd){dd=document.createElement('div');dd.id='wsdd';document.body.appendChild(dd)}
+    if(dd.style.display==='block'){dd.style.display='none';return}var r=e.target.closest('#wsbtn').getBoundingClientRect();dd.style.left=r.left+'px';dd.style.top=(r.bottom+6)+'px';
+    dd.innerHTML=['dash','music','plus'].map(function(k){return'<button data-ws="'+k+'"'+(k===WS?' class="on"':'')+'>'+WSN[k]+'</button>'}).join('');dd.style.display='block';return}
+  var dd2=document.getElementById('wsdd');if(dd2)dd2.style.display='none';
+  if(e.target.closest('[data-wsswitch]')){run('setWorkspace','').catch(function(){});var m=document.getElementById('wsm');if(m)m.style.display='none';showPicker()}});
+/* ---------- INNRVZN Music: same shell as Plus (nav, table rows, drawer). Sheet: INNRVZN Music Tracker (ARTISTS, PROJECTS = one row per task) ---------- */
+var MUS=null,MST=['Not started','In progress','Waiting','Done'],PLUSNAV='',MDR=null;
+var MUSNAV=[['mproj','i-projects','Projects'],['mart','i-network','Artists'],['more','i-more','More']];
+function musNav(on){var n=document.querySelector('nav');if(!PLUSNAV)PLUSNAV=n.innerHTML;
+  if(!on){n.innerHTML=PLUSNAV.replace(/<button data-v="dash"[\s\S]*?<\/button>/,'');view='tasks';[].forEach.call(n.children,function(x){x.classList.toggle('on',x.dataset.v==='tasks')});document.getElementById('qi').placeholder='Add a task: Review deck #Project @Ashley wed   (Ctrl+K)';return}
+  view='mproj';n.innerHTML=MUSNAV.map(function(x){return'<button data-v="'+x[0]+'"'+(x[0]===view?' class="on"':'')+'><svg class="ic" viewBox="0 0 24 24"><use href="#'+x[1]+'"/></svg><span>'+x[2]+'</span></button>'}).join('');
+  document.getElementById('qi').placeholder='Add a task: Shoot BTS #Feel Like Roll-out @Ashley dec 5   (Ctrl+K)'}
+function musLoad(){document.getElementById('rf').textContent='…';
+  return run('musicData').then(function(d){MUS=d;document.getElementById('rf').textContent='↻';if(WS==='music'||view==='dash'){render();if(MDR)musReDr()}})
+    .catch(function(e){document.getElementById('rf').textContent='↻';if(WS!=='music'){MUS={artists:[],tasks:[],url:''};if(view==='dash')render();return}if(WS==='music')document.getElementById('v').innerHTML='<div class="empty">Could not load the Music sheet: '+esc(e&&e.message||e)+'</div>'})}
+function mProjects(){var o={};MUS.tasks.forEach(function(t){var k=t.artist+'\u0001'+t.project;(o[k]=o[k]||{artist:t.artist,name:t.project,tasks:[]}).tasks.push(t)});
+  return Object.keys(o).map(function(k){var p=o[k],open=p.tasks.filter(function(t){return t.status!=='Done'});p.done=p.tasks.length-open.length;p.open=open;
+    p.status=!open.length?'Done':p.tasks.some(function(t){return t.status!=='Not started'})?'In progress':'Not started';
+    var due=open.map(function(t){return{t:t,d:parseDue(t.due)}}).filter(function(x){return x.d}).sort(function(a,b){return a.d-b.d})[0];p.next=due||null;
+    p.od=open.some(function(t){var d=parseDue(t.due);return d&&d<today()});p.h=p.od?'r':!open.length?'g':p.next?'g':'a';return p})}
+function mDue(t){var d=parseDue(t.due);return d?'<span class="m"'+(t.status!=='Done'&&d<today()?' style="color:var(--red)"':'')+'>'+fmt(d)+'</span>':'<span class="m">—</span>'}
+function mBar(p){var pc=p.tasks.length?Math.round(p.done*100/p.tasks.length):0;return'<span class="mbar"><i style="width:'+pc+'%"></i></span>'}
+function renderMusic(v){if(!MUS){v.innerHTML='<div class="empty">Loading INNRVZN Music…</div>';return}
+  var ps=mProjects(),q=(Q||'').toLowerCase(),me=who;
+  if(view==='mart'){var rows=MUS.artists.filter(function(a){return!q||a.name.toLowerCase().indexOf(q)>-1}).map(function(a){var mine=ps.filter(function(p){return p.artist===a.name}),op=0;mine.forEach(function(p){op+=p.open.length});
+      return'<div class="prow mu" data-mart="'+esc(a.name)+'"><span class="dot '+(mine.some(function(p){return p.od})?'r':'g')+'"></span><span><b>'+esc(a.name)+'</b></span><span class="stat">'+esc(a.status||'—')+'</span><span>'+mine.length+' project'+(mine.length===1?'':'s')+'</span><span>'+op+' open</span><span class="m">'+esc(a.contact||'')+'</span></div>'}).join('');
+    v.innerHTML=searchBar('Search artists…')+'<div class="bar"><button class="b newb" data-mnew="artist">+ Artist</button></div><div class="sum"><b>'+MUS.artists.length+'</b> artists</div>'+
+      '<div class="tbl"><div><div class="ph mu"><span></span><span>Artist</span><span>Status</span><span>Projects</span><span>Open tasks</span><span>Contact</span></div>'+(rows||'<div class="empty">No artists yet.</div>')+'</div></div>';return}
+  if(view==='mdash'){var open=MUS.tasks.filter(function(t){return t.status!=='Done'&&(!me||has(t.owner,me))}),
+      late=open.filter(function(t){var d=parseDue(t.due);return d&&d<today()}),soon=open.filter(function(t){var d=parseDue(t.due);return d&&d>=today()&&d<=+today()+7*864e5}),
+      nod=open.filter(function(t){return!parseDue(t.due)});
+    function sec(h,ts){return ts.length?'<h3>'+h+' ('+ts.length+')</h3>'+ts.map(mTaskRow).join(''):''}
+    v.innerHTML='<div class="sum"><b>'+open.length+'</b> open tasks'+(me?' for '+esc(me):'')+' · <b>'+late.length+'</b> overdue · <b>'+ps.filter(function(p){return p.status!=='Done'}).length+'</b> active projects</div>'+
+      '<div style="max-width:980px">'+(sec('Overdue',late)+sec('Due this week',soon)+sec('No due date',nod)||'<div class="empty">Nothing open. Add a task above.</div>')+'</div>';return}
+  var rows=ps.filter(function(p){return!q||(p.name+' '+p.artist).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.status==='Done')-(b.status==='Done')||a.artist.localeCompare(b.artist)||a.name.localeCompare(b.name)});
+  v.innerHTML=searchBar('Search projects…')+'<div class="bar"><button class="b newb" data-mnew="project">+ Project</button></div>'+
+    '<div class="sum"><b>'+rows.length+'</b> projects · <b>'+rows.filter(function(p){return p.od}).length+'</b> with overdue tasks</div>'+
+    '<div class="tbl"><div><div class="ph mp"><span></span><span>Project</span><span>Artist</span><span>Status</span><span>Progress</span><span>Open tasks</span><span>Next up</span></div>'+
+    (rows.map(function(p){return'<div class="prow mp" data-mp="'+esc(p.artist)+'\u0001'+esc(p.name)+'"><span class="dot '+p.h+'"></span><span><b>'+esc(p.name)+'</b></span><span>'+esc(p.artist)+'</span><span class="stat">'+p.status+'</span><span>'+mBar(p)+' <span class="m">'+p.done+'/'+p.tasks.length+'</span></span><span>'+p.open.length+'</span><span class="m">'+(p.next?esc(p.next.t.task)+' · '+fmt(p.next.d):'—')+'</span></div>'}).join('')||'<div class="empty">No projects yet.</div>')+'</div></div>'}
+function mTaskRow(t,inDr){var d=parseDue(t.due),od=t.status!=='Done'&&d&&d<today(),iso=d?d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2):'';
+  return'<div class="mtask'+(t.status==='Done'?' done':'')+(od?' od':'')+'" data-row="'+t.row+'" data-task="'+esc(t.task)+'">'+
+    '<div class="mt1"><input type="checkbox" data-mf="done"'+(t.status==='Done'?' checked':'')+' title="Done"><div class="mtn"><b>'+esc(t.task)+'</b>'+(inDr?'':'<div class="m">'+esc(t.artist)+' · '+esc(t.project)+'</div>')+'</div>'+
+    (t.link?'<button class="b mi" data-url="'+esc(t.link)+'" title="Open link">↗</button>':'')+'<button class="b mi mx" data-mdel="1" title="Delete task">✕</button></div>'+
+    '<div class="mt2"><select data-mf="status" class="st-'+t.status.replace(/\s/g,'')+'">'+MST.map(function(s){return'<option'+(s===t.status?' selected':'')+'>'+s+'</option>'}).join('')+'</select>'+
+    '<input data-mf="owner" placeholder="Owner" value="'+esc(t.owner)+'"><input type="date" data-mf="due" value="'+iso+'"'+(od?' class="late"':'')+'></div>'+
+    (t.notes?'<div class="m mt3">'+esc(t.notes)+'</div>':'')+'</div>'}
+function musReDr(){if(MDR.k==='p')mProjDr(MDR.a,MDR.p);else mArtDr(MDR.a)}
+function mProjDr(a,p){MDR={k:'p',a:a,p:p};var ts=MUS.tasks.filter(function(t){return t.artist===a&&t.project===p}),dn=ts.filter(function(t){return t.status==='Done'}).length;
+  openDr('<div style="color:var(--mute);font-size:12px">'+esc(a)+'</div><h2>'+esc(p)+'</h2><div class="mprog">'+mBar({done:dn,tasks:ts})+'<span class="m">'+dn+' of '+ts.length+' done</span></div>'+
+    '<h3>Tasks</h3>'+ts.map(function(t){return mTaskRow(t,1)}).join('')+'<form class="madd" data-madd="task"><input name="t" placeholder="Add a task…"><button class="b">Add</button></form>')}
+function mArtDr(a){MDR={k:'a',a:a};var ps=mProjects().filter(function(p){return p.artist===a});
+  openDr('<div style="color:var(--mute);font-size:12px">Artist</div><h2>'+esc(a)+'</h2><h3>Projects ('+ps.length+')</h3>'+
+    (ps.map(function(p){return'<div class="prow mq" data-mp="'+esc(p.artist)+'\u0001'+esc(p.name)+'"><span class="dot '+p.h+'"></span><span><b>'+esc(p.name)+'</b></span><span>'+mBar(p)+' <span class="m">'+p.done+'/'+p.tasks.length+'</span></span></div>'}).join('')||'<div class="m">No projects yet.</div>')+
+    '<form class="madd" data-madd="project"><input name="t" placeholder="New project for '+esc(a)+'…"><button class="b">Add</button></form>')}
+function mWhen(w){w=w.toLowerCase();var t=today();if(w==='today')return t;if(w==='tomorrow'){t.setDate(t.getDate()+1);return t}
+  var k=['sun','mon','tue','wed','thu','fri','sat'].indexOf(w);if(k>-1){t.setDate(t.getDate()+((k-t.getDay()+7)%7||7));return t}return parseDue(w)}
+function musErr(e){toast(String(e&&e.message||e));musLoad()}
+function mAskProject(a,name){var first=prompt('First task for "'+name+'":','');if(!first)return;run('musicAddTask',a,name,first,'','').then(function(){musLoad().then(function(){mProjDr(a,name)})},musErr)}
+document.addEventListener('click',function(e){var x;if((x=e.target.closest('[data-mp]'))&&MUS){var k=x.dataset.mp.split('\u0001');mProjDr(k[0],k[1]);return}if(WS!=='music')return;
+  if((x=e.target.closest('[data-mp]'))){var k=x.dataset.mp.split('\u0001');mProjDr(k[0],k[1])}
+  else if((x=e.target.closest('[data-mart]')))mArtDr(x.dataset.mart);
+  else if((x=e.target.closest('[data-mnew]'))){if(x.dataset.mnew==='artist'){var n=prompt('Artist name:','');if(n)run('musicAddArtist',n).then(musLoad,musErr)}
+    else{var a=prompt('Artist ('+MUS.artists.map(function(a){return a.name}).join(', ')+'):',MUS.artists[0]?MUS.artists[0].name:'');if(!a)return;
+      var m=MUS.artists.filter(function(z){return z.name.toLowerCase()===a.trim().toLowerCase()})[0];if(!m)return toast('Add '+a+' under Artists first');var p=prompt('Project name:','');if(p)mAskProject(m.name,p.trim())}}
+  else if((x=e.target.closest('[data-mdel]'))){var r=x.closest('.mtask');if(confirm('Delete "'+r.dataset.task+'"?'))run('musicDelTask',+r.dataset.row,r.dataset.task).then(musLoad,musErr)}});
+document.addEventListener('change',function(e){var f=e.target.dataset&&e.target.dataset.mf,r=e.target.closest('.mtask');if(!f||!r)return;
+  var fld=f,val=e.target.value;if(f==='done'){fld='status';val=e.target.checked?'Done':'In progress'}
+  run('musicSet',+r.dataset.row,r.dataset.task,fld,val).then(function(){toast('Saved');musLoad()},musErr)},true);
+document.addEventListener('submit',function(e){var f=e.target.closest('[data-madd]');if(!f||WS!=='music')return;e.preventDefault();var v=f.t.value.trim();if(!v||!MDR)return;
+  if(f.dataset.madd==='project')mAskProject(MDR.a,v);else run('musicAddTask',MDR.a,MDR.p,v,'','').then(musLoad,musErr)},true);
+/* quick-add bar in Music: "task #Project @Owner due" */
+document.getElementById('qa').addEventListener('submit',function(e){if(WS!=='music')return;e.preventDefault();e.stopImmediatePropagation();var i=document.getElementById('qi'),s=i.value.trim();if(!s||!MUS)return;
+  var ps=mProjects().sort(function(a,b){return b.name.length-a.name.length}),p=ps.filter(function(p){return s.toLowerCase().indexOf('#'+p.name.toLowerCase())>-1})[0];
+  if(!p&&MDR&&MDR.k==='p')p={artist:MDR.a,name:MDR.p};if(!p)return toast('Add #Project to say where the task goes');
+  s=s.replace(new RegExp('#'+p.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'');var o=(s.match(/@(\S+)/)||[])[1]||'';s=s.replace(/@\S+/,'');
+  var dm=s.match(/\b(today|tomorrow|mon|tue|wed|thu|fri|sat|sun|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* \d{1,2})\s*$/i),due='';if(dm){var d=mWhen(dm[1]);if(d){due=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);s=s.slice(0,dm.index)}}
+  s=s.replace(/\s+/g,' ').trim();if(!s)return toast('Task name missing');
+  run('musicAddTask',p.artist,p.name,s,o,due).then(function(){toast('Added to '+p.name);i.value='';musLoad()},musErr)},true);
+/* ---------- sign-in screen (desktop). Google's own consent page must open in the browser: Google blocks it inside app windows. ---------- */
+function showLogin(msg){var o=document.getElementById('login');if(!o){o=document.createElement('div');o.id='login';document.body.appendChild(o)}
+  o.innerHTML='<div class="wsbox"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="wst">Sign in to INNRVZN Seer</div>'+
+    '<p class="m" style="margin:-6px 0 18px">Use your INNRVZN Google account. Google asks for permission in your browser once, then you come straight back here.</p>'+
+    '<button class="b gbtn" data-signin><b>G</b> Sign in with Google</button><p class="m" id="lgmsg" style="margin-top:14px;min-height:18px">'+esc(msg||'')+'</p></div>';o.style.display='flex'}
+function startApp(){var o=document.getElementById('login');if(o)o.style.display='none';
+  return run('getWorkspace').catch(function(){return'plus'}).then(function(ws){if(ws==='plus'||ws==='music'||ws==='dash')return enterWS(ws);showPicker()})}
+document.addEventListener('click',function(e){
+  if(e.target.closest('[data-signin]')){var b=e.target.closest('[data-signin]');b.disabled=true;document.getElementById('lgmsg').textContent='Finish signing in on the Google page that just opened in your browser…';
+    run('signIn').then(function(r){toast('Signed in'+(r.email?' as '+r.email:''));startApp()}).catch(function(err){b.disabled=false;document.getElementById('lgmsg').textContent=String(err&&err.message||err)})}
+  else if(e.target.closest('[data-signout]')){if(!confirm('Sign out of INNRVZN Seer on this computer?'))return;run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin('Signed out.')})}
+  else if(e.target.closest('[data-switchacct]')){run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin();document.querySelector('[data-signin]').click()})}});
+var _renderMore=renderMore;renderMore=function(v){_renderMore(v);if(!window.pywebview)return;run('authStatus').then(function(a){if(!a.ok||view!=='more')return;
+  v.insertAdjacentHTML('afterbegin','<div class="card acct"><div><div class="m">Signed in as</div><b>'+esc(a.email||'Google account')+'</b></div><span style="flex:1"></span><button class="b" data-switchacct>Switch account</button><button class="b delb" data-signout>Sign out</button></div>')})};
 render();
-run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
+run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
+if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
   if(ws==='plus'||ws==='music')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
-setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus')load()},60000);
+setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash')load()},60000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script><script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>
