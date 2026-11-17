@@ -774,7 +774,7 @@
     return { ok: true };
   }
   async function labelAddStat(acode, metric, value, release, date, source, song) {
-    if (['Monthly listeners', 'Followers', 'Streams', 'Listeners'].indexOf(metric) === -1) throw new Error('Unknown metric.');
+    if (['Monthly listeners', 'Followers', 'Streams', 'Listeners', 'TikTok creates'].indexOf(metric) === -1) throw new Error('Unknown metric.');
     var n = parseFloat(String(value).replace(/,/g, '')); if (isNaN(n)) throw new Error('The value must be a number.');
     var x = await lArtist_(acode);
     await sAppend_(LABEL_ID, 'STATS!A:H', [[date || dateNow(), acode, x.a.name, release || '', metric, n, source || 'Entered in Seer', song || '']]);
