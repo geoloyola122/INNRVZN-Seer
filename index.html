@@ -967,7 +967,7 @@ function lArtDr(code){var a=lArt(code);LDR={k:'a',code:code};var sg=LBL.songs.fi
     names=rl.map(function(r){return r.release}),loose=sg.filter(function(x){return!x.release||names.indexOf(x.release)<0});
   function srow(x,sub){return'<div class="prow mq'+(sub?' lsub':'')+'" data-lsong="'+x.row+'"><span class="dot '+lDot(x.status)+'"></span><span>'+esc(x.song)+'</span><span class="stat">'+esc(x.status)+'</span></div>'}
   openDr('<div style="color:var(--mute);font-size:12px">Artist <span class="lcode">'+esc(a.code)+'</span></div><h2>'+esc(a.name)+'</h2>'+
-    '<div class="bar" style="margin:6px 0">'+(/^https?:/i.test(a.folder||'')?'<button class="b" data-url="'+esc(a.folder)+'">Open Drive folder ↗</button>':'<span class="m">No Drive folder linked yet.</span>')+'</div>'+
+    '<div class="bar" style="margin:6px 0">'+(/^https?:/i.test(a.folder||'')?'<button class="b" data-url="'+esc(a.folder)+'">Open Drive folder ↗</button>':'<span class="m">No Drive folder linked yet.</span>')+(/^https?:/i.test(a.spotify||'')?'<button class="b" data-url="'+esc(a.spotify)+'">Spotify ↗</button>':'')+'</div>'+
     (a.contact?'<div class="m">Contact: '+esc(a.contact)+'</div>':'')+(a.notes?'<div class="m">'+esc(a.notes)+'</div>':'')+
     '<h3>Songs & releases ('+(rl.length+loose.length)+')</h3>'+
     rl.map(function(r){var st=lRelStats(r);return'<div class="prow mq" data-lrel="'+r.row+'"><span class="dot '+lDot(r.status)+'"></span><span><b>'+esc(r.release)+'</b> <span class="m">'+esc(r.type)+'</span></span><span>'+mBar({done:st.done,tasks:{length:st.total}})+' <span class="m">'+st.done+'/'+st.total+'</span></span></div>'+st.songs.map(function(x){return srow(x,1)}).join('')}).join('')+

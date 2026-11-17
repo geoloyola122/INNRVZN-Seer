@@ -713,11 +713,11 @@
   var LABEL_ASSET_TEMPLATE = [['Song Master', 'Highest quality export'], ['Cover Art', 'Cover artwork, 3000x3000px, 300dpi'],
     ['Spotify Canvas', '9x16, 7 second clip'], ['Metadata', ''], ['Split Sheet', 'A signed document to protect all parties']];
   var LABEL_EP_EXTRA = [['Brand Book', ''], ['Press Kit', '']];
-  var LABEL_ART_KEYS = ['code', 'name', 'status', 'contact', 'folder', 'notes'];
+  var LABEL_ART_KEYS = ['code', 'name', 'status', 'contact', 'folder', 'notes', 'spotify'];
   function colLetter_(n) { return String.fromCharCode(64 + n); }
   async function labelData() {
     var names = Object.keys(LABEL_TABS);
-    var res = await Promise.all([sv_(LABEL_ID, 'ARTISTS!A2:F')].concat(names.map(function (k) { var t = LABEL_TABS[k]; return sv_(LABEL_ID, t[0] + '!A2:' + colLetter_(t[1].length)); })));
+    var res = await Promise.all([sv_(LABEL_ID, 'ARTISTS!A2:G')].concat(names.map(function (k) { var t = LABEL_TABS[k]; return sv_(LABEL_ID, t[0] + '!A2:' + colLetter_(t[1].length)); })));
     var arts = [];
     res[0].forEach(function (r, i) { if (r && String(r[0] || '').trim()) { var o = zip_(LABEL_ART_KEYS, r); o.row = i + 2; arts.push(o); } });
     var out = { artists: arts, url: 'https://docs.google.com/spreadsheets/d/' + LABEL_ID + '/edit' };
