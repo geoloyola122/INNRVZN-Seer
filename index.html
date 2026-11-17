@@ -229,7 +229,7 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 .gbtn{font-size:15px;padding:10px 18px;border-radius:10px}.gbtn b{color:var(--acc);margin-right:8px}.card.acct{display:flex;gap:8px;align-items:center;padding:12px 16px;margin-bottom:12px;max-width:820px}
 .wtag{font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-right:6px;color:var(--mute);vertical-align:1px}.wtag.mus{color:var(--acc);border-color:var(--acc)}
 .ph.mp,.prow.mp{grid-template-columns:18px minmax(170px,2fr) minmax(110px,1fr) 110px 160px 90px minmax(150px,1.6fr)}.ph.mu,.prow.mu{grid-template-columns:18px minmax(170px,2fr) 100px 110px 100px minmax(120px,1fr)}.prow.mq{grid-template-columns:18px 1fr 150px}
-.mbar{display:inline-block;vertical-align:middle;width:90px;flex:none}.mgrid{display:grid;grid-template-columns:260px 1fr;flex:1}.mgrid aside{border-right:1px solid var(--line);padding:12px}.mgrid main{padding:18px 22px;max-width:980px}
+.ph.ls,.prow.ls{grid-template-columns:18px minmax(170px,2fr) minmax(130px,1fr) minmax(110px,1fr) 110px 90px}.ph.lr,.prow.lr{grid-template-columns:18px minmax(170px,2fr) minmax(130px,1fr) 70px 110px 110px 150px}.ph.la,.prow.la{grid-template-columns:18px 84px minmax(170px,2fr) 100px 80px 80px minmax(120px,1fr)}.lf{display:grid;grid-template-columns:120px 1fr auto;gap:8px;align-items:center;margin:6px 0}.lf label{color:var(--mute);font-size:12px}.lf input,.lf select{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:5px 8px;font:inherit;min-width:0}.lcode{font-size:11px;letter-spacing:.06em;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:0 6px}.mbar{display:inline-block;vertical-align:middle;width:90px;flex:none}.mgrid{display:grid;grid-template-columns:260px 1fr;flex:1}.mgrid aside{border-right:1px solid var(--line);padding:12px}.mgrid main{padding:18px 22px;max-width:980px}
 .mart{padding:9px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-top:4px}.mart.on,.mart:hover{background:var(--panel)}
 .mproj{padding:7px 10px 7px 22px;border-radius:7px;cursor:pointer;display:flex;justify-content:space-between;font-size:13px}.mproj.on{color:var(--acc);background:var(--panel)}.mproj:hover{background:var(--panel)}
 .m{color:var(--mute);font-size:12px}.mhd{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}.mhd h2{margin:2px 0 0;font-size:20px}
@@ -640,7 +640,7 @@ function mDashRow(t){var d=parseDue(t.due),od=d&&d<today();
     '<div class="m">'+esc(t.artist)+' · '+esc(t.project)+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-dws]');if(!b)return;UI.dws=b.dataset.dws;render()});
 function setTone(){var p=(view==='tasks'&&UI.pmeProj)||(view==='clients'&&UI.pmeNet),r=document.documentElement;if(p!==(r.getAttribute('data-mode')==='pme')){if(p)r.setAttribute('data-mode','pme');else r.removeAttribute('data-mode');applyBD()}}
-function render(){setTone();var v=document.getElementById('v');if(view==='dash')return renderDash(v);if(WS==='music')return view==='more'?renderMore(v):renderMusic(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
+function render(){setTone();var v=document.getElementById('v');if(view==='dash')return renderDash(v);if(WS==='music')return view==='more'?renderMore(v):renderMusic(v);if(WS==='label')return view==='more'?renderMore(v):renderLabel(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
   if(view==='clients')renderNet(v);else if(view==='tasks')renderProjects(v);else if(view==='cal')renderCal(v);else if(view==='dev')renderDev(v);else if(view==='more')renderMore(v);else renderDash(v)}
 var BL=null;
 function blHtml(){var out=[],open=0,done=0;BL.split('\n').forEach(function(l,i){var m=l.match(/^- \[( |x)\] (.*)$/i);
@@ -728,9 +728,9 @@ document.getElementById('qa').onsubmit=function(e){e.preventDefault();if(WS==='m
   try{var o=parseQA(i.value)}catch(err){toast(err.message);return}if(!o.task){toast('Task name missing');return}
   run('addTask',o).then(function(){toast('Added: '+o.task+(o.owner?' → '+o.owner:'')+(o.due?' · '+fmt(parseDue(o.due)):''));i.value='';load()}).catch(function(e){toast(e.message)})};
 document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.getElementById('qi').focus()}});
-document.querySelector('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;view=b.dataset.v;Q='';closeDr();MDR=null;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});render()};
+document.querySelector('nav').onclick=function(e){var b=e.target.closest('button');if(!b)return;view=b.dataset.v;Q='';closeDr();MDR=null;LDR=null;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b)});render()};
 document.getElementById('who').onchange=function(){who=this.value;try{localStorage.setItem('ta_who',who)}catch(e){}render()};
-document.getElementById('rf').onclick=function(){if(WS!=='plus')musLoad();if(WS!=='music')load(true)};
+document.getElementById('rf').onclick=function(){if(WS==='label')return lblLoad();if(WS!=='plus')musLoad();if(WS!=='music')load(true)};
 function navClick(e){var nb=e.target.closest('[data-new]');if(nb){newRecord(nb.dataset.new,nb.dataset.t,nb.dataset.date?{D:nb.dataset.date}:(nb.dataset.for?{D:nb.dataset.for}:(nb.dataset.new==='TASKS'?{}:null)));return true}
   var og=e.target.closest('[data-orph]');if(og){orphDr();return true}
   var tk=e.target.closest('[data-task]');if(tk){taskDr(+tk.dataset.task);return true}
@@ -810,25 +810,27 @@ function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 function hideSplash(){if(__sp)return;__sp=true;if(__vd)fadeSplash();else __go=fadeSplash}
 /* Workspaces: INNRVZN Plus = this tracker sheet. INNRVZN Music = placeholder until its sheet exists.
    The choice is remembered (Python side, workspace.json); the header button switches. */
-var WS='',WSN={dash:'Dashboard',music:'INNRVZN Music',plus:'INNRVZN Plus'};
+var WS='',WSN={dash:'Dashboard',music:'INNRVZN Music',label:'INNRVZN Label',plus:'INNRVZN Plus'};
 function wsLabel(){var b=document.getElementById('wsbtn');if(b)b.innerHTML=esc(WSN[WS]||'Workspace')+' <span style="opacity:.6">▾</span>'}
 function showPicker(){if(document.getElementById('splash')){setTimeout(showPicker,150);return} /* only once the splash is gone */
   var o=document.getElementById('wsp');if(!o){o=document.createElement('div');o.id='wsp';document.body.appendChild(o)}
   o.innerHTML='<div class="wsbox"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="wst">Choose a workspace</div><div class="wscards">'+
     '<button class="wscard" data-ws="dash"><b>Dashboard</b><span>Your tasks across Plus and Music</span></button>'+
     '<button class="wscard" data-ws="plus"><b>INNRVZN Plus</b><span>Campaigns, network, tasks and CRM</span></button>'+
-    '<button class="wscard" data-ws="music"><b>INNRVZN Music</b><span>Artists, projects and tasks</span></button></div></div>';o.style.display='flex'}
+    '<button class="wscard" data-ws="music"><b>INNRVZN Music</b><span>Artists, projects and tasks</span></button>'+
+    '<button class="wscard" data-ws="label"><b>INNRVZN Label</b><span>Label artists, songs and releases</span></button></div></div>';o.style.display='flex'}
 function enterWS(ws){WS=ws;wsLabel();var o=document.getElementById('wsp');if(o)o.style.display='none';var m=document.getElementById('wsm');
-  if(ws==='music'&&document.getElementById('splash')){setTimeout(function(){enterWS(ws)},150);return Promise.resolve()}
-  if(m)m.style.display='none';closeDr();MDR=null;Q='';
+  if((ws==='music'||ws==='label')&&document.getElementById('splash')){setTimeout(function(){enterWS(ws)},150);return Promise.resolve()}
+  if(m)m.style.display='none';closeDr();MDR=null;LDR=null;Q='';
   var n=document.querySelector('nav');n.style.display=ws==='dash'?'none':'';
   if(ws==='dash'){view='dash';render();musLoad();return load()}
+  if(ws==='label'){lblNav(true);render();return lblLoad()}
   if(ws==='music'){musNav(true);render();return musLoad()}
   musNav(false);render();return load()}
 document.addEventListener('click',function(e){var c=e.target.closest('[data-ws]');if(c){var dd0=document.getElementById('wsdd');if(dd0)dd0.style.display='none';run('setWorkspace',c.dataset.ws).catch(function(){});enterWS(c.dataset.ws);return}
   if(e.target.closest('#wsbtn')){var dd=document.getElementById('wsdd');if(!dd){dd=document.createElement('div');dd.id='wsdd';document.body.appendChild(dd)}
     if(dd.style.display==='block'){dd.style.display='none';return}var r=e.target.closest('#wsbtn').getBoundingClientRect();dd.style.left=r.left+'px';dd.style.top=(r.bottom+6)+'px';
-    dd.innerHTML=['dash','music','plus'].map(function(k){return'<button data-ws="'+k+'"'+(k===WS?' class="on"':'')+'>'+WSN[k]+'</button>'}).join('');dd.style.display='block';return}
+    dd.innerHTML=['dash','music','label','plus'].map(function(k){return'<button data-ws="'+k+'"'+(k===WS?' class="on"':'')+'>'+WSN[k]+'</button>'}).join('');dd.style.display='block';return}
   var dd2=document.getElementById('wsdd');if(dd2)dd2.style.display='none';
   if(e.target.closest('[data-wsswitch]')){run('setWorkspace','').catch(function(){});var m=document.getElementById('wsm');if(m)m.style.display='none';showPicker()}});
 /* ---------- INNRVZN Music: same shell as Plus (nav, table rows, drawer). Sheet: INNRVZN Music Tracker (ARTISTS, PROJECTS = one row per task) ---------- */
@@ -904,13 +906,110 @@ document.getElementById('qa').addEventListener('submit',function(e){if(WS!=='mus
   var dm=s.match(/\b(today|tomorrow|mon|tue|wed|thu|fri|sat|sun|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* \d{1,2})\s*$/i),due='';if(dm){var d=mWhen(dm[1]);if(d){due=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);s=s.slice(0,dm.index)}}
   s=s.replace(/\s+/g,' ').trim();if(!s)return toast('Task name missing');
   run('musicAddTask',p.artist,p.name,s,o,due).then(function(){toast('Added to '+p.name);i.value='';musLoad()},musErr)},true);
+/* ---------- INNRVZN Label: artists (LBL codes), songs and releases. Sheet: INNRVZN Label Tracker (ARTISTS, SONGS, RELEASES, RELEASE_ASSETS) ---------- */
+var LBL=null,LDR=null,LSONG_ST=['Idea','Recording','Tracking','Mixing','Mastering','Ready','Released'],LREL_ST=['Planning','In progress','Ready','Released'],LAS_ST=['Not started','In progress','Done'],
+  LSONG_LINKS=[['demo','Demo'],['mix','Mix'],['splitsheet','Splitsheet'],['ingestion','Ingestion files'],['master','Master'],['visual','Visual assets']],
+  LBLNAV=[['lsong','i-projects','Songs'],['lrel','i-network','Releases'],['lart','i-building','Artists'],['more','i-more','More']];
+function lblNav(on){var n=document.querySelector('nav');if(!PLUSNAV)PLUSNAV=n.innerHTML;if(!on)return;
+  view='lsong';n.innerHTML=LBLNAV.map(function(x){return'<button data-v="'+x[0]+'"'+(x[0]===view?' class="on"':'')+'><svg class="ic" viewBox="0 0 24 24"><use href="#'+x[1]+'"/></svg><span>'+x[2]+'</span></button>'}).join('');
+  document.getElementById('qi').placeholder='Add a song: Feel Like #Matt Habit   (Ctrl+K)'}
+function lblLoad(){document.getElementById('rf').textContent='…';
+  return run('labelData').then(function(d){LBL=d;document.getElementById('rf').textContent='↻';if(WS==='label'){render();if(LDR)lblReDr()}})
+    .catch(function(e){document.getElementById('rf').textContent='↻';if(WS==='label')document.getElementById('v').innerHTML='<div class="empty">Could not load the Label sheet: '+esc(e&&e.message||e)+'</div>'})}
+function lErr(e){toast(String(e&&e.message||e));lblLoad()}
+function lIso(x){var d=parseDue(x);return d?d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2):''}
+function lOpts(list,val){var o=list.slice();if(val&&o.indexOf(val)<0)o.unshift(val);return o.map(function(x){return'<option'+(x===val?' selected':'')+'>'+esc(x)+'</option>'}).join('')}
+function lArt(code){return LBL.artists.filter(function(a){return a.code===code})[0]||{code:code,name:code}}
+function lRelOf(a,name){return LBL.releases.filter(function(r){return r.acode===a&&r.release===name})[0]}
+function lRelStats(r){var as=LBL.assets.filter(function(a){return a.acode===r.acode&&a.release===r.release}),dn=as.filter(function(a){return a.progress==='Done'}).length;
+  return{as:as,total:as.length,done:dn,songs:LBL.songs.filter(function(x){return x.acode===r.acode&&x.release===r.release})}}
+function lDot(st){return st==='Released'||st==='Ready'||st==='Done'?'g':st==='Idea'||st==='Planning'||st==='Not started'?'x':'a'}
+function lLinkN(x){return LSONG_LINKS.filter(function(k){return String(x[k[0]]||'').trim()}).length}
+function renderLabel(v){if(!LBL){v.innerHTML='<div class="empty">Loading INNRVZN Label…</div>';return}
+  var q=(Q||'').toLowerCase();
+  if(view==='lart'){var rows=LBL.artists.filter(function(a){return!q||(a.name+' '+a.code).toLowerCase().indexOf(q)>-1}).map(function(a){
+      var ns=LBL.songs.filter(function(x){return x.acode===a.code}).length,nr=LBL.releases.filter(function(x){return x.acode===a.code}).length;
+      return'<div class="prow la" data-lart="'+esc(a.code)+'"><span class="dot g"></span><span class="lcode">'+esc(a.code)+'</span><span><b>'+esc(a.name)+'</b></span><span class="stat">'+esc(a.status||'—')+'</span><span>'+ns+' song'+(ns===1?'':'s')+'</span><span>'+nr+' release'+(nr===1?'':'s')+'</span><span class="m">'+esc(a.contact||'')+'</span></div>'}).join('');
+    v.innerHTML=searchBar('Search artists…')+'<div class="bar"><button class="b newb" data-lnew="artist">+ Artist</button></div><div class="sum"><b>'+LBL.artists.length+'</b> artists</div>'+
+      '<div class="tbl"><div><div class="ph la"><span></span><span>ID</span><span>Artist</span><span>Status</span><span>Songs</span><span>Releases</span><span>Contact</span></div>'+(rows||'<div class="empty">No artists yet.</div>')+'</div></div>';return}
+  if(view==='lrel'){var rr=LBL.releases.filter(function(r){return!q||(r.release+' '+r.artist+' '+r.acode).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.status==='Released')-(b.status==='Released')||a.artist.localeCompare(b.artist)||a.release.localeCompare(b.release)});
+    v.innerHTML=searchBar('Search releases…')+'<div class="bar"><button class="b newb" data-lnew="release">+ Release</button></div><div class="sum"><b>'+rr.length+'</b> releases · <b>'+rr.filter(function(r){return r.status!=='Released'}).length+'</b> in the works</div>'+
+      '<div class="tbl"><div><div class="ph lr"><span></span><span>Release</span><span>Artist</span><span>Type</span><span>Date</span><span>Status</span><span>Checklist</span></div>'+
+      (rr.map(function(r){var st=lRelStats(r),d=parseDue(r.date);return'<div class="prow lr" data-lrel="'+r.row+'"><span class="dot '+lDot(r.status)+'"></span><span><b>'+esc(r.release)+'</b></span><span>'+esc(r.artist)+'</span><span>'+esc(r.type)+'</span><span class="m">'+(d?fmt(d):esc(r.date||'—'))+'</span><span class="stat">'+esc(r.status||'—')+'</span><span>'+mBar({done:st.done,tasks:{length:st.total}})+' <span class="m">'+st.done+'/'+st.total+'</span></span></div>'}).join('')||'<div class="empty">No releases yet.</div>')+'</div></div>';return}
+  var ss=LBL.songs.filter(function(x){return!q||(x.song+' '+x.artist+' '+x.release+' '+x.acode).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.status==='Released')-(b.status==='Released')||a.artist.localeCompare(b.artist)||a.song.localeCompare(b.song)});
+  v.innerHTML=searchBar('Search songs…')+'<div class="bar"><button class="b newb" data-lnew="song">+ Song</button></div><div class="sum"><b>'+ss.length+'</b> songs · <b>'+ss.filter(function(x){return x.status!=='Released'}).length+'</b> in progress</div>'+
+    '<div class="tbl"><div><div class="ph ls"><span></span><span>Song</span><span>Artist</span><span>Release</span><span>Status</span><span>Files</span></div>'+
+    (ss.map(function(x){return'<div class="prow ls" data-lsong="'+x.row+'"><span class="dot '+lDot(x.status)+'"></span><span><b>'+esc(x.song)+'</b></span><span>'+esc(x.artist)+'</span><span class="m">'+esc(x.release||'—')+'</span><span class="stat">'+esc(x.status||'—')+'</span><span class="m">'+lLinkN(x)+'/6</span></div>'}).join('')||'<div class="empty">No songs yet.</div>')+'</div></div>'}
+function lField(tab,row,key,field,label,val,kind){var a='data-lt="'+tab+'" data-lr="'+row+'" data-lk="'+esc(key)+'" data-lf="'+field+'"',inp;
+  if(kind==='date')inp='<input type="date" '+a+' value="'+lIso(val)+'">';
+  else inp='<input '+a+' value="'+esc(val||'')+'" placeholder="'+(kind==='link'?'Paste a link':'')+'">';
+  return'<div class="lf"><label>'+label+'</label>'+inp+(kind==='link'&&/^https?:/i.test(val||'')?'<button class="b mi" data-url="'+esc(val)+'" title="Open">↗</button>':'<span></span>')+'</div>'}
+function lSel(tab,row,key,field,label,opts,val){return'<div class="lf"><label>'+label+'</label><select data-lt="'+tab+'" data-lr="'+row+'" data-lk="'+esc(key)+'" data-lf="'+field+'">'+lOpts(opts,val)+'</select><span></span></div>'}
+function lblReDr(){if(LDR.k==='s')lSongDr(LDR.row);else if(LDR.k==='r')lRelDr(LDR.row);else lArtDr(LDR.code)}
+function lSongDr(row){var x=LBL.songs.filter(function(z){return z.row===+row})[0];if(!x){LDR=null;return closeDr()}LDR={k:'s',row:+row};
+  openDr('<div style="color:var(--mute);font-size:12px">'+esc(x.artist)+' <span class="lcode">'+esc(x.acode)+'</span></div><h2>'+esc(x.song)+'</h2>'+
+    lSel('songs',x.row,x.song,'status','Status',LSONG_ST,x.status)+lField('songs',x.row,x.song,'release','Release',x.release)+
+    '<h3>Files</h3>'+LSONG_LINKS.map(function(k){return lField('songs',x.row,x.song,k[0],k[1],x[k[0]],'link')}).join('')+
+    '<h3>Notes</h3>'+lField('songs',x.row,x.song,'notes','Notes',x.notes)+
+    '<div style="margin-top:14px"><button class="b delb" data-ldel="songs" data-lr="'+x.row+'" data-lk="'+esc(x.song)+'">Delete song</button></div>')}
+function lAssetRow(a){var d=a.progress==='Done';return'<div class="mtask'+(d?' done':'')+'"><div class="mt1"><input type="checkbox" data-lt="assets" data-lr="'+a.row+'" data-lk="'+esc(a.item)+'" data-lf="done"'+(d?' checked':'')+' title="Done">'+
+  '<div class="mtn"><b>'+esc(a.item)+'</b>'+(a.desc?'<div class="m">'+esc(a.desc)+'</div>':'')+'</div>'+(/^https?:/i.test(a.link)?'<button class="b mi" data-url="'+esc(a.link)+'" title="Open link">↗</button>':'')+'</div>'+
+  '<div class="mt2"><select data-lt="assets" data-lr="'+a.row+'" data-lk="'+esc(a.item)+'" data-lf="progress">'+lOpts(LAS_ST,a.progress||'Not started')+'</select>'+
+  '<input placeholder="Owner" data-lt="assets" data-lr="'+a.row+'" data-lk="'+esc(a.item)+'" data-lf="owner" value="'+esc(a.owner)+'"><input type="date" data-lt="assets" data-lr="'+a.row+'" data-lk="'+esc(a.item)+'" data-lf="due" value="'+lIso(a.due)+'">'+
+  '<input placeholder="Link" data-lt="assets" data-lr="'+a.row+'" data-lk="'+esc(a.item)+'" data-lf="link" value="'+esc(a.link)+'"></div></div>'}
+function lRelDr(row){var r=LBL.releases.filter(function(z){return z.row===+row})[0];if(!r){LDR=null;return closeDr()}LDR={k:'r',row:+row};var st=lRelStats(r);
+  openDr('<div style="color:var(--mute);font-size:12px">'+esc(r.artist)+' <span class="lcode">'+esc(r.acode)+'</span></div><h2>'+esc(r.release)+'</h2><div class="mprog">'+mBar({done:st.done,tasks:{length:st.total}})+'<span class="m">'+st.done+' of '+st.total+' ready</span></div>'+
+    lSel('releases',r.row,r.release,'type','Type',['Single','EP','Album'],r.type)+lSel('releases',r.row,r.release,'status','Status',LREL_ST,r.status)+lField('releases',r.row,r.release,'date','Release date',r.date,'date')+lField('releases',r.row,r.release,'folder','Folder',r.folder,'link')+
+    '<h3>Songs ('+st.songs.length+')</h3>'+(st.songs.map(function(x){return'<div class="prow mq" data-lsong="'+x.row+'"><span class="dot '+lDot(x.status)+'"></span><span><b>'+esc(x.song)+'</b></span><span class="stat">'+esc(x.status)+'</span></div>'}).join('')||'<div class="m">No songs linked yet. Set a song\'s Release to "'+esc(r.release)+'".</div>')+
+    '<h3>Release checklist</h3>'+st.as.map(lAssetRow).join('')+
+    '<div style="margin-top:14px"><button class="b delb" data-ldel="releases" data-lr="'+r.row+'" data-lk="'+esc(r.release)+'">Delete release</button></div>')}
+function lArtDr(code){var a=lArt(code);LDR={k:'a',code:code};var sg=LBL.songs.filter(function(x){return x.acode===code}),rl=LBL.releases.filter(function(x){return x.acode===code});
+  openDr('<div style="color:var(--mute);font-size:12px">Artist <span class="lcode">'+esc(a.code)+'</span></div><h2>'+esc(a.name)+'</h2>'+
+    '<div class="bar" style="margin:6px 0">'+(/^https?:/i.test(a.folder||'')?'<button class="b" data-url="'+esc(a.folder)+'">Open Drive folder ↗</button>':'<span class="m">No Drive folder linked yet.</span>')+'</div>'+
+    (a.contact?'<div class="m">Contact: '+esc(a.contact)+'</div>':'')+(a.notes?'<div class="m">'+esc(a.notes)+'</div>':'')+
+    '<h3>Releases ('+rl.length+')</h3>'+(rl.map(function(r){var st=lRelStats(r);return'<div class="prow mq" data-lrel="'+r.row+'"><span class="dot '+lDot(r.status)+'"></span><span><b>'+esc(r.release)+'</b> <span class="m">'+esc(r.type)+'</span></span><span>'+mBar({done:st.done,tasks:{length:st.total}})+' <span class="m">'+st.done+'/'+st.total+'</span></span></div>'}).join('')||'<div class="m">No releases yet.</div>')+
+    '<form class="madd" data-ladd="release"><input name="t" placeholder="New release for '+esc(a.name)+'…"><button class="b">Add</button></form>'+
+    '<h3>Songs ('+sg.length+')</h3>'+(sg.map(function(x){return'<div class="prow mq" data-lsong="'+x.row+'"><span class="dot '+lDot(x.status)+'"></span><span><b>'+esc(x.song)+'</b></span><span class="stat">'+esc(x.status)+'</span></div>'}).join('')||'<div class="m">No songs yet.</div>')+
+    '<form class="madd" data-ladd="song"><input name="t" placeholder="New song for '+esc(a.name)+'…"><button class="b">Add</button></form>')}
+function lPickArtist(cb){if(LDR&&LDR.k==='a')return cb(lArt(LDR.code));
+  var t=prompt('Artist ('+LBL.artists.map(function(a){return a.name}).join(', ')+'):',LBL.artists[0]?LBL.artists[0].name:'');if(!t)return;t=t.trim().toLowerCase();
+  var a=LBL.artists.filter(function(z){return z.name.toLowerCase()===t||z.code.toLowerCase()===t})[0];if(!a)return toast('Add that artist first (Artists > + Artist)');cb(a)}
+function lAddSong(a,name){run('labelAddSong',a.code,name,'').then(function(){toast('Added '+name);lblLoad()},lErr)}
+function lAddRelease(a,name,type){run('labelAddRelease',a.code,name,type||'Single','').then(function(){toast('Added '+name+' with its checklist');lblLoad()},lErr)}
+document.addEventListener('click',function(e){if(WS!=='label')return;var x;
+  if((x=e.target.closest('[data-lsong]')))lSongDr(x.dataset.lsong);
+  else if((x=e.target.closest('[data-lrel]')))lRelDr(x.dataset.lrel);
+  else if((x=e.target.closest('[data-lart]')))lArtDr(x.dataset.lart);
+  else if((x=e.target.closest('[data-lnew]'))){var k=x.dataset.lnew;
+    if(k==='artist'){var n=prompt('Artist name:','');if(n)run('labelAddArtist',n).then(function(r){toast('Added '+n.trim()+' ('+r.code+')');lblLoad()},lErr)}
+    else lPickArtist(function(a){if(k==='song'){var s=prompt('Song title for '+a.name+':','');if(s)lAddSong(a,s.trim())}
+      else{var r=prompt('Release name for '+a.name+':','');if(!r)return;var t=(prompt('Type: Single, EP or Album','Single')||'Single').trim();lAddRelease(a,r.trim(),/^ep$/i.test(t)?'EP':/^album$/i.test(t)?'Album':'Single')}})}
+  else if((x=e.target.closest('[data-ldel]'))){var tab=x.dataset.ldel,row=+x.dataset.lr,key=x.dataset.lk;
+    if(tab==='releases'){var r=LBL.releases.filter(function(z){return z.row===row})[0],as=r?lRelStats(r).as.slice().sort(function(a,b){return b.row-a.row}):[];
+      if(!confirm('Delete "'+key+'" and its '+as.length+' checklist items? Songs stay, but lose this release name.'))return;
+      as.reduce(function(p,a){return p.then(function(){return run('labelDel','assets',a.row,a.item)})},Promise.resolve()).then(function(){return run('labelDel','releases',row,key)}).then(function(){LDR=null;closeDr();lblLoad()},lErr)}
+    else if(confirm('Delete "'+key+'"?'))run('labelDel',tab,row,key).then(function(){LDR=null;closeDr();lblLoad()},lErr)}},true);
+document.addEventListener('change',function(e){var t=e.target,f=t.dataset&&t.dataset.lf;if(!f||WS!=='label')return;var tab=t.dataset.lt,row=+t.dataset.lr,key=t.dataset.lk,val=t.value;
+  if(f==='done'){f='progress';val=t.checked?'Done':'In progress';
+    if(t.checked){var a=LBL.assets.filter(function(z){return z.row===row})[0];if(a&&!String(a.link||'').trim()){var l=prompt('Paste the link to "'+key+'" (leave blank to mark it done without one):','');
+      if(l&&l.trim())return run('labelSet','assets',row,key,'link',l.trim()).then(function(){return run('labelSet','assets',row,key,'progress','Done')}).then(function(){toast('Saved');lblLoad()},lErr)}}}
+  if(f==='due'||(tab==='releases'&&f==='date'))val=val;
+  run('labelSet',tab,row,key,f,val).then(function(){toast('Saved');lblLoad()},lErr)},true);
+document.addEventListener('submit',function(e){var f=e.target.closest('[data-ladd]');if(!f||WS!=='label')return;e.preventDefault();var v=f.t.value.trim();if(!v||!LDR||LDR.k!=='a')return;
+  var a=lArt(LDR.code);if(f.dataset.ladd==='song')lAddSong(a,v);else lAddRelease(a,v,'Single')},true);
+/* quick-add bar in Label: "Song title #Artist" (on the Releases tab it adds a single release instead) */
+document.getElementById('qa').addEventListener('submit',function(e){if(WS!=='label')return;e.preventDefault();e.stopImmediatePropagation();var i=document.getElementById('qi'),s=i.value.trim();if(!s||!LBL)return;
+  var as=LBL.artists.slice().sort(function(a,b){return b.name.length-a.name.length}),a=as.filter(function(z){return s.toLowerCase().indexOf('#'+z.name.toLowerCase())>-1||s.toUpperCase().indexOf('#'+z.code)>-1})[0];
+  if(!a&&LDR&&LDR.k==='a')a=lArt(LDR.code);if(!a)return toast('Add #Artist to say whose it is');
+  s=s.replace(new RegExp('#'+a.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'').replace(new RegExp('#'+a.code,'i'),'').replace(/\s+/g,' ').trim();if(!s)return toast('Title missing');
+  i.value='';if(view==='lrel')lAddRelease(a,s,'Single');else lAddSong(a,s)},true);
 /* ---------- sign-in screen (desktop). Google's own consent page must open in the browser: Google blocks it inside app windows. ---------- */
 function showLogin(msg){var o=document.getElementById('login');if(!o){o=document.createElement('div');o.id='login';document.body.appendChild(o)}
   o.innerHTML='<div class="wsbox"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="wst">Sign in to INNRVZN Seer</div>'+
     '<p class="m" style="margin:-6px 0 18px">Use your INNRVZN Google account. Google asks for permission in your browser once, then you come straight back here.</p>'+
     '<button class="b gbtn" data-signin><b>G</b> Sign in with Google</button><p class="m" id="lgmsg" style="margin-top:14px;min-height:18px">'+esc(msg||'')+'</p></div>';o.style.display='flex'}
 function startApp(){var o=document.getElementById('login');if(o)o.style.display='none';
-  return run('getWorkspace').catch(function(){return'plus'}).then(function(ws){if(ws==='plus'||ws==='music'||ws==='dash')return enterWS(ws);showPicker()})}
+  return run('getWorkspace').catch(function(){return'plus'}).then(function(ws){if(ws==='plus'||ws==='music'||ws==='dash'||ws==='label')return enterWS(ws);showPicker()})}
 document.addEventListener('click',function(e){
   if(e.target.closest('[data-signin]')){var b=e.target.closest('[data-signin]');b.disabled=true;document.getElementById('lgmsg').textContent='Finish signing in on the Google page that just opened in your browser…';
     run('signIn').then(function(r){toast('Signed in'+(r.email?' as '+r.email:''));startApp()}).catch(function(err){b.disabled=false;document.getElementById('lgmsg').textContent=String(err&&err.message||err)})}
@@ -921,7 +1020,7 @@ var _renderMore=renderMore;renderMore=function(v){_renderMore(v);if(!window.pywe
 render();
 run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
 if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
-  if(ws==='plus'||ws==='music')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
+  if(ws==='plus'||ws==='music'||ws==='label')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
 setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash')load()},60000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script><script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>

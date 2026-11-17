@@ -121,12 +121,12 @@
     var s = p.toString();
     return s ? '?' + s : '';
   }
-  async function api(method, path, query, body, retried) {
+  async function apiOn(sid, method, path, query, body, retried) {
     var t = await ensureToken();
     var headers = { 'Content-Type': 'application/json' };
     if (t) headers.Authorization = 'Bearer ' + t;
-    var r = await fetch(BASE + '/' + SHEET_ID + path + qs(query), { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined });
-    if (r.status === 401 && !retried && !CFG.NO_AUTH) { token = ''; return api(method, path, query, body, true); }
+    var r = await fetch(BASE + '/' + sid + path + qs(query), { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined });
+    if (r.status === 401 && !retried && !CFG.NO_AUTH) { token = ''; return apiOn(sid, method, path, query, body, true); }
     if (!r.ok) {
       var j = null; try { j = await r.json(); } catch (e) { }
       var msg = (j && j.error && j.error.message) || ('Google Sheets returned ' + r.status);
@@ -135,6 +135,7 @@
     }
     return r.json();
   }
+  function api(method, path, query, body, retried) { return apiOn(SHEET_ID, method, path, query, body, retried); }
   var VR = { valueRenderOption: 'UNFORMATTED_VALUE', dateTimeRenderOption: 'SERIAL_NUMBER' };
   async function vals_(rng) {
     var r = await api('GET', '/values/' + encodeURIComponent(rng), VR);
@@ -646,12 +647,140 @@
     return out;
   }
 
+
+  // ------------------------------------------------------------ INNRVZN Music + INNRVZN Label (their own sheets)
+  var MUSIC_ID = CFG.MUSIC_SHEET_ID || '1tPnrzTf3h_oUDnCM93gnCovCDMt6f-mWIDaD4wtHYcQ';
+  var LABEL_ID = CFG.LABEL_SHEET_ID || '1hmsrljx7QzJqwUyofbW0M7Yjou2OPjk2OS2cioebu7k';
+  async function sv_(sid, rng) {
+    var r = await apiOn(sid, 'GET', '/values/' + encodeURIComponent(rng), { valueRenderOption: 'FORMATTED_VALUE' });
+    return r.values || [];
+  }
+  function sAppend_(sid, rng, values) {
+    return apiOn(sid, 'POST', '/values/' + encodeURIComponent(rng) + ':append', { valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS' }, { values: values });
+  }
+  function sUpdate_(sid, rng, values) {
+    return apiOn(sid, 'PUT', '/values/' + encodeURIComponent(rng), { valueInputOption: 'USER_ENTERED' }, { values: values });
+  }
+  async function sDelRow_(sid, title, row) {
+    var meta = await apiOn(sid, 'GET', '', { fields: 'sheets.properties(sheetId,title)' }), id = null;
+    (meta.sheets || []).forEach(function (x) { if (x.properties.title === title) id = x.properties.sheetId; });
+    if (id === null) throw new Error('No such tab: ' + title);
+    await apiOn(sid, 'POST', ':batchUpdate', null, { requests: [{ deleteDimension: { range: { sheetId: id, dimension: 'ROWS', startIndex: row - 1, endIndex: row } } }] });
+  }
+  function zip_(keys, r) { var o = {}, a = pad_(r, keys.length); keys.forEach(function (k, i) { o[k] = pstr_(a[i]); }); return o; }
+  function anyCell_(r) { return r && r.some(function (x) { return String(x == null ? '' : x).trim() !== ''; }); }
+
+  var MUSIC_COLS = { status: 'D', owner: 'E', due: 'F', link: 'G', notes: 'H', task: 'C' };
+  async function musicData() {
+    var a = await sv_(MUSIC_ID, 'ARTISTS!A2:E'), t = await sv_(MUSIC_ID, 'PROJECTS!A2:H'), arts = [], tasks = [];
+    a.forEach(function (r) { if (r && String(r[0] || '').trim()) arts.push(zip_(['name', 'status', 'contact', 'folder', 'notes'], r)); });
+    t.forEach(function (r, i) { if (anyCell_(r)) { var o = zip_(['artist', 'project', 'task', 'status', 'owner', 'due', 'link', 'notes'], r); o.row = i + 2; tasks.push(o); } });
+    return { artists: arts, tasks: tasks, url: 'https://docs.google.com/spreadsheets/d/' + MUSIC_ID + '/edit' };
+  }
+  async function mCheck_(row, expected) {
+    var cur = await sv_(MUSIC_ID, 'PROJECTS!C' + row);
+    if (!cur.length || !cur[0].length || pstr_(cur[0][0]).trim() !== String(expected).trim()) throw new Error('That task moved in the sheet. Refresh and try again.');
+  }
+  async function musicSet(row, expected, field, value) {
+    var col = MUSIC_COLS[field]; if (!col) throw new Error('Unknown field');
+    await mCheck_(row, expected);
+    await sUpdate_(MUSIC_ID, 'PROJECTS!' + col + row, [[value]]);
+    return { ok: true };
+  }
+  async function musicAddTask(artist, project, task, owner, due) {
+    var v = [artist, project, task, owner, due].map(function (x) { return String(x || '').trim(); });
+    if (!(v[0] && v[1] && v[2])) throw new Error('Artist, project and task are all needed.');
+    await sAppend_(MUSIC_ID, 'PROJECTS!A:H', [[v[0], v[1], v[2], 'Not started', v[3], v[4], '', '']]);
+    return { ok: true };
+  }
+  async function musicAddArtist(name) {
+    name = String(name || '').trim(); if (!name) throw new Error('Name needed.');
+    var d = await musicData();
+    if (d.artists.some(function (a) { return a.name.toLowerCase() === name.toLowerCase(); })) throw new Error(name + ' is already listed.');
+    await sAppend_(MUSIC_ID, 'ARTISTS!A:E', [[name, 'Active', '', '', '']]);
+    return { ok: true };
+  }
+  async function musicDelTask(row, expected) { await mCheck_(row, expected); await sDelRow_(MUSIC_ID, 'PROJECTS', row); return { ok: true }; }
+
+  var LABEL_TABS = {
+    songs: ['SONGS', ['acode', 'artist', 'song', 'release', 'status', 'demo', 'mix', 'splitsheet', 'ingestion', 'master', 'visual', 'notes'], 'C',
+      { release: 'D', status: 'E', demo: 'F', mix: 'G', splitsheet: 'H', ingestion: 'I', master: 'J', visual: 'K', notes: 'L' }],
+    releases: ['RELEASES', ['acode', 'artist', 'release', 'type', 'date', 'status', 'folder', 'notes'], 'C',
+      { type: 'D', date: 'E', status: 'F', folder: 'G', notes: 'H' }],
+    assets: ['RELEASE_ASSETS', ['acode', 'artist', 'release', 'item', 'desc', 'due', 'owner', 'link', 'progress'], 'D',
+      { desc: 'E', due: 'F', owner: 'G', link: 'H', progress: 'I' }]
+  };
+  var LABEL_ASSET_TEMPLATE = [['Song Master', 'Highest quality export'], ['Cover Art', 'Cover artwork, 3000x3000px, 300dpi'],
+    ['Spotify Canvas', '9x16, 7 second clip'], ['Metadata', ''], ['Split Sheet', 'A signed document to protect all parties']];
+  var LABEL_EP_EXTRA = [['Brand Book', ''], ['Press Kit', '']];
+  var LABEL_ART_KEYS = ['code', 'name', 'status', 'contact', 'folder', 'notes'];
+  function colLetter_(n) { return String.fromCharCode(64 + n); }
+  async function labelData() {
+    var names = Object.keys(LABEL_TABS);
+    var res = await Promise.all([sv_(LABEL_ID, 'ARTISTS!A2:F')].concat(names.map(function (k) { var t = LABEL_TABS[k]; return sv_(LABEL_ID, t[0] + '!A2:' + colLetter_(t[1].length)); })));
+    var arts = [];
+    res[0].forEach(function (r, i) { if (r && String(r[0] || '').trim()) { var o = zip_(LABEL_ART_KEYS, r); o.row = i + 2; arts.push(o); } });
+    var out = { artists: arts, url: 'https://docs.google.com/spreadsheets/d/' + LABEL_ID + '/edit' };
+    names.forEach(function (k, n) { out[k] = []; res[n + 1].forEach(function (r, i) { if (anyCell_(r)) { var o = zip_(LABEL_TABS[k][1], r); o.row = i + 2; out[k].push(o); } }); });
+    return out;
+  }
+  async function lCheck_(tab, row, expected) {
+    var t = LABEL_TABS[tab]; if (!t) throw new Error('Unknown tab');
+    var cur = await sv_(LABEL_ID, t[0] + '!' + t[2] + row);
+    if (!cur.length || !cur[0].length || pstr_(cur[0][0]).trim() !== String(expected).trim()) throw new Error('That row moved in the sheet. Refresh and try again.');
+  }
+  async function labelSet(tab, row, expected, field, value) {
+    var t = LABEL_TABS[tab]; if (!t || !t[3][field]) throw new Error('Unknown field');
+    await lCheck_(tab, row, expected);
+    await sUpdate_(LABEL_ID, t[0] + '!' + t[3][field] + row, [[value]]);
+    return { ok: true };
+  }
+  async function labelNextCode() {
+    var r = await sv_(LABEL_ID, 'ARTISTS!A2:A'), mx = 0;
+    r.forEach(function (x) { var m = /^LBL(\d+)$/i.exec(pstr_(x && x[0]).trim()); if (m) mx = Math.max(mx, +m[1]); });
+    return 'LBL' + ('0000' + (mx + 1)).slice(-4);
+  }
+  async function lArtist_(code) {
+    var d = await labelData(), a = d.artists.filter(function (x) { return x.code === code; })[0];
+    if (!a) throw new Error('Unknown artist code ' + code);
+    return { a: a, d: d };
+  }
+  async function labelAddArtist(name) {
+    name = String(name || '').trim(); if (!name) throw new Error('Name needed.');
+    var d = await labelData();
+    if (d.artists.some(function (a) { return a.name.toLowerCase() === name.toLowerCase(); })) throw new Error(name + ' is already listed.');
+    var code = await labelNextCode();
+    await sAppend_(LABEL_ID, 'ARTISTS!A:F', [[code, name, 'Active', '', '', '']]);
+    return { ok: true, code: code };
+  }
+  async function labelAddSong(acode, song, release) {
+    song = String(song || '').trim(); if (!song) throw new Error('Song title needed.');
+    var x = await lArtist_(acode);
+    if (x.d.songs.some(function (s) { return s.acode === acode && s.song.toLowerCase() === song.toLowerCase(); })) throw new Error(song + ' is already on ' + x.a.name + "'s list.");
+    await sAppend_(LABEL_ID, 'SONGS!A:L', [[acode, x.a.name, song, String(release || '').trim(), 'Idea', '', '', '', '', '', '', '']]);
+    return { ok: true };
+  }
+  async function labelAddRelease(acode, name, rtype, date) {
+    name = String(name || '').trim(); if (!name) throw new Error('Release name needed.');
+    var x = await lArtist_(acode);
+    if (x.d.releases.some(function (r) { return r.acode === acode && r.release.toLowerCase() === name.toLowerCase(); })) throw new Error(name + ' already exists for ' + x.a.name + '.');
+    rtype = ['Single', 'EP', 'Album'].indexOf(rtype) > -1 ? rtype : 'Single';
+    await sAppend_(LABEL_ID, 'RELEASES!A:H', [[acode, x.a.name, name, rtype, String(date || ''), 'Planning', '', '']]);
+    var items = (rtype !== 'Single' ? LABEL_EP_EXTRA : []).concat(LABEL_ASSET_TEMPLATE);
+    await sAppend_(LABEL_ID, 'RELEASE_ASSETS!A:I', items.map(function (it) { return [acode, x.a.name, name, it[0], it[1], '', '', '', 'Not started']; }));
+    return { ok: true };
+  }
+  async function labelDel(tab, row, expected) { await lCheck_(tab, row, expected); await sDelRow_(LABEL_ID, LABEL_TABS[tab][0], row); return { ok: true }; }
+
   var A = {
     getData: getData, addTask: addTask, completeTask: completeTask, snoozeTask: snoozeTask, setCampaignStatus: setCampaignStatus,
     driveStatus: driveStatus, driveConnect: driveStatus, driveDisconnect: driveStatus, driveFind: driveFind, driveSetRoot: driveSetRoot,
     driveCreateRoot: driveCreateRoot, createFolder: ensureFolder_, submitDeliverable: submitDeliverable, uploadDeliverableData: uploadDeliverableData,
     appVersion: function () { return Promise.resolve({ version: WEB_VERSION, web: true }); },
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
+    musicData: musicData, musicSet: musicSet, musicAddTask: musicAddTask, musicAddArtist: musicAddArtist, musicDelTask: musicDelTask,
+    labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, labelAddSong: labelAddSong,
+    labelAddRelease: labelAddRelease, labelDel: labelDel,
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
     addLog: addLog, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
@@ -660,8 +789,8 @@
     splashPlate: function () { return Promise.resolve({ ok: false }); },
     openUrl: function (u) { window.open(u, '_blank', 'noopener'); return Promise.resolve({ ok: true }); },
     log: function () { return Promise.resolve({ ok: true }); },
-    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(w === 'plus' || w === 'music' ? w : ''); },
-    setWorkspace: function (ws) { if (ws !== 'plus' && ws !== 'music') return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
+    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'plus', 'music', 'label'].indexOf(w) > -1 ? w : ''); },
+    setWorkspace: function (ws) { if (['dash', 'plus', 'music', 'label'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
     signOut: function () {
       try { if (token && window.google && google.accounts) google.accounts.oauth2.revoke(token, function () { }); } catch (e) { }
       token = ''; lsSet('ta_signed', ''); try { sessionStorage.clear(); } catch (e) { }
