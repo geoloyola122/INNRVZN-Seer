@@ -919,7 +919,7 @@ function lIso(x){var d=parseDue(x);return d?d.getFullYear()+'-'+('0'+(d.getMonth
 function lOpts(list,val){var o=list.slice();if(val&&o.indexOf(val)<0)o.unshift(val);return o.map(function(x){return'<option'+(x===val?' selected':'')+'>'+esc(x)+'</option>'}).join('')}
 function lNum(v){var n=parseFloat(String(v==null?'':v).replace(/,/g,''));return isNaN(n)?null:n}
 function lK(n){var a=Math.abs(n);return a>=1e6?(n/1e6).toFixed(a>=1e7?0:1).replace(/\.0$/,'')+'M':a>=1e3?(n/1e3).toFixed(a>=1e5?0:1).replace(/\.0$/,'')+'K':String(n)}
-function lSeries(code,metric){return(LBL.stats||[]).filter(function(x){return x.acode===code&&x.metric===metric&&!x.release}).map(function(x){return{d:x.date,v:lNum(x.value)}}).filter(function(x){return x.v!==null}).sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0})}
+function lSeries(code,metric,song){return(LBL.stats||[]).filter(function(x){return x.acode===code&&x.metric===metric&&(song?x.song===song:!x.song)}).map(function(x){return{d:x.date,v:lNum(x.value)}}).filter(function(x){return x.v!==null}).sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0})}
 function lSpark(sr){if(sr.length<2)return'';var w=110,h=22,vs=sr.map(function(x){return x.v}),mn=Math.min.apply(0,vs),mx=Math.max.apply(0,vs),rg=mx-mn||1;
   return'<svg class="sp" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><polyline fill="none" stroke="var(--acc)" stroke-width="1.6" points="'+vs.map(function(v,i){return(i*(w-2)/(vs.length-1)+1).toFixed(1)+','+(h-2-(v-mn)*(h-4)/rg).toFixed(1)}).join(' ')+'"/></svg>'}
 function lDelta(sr){if(sr.length<2)return'';var d=sr[sr.length-1].v-sr[sr.length-2].v;return' <span style="color:var('+(d>=0?'--ok':'--red')+')">'+(d>=0?'+':'−')+lK(Math.abs(d))+'</span>'}
@@ -956,6 +956,8 @@ function lblReDr(){if(LDR.k==='s')lSongDr(LDR.row);else if(LDR.k==='r')lRelDr(LD
 function lSongDr(row){var x=LBL.songs.filter(function(z){return z.row===+row})[0];if(!x){LDR=null;return closeDr()}LDR={k:'s',row:+row};
   openDr('<div style="color:var(--mute);font-size:12px">'+esc(x.artist)+' <span class="lcode">'+esc(x.acode)+'</span></div><h2>'+esc(x.song)+'</h2>'+
     lSel('songs',x.row,x.song,'status','Status',LSONG_ST,x.status)+lSel('songs',x.row,x.song,'release','Release',[''].concat(LBL.releases.filter(function(r){return r.acode===x.acode}).map(function(r){return r.release})),x.release)+
+    '<h3>Stats</h3>'+(['Streams','Listeners'].map(function(m){var sr=lSeries(x.acode,m,x.song);return sr.length?'<div><b>'+lK(sr[sr.length-1].v)+'</b> <span class="m">'+m.toLowerCase()+' · '+esc(sr[sr.length-1].d)+'</span>'+lDelta(sr)+lSpark(sr)+'</div>':''}).join('')||'<div class="m">No stats yet.</div>')+
+    '<form class="madd" data-lstat="1"><select name="m"><option>Streams</option><option>Listeners</option></select><input name="v" placeholder="Number"><button class="b">Add</button></form>'+
     '<h3>Files</h3>'+LSONG_LINKS.map(function(k){return lField('songs',x.row,x.song,k[0],k[1],x[k[0]],'link')}).join('')+
     '<h3>Notes</h3>'+lField('songs',x.row,x.song,'notes','Notes',x.notes)+
     '<div style="margin-top:14px"><button class="b delb" data-ldel="songs" data-lr="'+x.row+'" data-lk="'+esc(x.song)+'">Delete song</button></div>')}
@@ -970,8 +972,10 @@ function lRelDr(row){var r=LBL.releases.filter(function(z){return z.row===+row})
     '<h3>Songs ('+st.songs.length+')</h3>'+(st.songs.length?'<div class="sgrid">'+st.songs.map(lSongCard).join('')+'</div>':'<div class="m">No songs linked yet. Set a song\'s Release to "'+esc(r.release)+'".</div>')+
     (st.as.length?'<h3>Release checklist</h3>'+st.as.map(lAssetRow).join(''):'')+
     '<div style="margin-top:14px"><button class="b delb" data-ldel="releases" data-lr="'+r.row+'" data-lk="'+esc(r.release)+'">Delete release</button></div>')}
-function lCard(r){var st=lRelStats(r),d=parseDue(r.date);return'<div class="scard" data-lrel="'+r.row+'"><div><span class="dot '+lDot(r.status)+'"></span><b>'+esc(r.release)+'</b></div><span class="m">'+esc(r.type)+' · '+(r.date?esc(r.date):'no date')+'</span><span class="m">'+st.songs.length+' song'+(st.songs.length===1?'':'s')+'</span></div>'}
-function lSongCard(x){return'<div class="scard" data-lsong="'+x.row+'"><div><span class="dot '+lDot(x.status)+'"></span><b>'+esc(x.song)+'</b></div><span class="m">'+esc(x.status)+(x.release&&x.release!==x.song?' · '+esc(x.release):'')+'</span></div>'}
+function lSongStreams(x){var sr=lSeries(x.acode,'Streams',x.song);return sr.length?sr[sr.length-1].v:null}
+function lCard(r){var st=lRelStats(r),tot=0,has=false;st.songs.forEach(function(x){var v=lSongStreams(x);if(v!==null){tot+=v;has=true}});
+  return'<div class="scard" data-lrel="'+r.row+'"><div><span class="dot '+lDot(r.status)+'"></span><b>'+esc(r.release)+'</b></div><span class="m">'+esc(r.type)+' · '+(r.date?esc(r.date):'no date')+'</span><span class="m">'+st.songs.length+' song'+(st.songs.length===1?'':'s')+'</span>'+(has?'<span><b>'+lK(tot)+'</b> <span class="m">streams</span></span>':'')+'</div>'}
+function lSongCard(x){return'<div class="scard" data-lsong="'+x.row+'"><div><span class="dot '+lDot(x.status)+'"></span><b>'+esc(x.song)+'</b></div><span class="m">'+esc(x.status)+(x.release&&x.release!==x.song?' · '+esc(x.release):'')+'</span>'+(lSongStreams(x)!==null?'<span><b>'+lK(lSongStreams(x))+'</b> <span class="m">streams</span></span>':'')+'</div>'}
 function lArtDr(code){var a=lArt(code);LDR={k:'a',code:code};var sg=LBL.songs.filter(function(x){return x.acode===code}),rl=LBL.releases.filter(function(x){return x.acode===code}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))}),
     names=rl.map(function(r){return r.release}),loose=sg.filter(function(x){return!x.release||names.indexOf(x.release)<0}),
     mets=['Monthly listeners','Followers','Streams'].map(function(m){var sr=lSeries(code,m);return sr.length?'<div><b>'+lK(sr[sr.length-1].v)+'</b> <span class="m">'+m.toLowerCase()+' · '+esc(sr[sr.length-1].d)+'</span>'+lDelta(sr)+lSpark(sr)+'</div>':''}).join('');
@@ -1007,7 +1011,8 @@ document.addEventListener('change',function(e){var t=e.target,f=t.dataset&&t.dat
       if(l&&l.trim())return run('labelSet','assets',row,key,'link',l.trim()).then(function(){return run('labelSet','assets',row,key,'progress','Done')}).then(function(){toast('Saved');lblLoad()},lErr)}}}
   if(f==='due'||(tab==='releases'&&f==='date'))val=val;
   run('labelSet',tab,row,key,f,val).then(function(){toast('Saved');lblLoad()},lErr)},true);
-document.addEventListener('submit',function(e){var g=e.target.closest('[data-lstat]');if(g&&WS==='music'){e.preventDefault();var n=lNum(g.v.value);if(n===null||!LDR||LDR.k!=='a')return toast('Enter a number');
+document.addEventListener('submit',function(e){var g=e.target.closest('[data-lstat]');if(g&&WS==='music'){e.preventDefault();var n=lNum(g.v.value);if(n===null||!LDR||LDR.k==='r')return toast('Enter a number');
+  if(LDR.k==='s'){var sx=LBL.songs.filter(function(z){return z.row===LDR.row})[0];if(!sx)return;return run('labelAddStat',sx.acode,g.m.value,n,sx.release,'','Entered in Seer',sx.song).then(function(){toast('Stat added');lblLoad()},lErr)}
   return run('labelAddStat',LDR.code,g.m.value,n,'','','Entered in Seer').then(function(){toast('Stat added');lblLoad()},lErr)}
   var f=e.target.closest('[data-ladd]');if(!f||WS!=='music')return;e.preventDefault();var v=f.t.value.trim();if(!v||!LDR||LDR.k!=='a')return;
   var a=lArt(LDR.code);if(f.dataset.ladd==='song')lAddSong(a,v);else lAddRelease(a,v,'Single')},true);
