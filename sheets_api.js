@@ -709,6 +709,8 @@
       { type: 'D', date: 'E', status: 'F', folder: 'G', notes: 'H', spotify: 'I' }],
     assets: ['RELEASE_ASSETS', ['acode', 'artist', 'release', 'item', 'desc', 'due', 'owner', 'link', 'progress'], 'D',
       { desc: 'E', due: 'F', owner: 'G', link: 'H', progress: 'I' }],
+    playlists: ['PLAYLISTS', ['url', 'playlist', 'curator', 'type', 'acode', 'artist', 'song', 'status', 'pitched', 'added', 'checked', 'notes'], 'A',
+      { playlist: 'B', curator: 'C', type: 'D', status: 'H', pitched: 'I', added: 'J', notes: 'L' }],
     stats: ['STATS', ['date', 'acode', 'artist', 'release', 'metric', 'value', 'source', 'song'], 'E', {}]
   };
   var LABEL_ASSET_TEMPLATE = [['Song Master', 'Highest quality export'], ['Cover Art', 'Cover artwork, 3000x3000px, 300dpi'],
@@ -778,6 +780,19 @@
     await sAppend_(LABEL_ID, 'STATS!A:H', [[date || dateNow(), acode, x.a.name, release || '', metric, n, source || 'Entered in Seer', song || '']]);
     return { ok: true };
   }
+  async function labelAddPlaylist(acode, song, url, name, curator, ptype, status) {
+    var m = /open\.spotify\.com\/(?:intl-[a-z]+\/)?playlist\/([A-Za-z0-9]+)/.exec(String(url || ''));
+    if (!m) throw new Error('Paste a Spotify playlist link (open.spotify.com/playlist/...).');
+    var link = 'https://open.spotify.com/playlist/' + m[1], d = await labelData(), a = { name: '' };
+    if (acode) { a = d.artists.filter(function (x) { return x.code === acode; })[0]; if (!a) throw new Error('Unknown artist code ' + acode); }
+    song = String(song || '').trim();
+    if (song && !d.songs.some(function (s) { return s.acode === acode && s.song === song; })) throw new Error('Unknown song.');
+    if (d.playlists.some(function (r) { return r.url.replace(/\?.*/, '') === link && r.acode === (acode || '') && r.song === song; })) throw new Error('That playlist is already listed' + (song ? ' for this song.' : '.'));
+    status = ['Pitched', 'Added', 'Declined', 'Removed'].indexOf(status) > -1 ? status : 'Pitched';
+    var today = dateNow();
+    await sAppend_(LABEL_ID, 'PLAYLISTS!A:L', [[link, name || '', curator || '', ptype || '', acode || '', a.name, song, song ? status : '', status === 'Pitched' && song ? today : '', status === 'Added' && song ? today : '', '', '']]);
+    return { ok: true };
+  }
   async function labelDel(tab, row, expected) { await lCheck_(tab, row, expected); await sDelRow_(LABEL_ID, LABEL_TABS[tab][0], row); return { ok: true }; }
 
   var A = {
@@ -788,7 +803,8 @@
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
     musicData: musicData, musicSet: musicSet, musicAddTask: musicAddTask, musicAddArtist: musicAddArtist, musicDelTask: musicDelTask,
     labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, labelAddSong: labelAddSong,
-    labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelDel: labelDel,
+    labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
+    labelCheckPlaylists: function () { return Promise.reject(new Error('Checking playlists runs in the Seer desktop app (Windows or Mac). Playlists you add here are kept and checked from there.')); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
     addLog: addLog, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },

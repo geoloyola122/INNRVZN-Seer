@@ -937,7 +937,7 @@ function renderLabel(v){if(!LBL){v.innerHTML='<div class="empty">Loading INNRVZN
       return'<div class="acard" data-lart="'+esc(a.code)+'"><div class="ah"><span class="lcode">'+esc(a.code)+'</span><span class="stat">'+esc(a.status||'—')+'</span></div><b>'+esc(a.name)+'</b>'+
         '<div class="m">'+sg.length+' song'+(sg.length===1?'':'s')+' · '+rl.length+' release'+(rl.length===1?'':'s')+'</div>'+
         '<div style="margin-top:auto">'+(ml.length?'<div><b style="font-size:15px">'+lK(ml[ml.length-1].v)+'</b> <span class="m">monthly listeners</span>'+lDelta(ml)+'</div>'+lSpark(ml):'<div class="m">No stats yet</div>')+'</div></div>'}).join('');
-    v.innerHTML=searchBar('Search artists…')+'<div class="bar"><button class="b newb" data-lnew="artist">+ Artist</button></div><div class="sum"><b>'+LBL.artists.length+'</b> artists</div>'+
+    v.innerHTML=searchBar('Search artists…')+'<div class="bar"><button class="b newb" data-lnew="artist">+ Artist</button><button class="b" data-lnew="watch">+ Playlist</button><button class="b" data-lcheck="1">Check playlists</button></div><div class="sum"><b>'+LBL.artists.length+'</b> artists · <b>'+(LBL.playlists||[]).filter(function(p){return p.status==='Added'}).length+'</b> playlist placements</div>'+
       (cards?'<div class="agrid">'+cards+'</div>':'<div class="empty">No artists yet.</div>');return}
   if(view==='lrel'){var rr=LBL.releases.filter(function(r){return!q||(r.release+' '+r.artist+' '+r.acode).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.status==='Released')-(b.status==='Released')||a.artist.localeCompare(b.artist)||a.release.localeCompare(b.release)});
     v.innerHTML=searchBar('Search releases…')+'<div class="bar"><button class="b newb" data-lnew="release">+ Release</button></div><div class="sum"><b>'+rr.length+'</b> releases · <b>'+rr.filter(function(r){return r.status!=='Released'}).length+'</b> in the works</div>'+
@@ -958,6 +958,8 @@ function lSongDr(row){var x=LBL.songs.filter(function(z){return z.row===+row})[0
     lSel('songs',x.row,x.song,'status','Status',LSONG_ST,x.status)+lSel('songs',x.row,x.song,'release','Release',[''].concat(LBL.releases.filter(function(r){return r.acode===x.acode}).map(function(r){return r.release})),x.release)+
     '<h3>Stats</h3>'+(['Streams','Listeners'].map(function(m){var sr=lSeries(x.acode,m,x.song);return sr.length?'<div><b>'+lK(sr[sr.length-1].v)+'</b> <span class="m">'+m.toLowerCase()+' · '+esc(sr[sr.length-1].d)+'</span>'+lDelta(sr)+lSpark(sr)+'</div>':''}).join('')||'<div class="m">No stats yet.</div>')+
     '<form class="madd" data-lstat="1"><select name="m"><option>Streams</option><option>Listeners</option></select><input name="v" placeholder="Number"><button class="b">Add</button></form>'+
+    '<h3>Spotify playlists ('+lPls(x).length+')</h3>'+(lPls(x).map(lPlRow).join('')||'<div class="m">None yet.</div>')+
+    '<form class="madd" data-lpl="1"><input name="u" placeholder="Spotify playlist link"><select name="s"><option>Pitched</option><option>Added</option></select><button class="b">Add</button></form>'+
     '<h3>Files</h3>'+LSONG_LINKS.map(function(k){return lField('songs',x.row,x.song,k[0],k[1],x[k[0]],'link')}).join('')+
     '<h3>Notes</h3>'+lField('songs',x.row,x.song,'notes','Notes',x.notes)+
     '<div style="margin-top:14px"><button class="b delb" data-ldel="songs" data-lr="'+x.row+'" data-lk="'+esc(x.song)+'">Delete song</button></div>')}
@@ -972,10 +974,16 @@ function lRelDr(row){var r=LBL.releases.filter(function(z){return z.row===+row})
     '<h3>Songs ('+st.songs.length+')</h3>'+(st.songs.length?'<div class="sgrid">'+st.songs.map(lSongCard).join('')+'</div>':'<div class="m">No songs linked yet. Set a song\'s Release to "'+esc(r.release)+'".</div>')+
     (st.as.length?'<h3>Release checklist</h3>'+st.as.map(lAssetRow).join(''):'')+
     '<div style="margin-top:14px"><button class="b delb" data-ldel="releases" data-lr="'+r.row+'" data-lk="'+esc(r.release)+'">Delete release</button></div>')}
+var LPL_ST=['Pitched','Added','Declined','Removed'];
+function lPls(x){return(LBL.playlists||[]).filter(function(p){return p.acode===x.acode&&p.song===x.song})}
+function lPlAdded(x){return lPls(x).filter(function(p){return p.status==='Added'}).length}
+function lPlRow(p){var a='data-lt="playlists" data-lr="'+p.row+'" data-lk="'+esc(p.url)+'" data-lf="status"';
+  return'<div class="lf" style="grid-template-columns:1fr 100px auto"><span><a href="#" data-url="'+esc(p.url)+'" style="color:inherit"><b>'+esc(p.playlist||'Playlist')+'</b></a>'+(p.added?'<div class="m">added '+esc(p.added)+'</div>':p.pitched?'<div class="m">pitched '+esc(p.pitched)+'</div>':'')+'</span>'+
+    '<select '+a+'>'+lOpts(LPL_ST,p.status||'Pitched')+'</select><button class="b mi" data-url="'+esc(p.url)+'" title="Open in Spotify">↗</button></div>'}
 function lSongStreams(x){var sr=lSeries(x.acode,'Streams',x.song);return sr.length?sr[sr.length-1].v:null}
 function lCard(r){var st=lRelStats(r),tot=0,has=false;st.songs.forEach(function(x){var v=lSongStreams(x);if(v!==null){tot+=v;has=true}});
   return'<div class="scard" data-lrel="'+r.row+'"><div><span class="dot '+lDot(r.status)+'"></span><b>'+esc(r.release)+'</b></div><span class="m">'+esc(r.type)+' · '+(r.date?esc(r.date):'no date')+'</span><span class="m">'+st.songs.length+' song'+(st.songs.length===1?'':'s')+'</span>'+(has?'<span><b>'+lK(tot)+'</b> <span class="m">streams</span></span>':'')+'</div>'}
-function lSongCard(x){return'<div class="scard" data-lsong="'+x.row+'"><div><span class="dot '+lDot(x.status)+'"></span><b>'+esc(x.song)+'</b></div><span class="m">'+esc(x.status)+(x.release&&x.release!==x.song?' · '+esc(x.release):'')+'</span>'+(lSongStreams(x)!==null?'<span><b>'+lK(lSongStreams(x))+'</b> <span class="m">streams</span></span>':'')+'</div>'}
+function lSongCard(x){return'<div class="scard" data-lsong="'+x.row+'"><div><span class="dot '+lDot(x.status)+'"></span><b>'+esc(x.song)+'</b></div><span class="m">'+esc(x.status)+(x.release&&x.release!==x.song?' · '+esc(x.release):'')+'</span>'+(lSongStreams(x)!==null?'<span><b>'+lK(lSongStreams(x))+'</b> <span class="m">streams</span></span>':'')+(lPlAdded(x)?'<span class="m">'+lPlAdded(x)+' playlist'+(lPlAdded(x)===1?'':'s')+'</span>':'')+'</div>'}
 function lArtDr(code){var a=lArt(code);LDR={k:'a',code:code};var sg=LBL.songs.filter(function(x){return x.acode===code}),rl=LBL.releases.filter(function(x){return x.acode===code}).sort(function(a,b){return String(b.date).localeCompare(String(a.date))}),
     names=rl.map(function(r){return r.release}),loose=sg.filter(function(x){return!x.release||names.indexOf(x.release)<0}),
     mets=['Monthly listeners','Followers','Streams'].map(function(m){var sr=lSeries(code,m);return sr.length?'<div><b>'+lK(sr[sr.length-1].v)+'</b> <span class="m">'+m.toLowerCase()+' · '+esc(sr[sr.length-1].d)+'</span>'+lDelta(sr)+lSpark(sr)+'</div>':''}).join('');
@@ -996,8 +1004,11 @@ document.addEventListener('click',function(e){if(WS!=='music')return;var x;
   if((x=e.target.closest('[data-lsong]')))lSongDr(x.dataset.lsong);
   else if((x=e.target.closest('[data-lrel]')))lRelDr(x.dataset.lrel);
   else if((x=e.target.closest('[data-lart]')))lArtDr(x.dataset.lart);
+  else if((x=e.target.closest('[data-lcheck]'))){toast('Checking playlists… this takes a minute');x.disabled=true;
+    run('labelCheckPlaylists').then(function(r){x.disabled=false;toast(r&&r.message?r.message:'Checked '+r.checked+' playlist'+(r.checked===1?'':'s')+': '+r.new+' new, '+r.added+' now added, '+r.removed+' removed'+(r.errors&&r.errors.length?' ('+r.errors.length+' could not be read)':''));lblLoad()},function(e){x.disabled=false;toast(String(e&&e.message||e))})}
   else if((x=e.target.closest('[data-lnew]'))){var k=x.dataset.lnew;
-    if(k==='artist'){var n=prompt('Artist name:','');if(n)run('labelAddArtist',n).then(function(r){toast('Added '+n.trim()+' ('+r.code+')');lblLoad()},lErr)}
+    if(k==='watch'){var u=prompt('Spotify playlist link to keep an eye on:','');if(u)run('labelAddPlaylist','','',u.trim(),'','','','').then(function(){toast('Playlist added. Use Check playlists to see which of our songs are in it.');lblLoad()},lErr)}
+    else if(k==='artist'){var n=prompt('Artist name:','');if(n)run('labelAddArtist',n).then(function(r){toast('Added '+n.trim()+' ('+r.code+')');lblLoad()},lErr)}
     else lPickArtist(function(a){if(k==='song'){var s=prompt('Song title for '+a.name+':','');if(s)lAddSong(a,s.trim())}
       else{var r=prompt('Release name for '+a.name+':','');if(!r)return;var t=(prompt('Type: Single, EP or Album','Single')||'Single').trim();lAddRelease(a,r.trim(),/^ep$/i.test(t)?'EP':/^album$/i.test(t)?'Album':'Single')}})}
   else if((x=e.target.closest('[data-ldel]'))){var tab=x.dataset.ldel,row=+x.dataset.lr,key=x.dataset.lk;
@@ -1011,7 +1022,9 @@ document.addEventListener('change',function(e){var t=e.target,f=t.dataset&&t.dat
       if(l&&l.trim())return run('labelSet','assets',row,key,'link',l.trim()).then(function(){return run('labelSet','assets',row,key,'progress','Done')}).then(function(){toast('Saved');lblLoad()},lErr)}}}
   if(f==='due'||(tab==='releases'&&f==='date'))val=val;
   run('labelSet',tab,row,key,f,val).then(function(){toast('Saved');lblLoad()},lErr)},true);
-document.addEventListener('submit',function(e){var g=e.target.closest('[data-lstat]');if(g&&WS==='music'){e.preventDefault();var n=lNum(g.v.value);if(n===null||!LDR||LDR.k==='r')return toast('Enter a number');
+document.addEventListener('submit',function(e){var pf=e.target.closest('[data-lpl]');if(pf&&WS==='music'){e.preventDefault();var px=LDR&&LDR.k==='s'?LBL.songs.filter(function(z){return z.row===LDR.row})[0]:null;if(!px||!pf.u.value.trim())return;
+  return run('labelAddPlaylist',px.acode,px.song,pf.u.value.trim(),'','','',pf.s.value).then(function(){toast('Playlist added');lblLoad()},lErr)}
+  var g=e.target.closest('[data-lstat]');if(g&&WS==='music'){e.preventDefault();var n=lNum(g.v.value);if(n===null||!LDR||LDR.k==='r')return toast('Enter a number');
   if(LDR.k==='s'){var sx=LBL.songs.filter(function(z){return z.row===LDR.row})[0];if(!sx)return;return run('labelAddStat',sx.acode,g.m.value,n,sx.release,'','Entered in Seer',sx.song).then(function(){toast('Stat added');lblLoad()},lErr)}
   return run('labelAddStat',LDR.code,g.m.value,n,'','','Entered in Seer').then(function(){toast('Stat added');lblLoad()},lErr)}
   var f=e.target.closest('[data-ladd]');if(!f||WS!=='music')return;e.preventDefault();var v=f.t.value.trim();if(!v||!LDR||LDR.k!=='a')return;
