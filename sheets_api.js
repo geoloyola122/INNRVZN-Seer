@@ -708,7 +708,8 @@
     releases: ['RELEASES', ['acode', 'artist', 'release', 'type', 'date', 'status', 'folder', 'notes', 'spotify'], 'C',
       { type: 'D', date: 'E', status: 'F', folder: 'G', notes: 'H', spotify: 'I' }],
     assets: ['RELEASE_ASSETS', ['acode', 'artist', 'release', 'item', 'desc', 'due', 'owner', 'link', 'progress'], 'D',
-      { desc: 'E', due: 'F', owner: 'G', link: 'H', progress: 'I' }]
+      { desc: 'E', due: 'F', owner: 'G', link: 'H', progress: 'I' }],
+    stats: ['STATS', ['date', 'acode', 'artist', 'release', 'metric', 'value', 'source'], 'E', {}]
   };
   var LABEL_ASSET_TEMPLATE = [['Song Master', 'Highest quality export'], ['Cover Art', 'Cover artwork, 3000x3000px, 300dpi'],
     ['Spotify Canvas', '9x16, 7 second clip'], ['Metadata', ''], ['Split Sheet', 'A signed document to protect all parties']];
@@ -770,6 +771,13 @@
     await sAppend_(LABEL_ID, 'RELEASE_ASSETS!A:I', items.map(function (it) { return [acode, x.a.name, name, it[0], it[1], '', '', '', 'Not started']; }));
     return { ok: true };
   }
+  async function labelAddStat(acode, metric, value, release, date, source) {
+    if (['Monthly listeners', 'Followers', 'Streams'].indexOf(metric) === -1) throw new Error('Unknown metric.');
+    var n = parseFloat(String(value).replace(/,/g, '')); if (isNaN(n)) throw new Error('The value must be a number.');
+    var x = await lArtist_(acode);
+    await sAppend_(LABEL_ID, 'STATS!A:G', [[date || dateNow(), acode, x.a.name, release || '', metric, n, source || 'Entered in Seer']]);
+    return { ok: true };
+  }
   async function labelDel(tab, row, expected) { await lCheck_(tab, row, expected); await sDelRow_(LABEL_ID, LABEL_TABS[tab][0], row); return { ok: true }; }
 
   var A = {
@@ -780,7 +788,7 @@
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
     musicData: musicData, musicSet: musicSet, musicAddTask: musicAddTask, musicAddArtist: musicAddArtist, musicDelTask: musicDelTask,
     labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, labelAddSong: labelAddSong,
-    labelAddRelease: labelAddRelease, labelDel: labelDel,
+    labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelDel: labelDel,
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
     addLog: addLog, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
