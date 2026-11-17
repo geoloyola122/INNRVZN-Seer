@@ -705,8 +705,8 @@
   var LABEL_TABS = {
     songs: ['SONGS', ['acode', 'artist', 'song', 'release', 'status', 'demo', 'mix', 'splitsheet', 'ingestion', 'master', 'visual', 'notes'], 'C',
       { release: 'D', status: 'E', demo: 'F', mix: 'G', splitsheet: 'H', ingestion: 'I', master: 'J', visual: 'K', notes: 'L' }],
-    releases: ['RELEASES', ['acode', 'artist', 'release', 'type', 'date', 'status', 'folder', 'notes'], 'C',
-      { type: 'D', date: 'E', status: 'F', folder: 'G', notes: 'H' }],
+    releases: ['RELEASES', ['acode', 'artist', 'release', 'type', 'date', 'status', 'folder', 'notes', 'spotify'], 'C',
+      { type: 'D', date: 'E', status: 'F', folder: 'G', notes: 'H', spotify: 'I' }],
     assets: ['RELEASE_ASSETS', ['acode', 'artist', 'release', 'item', 'desc', 'due', 'owner', 'link', 'progress'], 'D',
       { desc: 'E', due: 'F', owner: 'G', link: 'H', progress: 'I' }]
   };
@@ -765,7 +765,7 @@
     var x = await lArtist_(acode);
     if (x.d.releases.some(function (r) { return r.acode === acode && r.release.toLowerCase() === name.toLowerCase(); })) throw new Error(name + ' already exists for ' + x.a.name + '.');
     rtype = ['Single', 'EP', 'Album'].indexOf(rtype) > -1 ? rtype : 'Single';
-    await sAppend_(LABEL_ID, 'RELEASES!A:H', [[acode, x.a.name, name, rtype, String(date || ''), 'Planning', '', '']]);
+    await sAppend_(LABEL_ID, 'RELEASES!A:I', [[acode, x.a.name, name, rtype, String(date || ''), 'Planning', '', '', '']]);
     var items = (rtype !== 'Single' ? LABEL_EP_EXTRA : []).concat(LABEL_ASSET_TEMPLATE);
     await sAppend_(LABEL_ID, 'RELEASE_ASSETS!A:I', items.map(function (it) { return [acode, x.a.name, name, it[0], it[1], '', '', '', 'Not started']; }));
     return { ok: true };
