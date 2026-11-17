@@ -843,6 +843,7 @@ function dbNet(name){var k=dbKey(name);if(k.length<3||!D)return-1;var cs=D.clien
   for(var i=0;i<cs.length;i++){if(cs[i].kind==='PME')continue;var c=dbKey(cs[i].name);if(c.length>=3&&(c===k||c.indexOf(k)===0||k.indexOf(c)===0))return i}return-1}
 function dbBadge(name){var i=dbNet(name);return i>-1?' <span class="kind lnk" data-cli="'+i+'" title="Open the record">Also in '+(D.clients[i].kind==='Partner'?'Partners':'Clients')+'</span>':''}
 function dbNm(main,sub){return main+(sub?'<div class="m dbsub">'+esc(sub)+'</div>':'')}
+var TCAT=['Celebrities','Actors / VO / Hosts','Streamers','Influencers','Lyric & Meme Pages'];
 var NEWSEL='<select id="newsel" class="newb"><option value="">+ New…</option><option value="CLIENTS & PARTNERSHIPS" data-t="New client / partner">Client / partner</option><option value="BRAND OUTREACH CLIENTS" data-t="New prospect">Prospect</option><option value="AGENCIES" data-t="New service partner">Service partner</option><option value="PME CLIENTS" data-t="New PME entry">PME</option><option value="ACCOUNT MANAGERS" data-t="New account manager">Account manager</option></select>';
 function renderDb(v){var sec=String(view).replace(/^db/,'')||'clients',f=UI.dbf||'';
   if(!DB){v.innerHTML='<div class="empty">Loading database…</div>';dbLoad();return}
@@ -861,9 +862,9 @@ function renderDb(v){var sec=String(view).replace(/^db/,'')||'clients',f=UI.dbf|
     cols='minmax(200px,3fr) 150px minmax(160px,2fr)';head=['Name','Team','Accounts'];hay=function(a){return[a.name,a.known,a.team,a.accounts].join(' ')};
     sortf=function(a,b){return(a.team||'').localeCompare(b.team||'')||a.name.localeCompare(b.name)};
     cell=function(a){return{a:' data-am="'+a.row+'"',c:[dbNm('<b>'+esc(a.name)+'</b>',a.known?'"'+a.known+'"':''),esc(a.team||'No team'),esc(a.accounts||a.count||'')]}}}
-  else if(sec==='talent'){items=DB.talent;fk=function(t){return t.agency};
-    cols='minmax(200px,3fr) minmax(220px,2fr)';head=['Talent','Agency / label'];hay=function(t){return[t.name,t.agency,t.tag,t.notes].join(' ')};
-    cell=function(t){return{n:dbNet(t.agency)>-1,c:[dbNm('<b>'+esc(t.name)+'</b>',[t.tag,t.notes].filter(Boolean).join(' · ')),esc(t.agency)+dbBadge(t.agency)]}}}
+  else if(sec==='talent'){items=DB.talent.slice().sort(function(a,b){return TCAT.indexOf(a.category)-TCAT.indexOf(b.category)});fk=function(t){return t.category||'Other'};
+    cols='minmax(200px,3fr) 170px minmax(160px,2fr)';head=['Talent','Category','Agency / handle'];hay=function(t){return[t.name,t.category,t.agency,t.handle,t.tier,t.region,t.notes].join(' ')};
+    cell=function(t){var who=t.agency||t.handle;return{n:!!t.agency&&dbNet(t.agency)>-1,c:[dbNm('<b>'+esc(t.name)+'</b>',[t.tier,t.region,t.notes].filter(Boolean).join(' · ')),esc(t.category),esc(who)+(t.agency?dbBadge(t.agency):'')]}}}
   else if(sec==='brands'){items=DB.brands;fk=function(b){return b.type};
     cols='minmax(200px,3fr) 160px 90px';head=['Organization','Type','Region'];hay=function(b){return[b.org,b.type,b.region,b.notes].join(' ')};
     cell=function(b){return{n:dbNet(b.org)>-1,c:[dbNm('<b>'+esc(b.org)+'</b>'+dbBadge(b.org),b.notes),esc(b.type),esc(b.region)]}}}

@@ -677,7 +677,7 @@
     t.forEach(function (r, i) { if (anyCell_(r)) { var o = zip_(['artist', 'project', 'task', 'status', 'owner', 'due', 'link', 'notes'], r); o.row = i + 2; tasks.push(o); } });
     return { artists: arts, tasks: tasks, url: 'https://docs.google.com/spreadsheets/d/' + MUSIC_ID + '/edit' };
   }
-  var DB_TABS = [['talent', 'TALENT', ['name', 'agency', 'tag', 'notes']],
+  var DB_TABS = [['talent', 'TALENT', ['name', 'category', 'agency', 'handle', 'tier', 'region', 'notes']],
   ['brands', 'BRANDS', ['type', 'region', 'org', 'notes']],
   ['contacts', 'CONTACTS', ['section', 'type', 'name', 'org', 'handle', 'region', 'reach', 'notes']]];
   async function databaseData() {
