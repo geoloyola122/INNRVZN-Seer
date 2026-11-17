@@ -677,6 +677,18 @@
     t.forEach(function (r, i) { if (anyCell_(r)) { var o = zip_(['artist', 'project', 'task', 'status', 'owner', 'due', 'link', 'notes'], r); o.row = i + 2; tasks.push(o); } });
     return { artists: arts, tasks: tasks, url: 'https://docs.google.com/spreadsheets/d/' + MUSIC_ID + '/edit' };
   }
+  var DB_TABS = [['talent', 'TALENT', ['name', 'agency', 'tag', 'notes']],
+  ['brands', 'BRANDS', ['type', 'region', 'org', 'notes']],
+  ['contacts', 'CONTACTS', ['section', 'type', 'name', 'org', 'handle', 'region', 'reach', 'notes']]];
+  async function databaseData() {
+    var out = { url: 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit' };
+    for (var i = 0; i < DB_TABS.length; i++) {
+      var t = DB_TABS[i], rows = [];
+      try { rows = await sv_(SHEET_ID, "'" + t[1] + "'!A2:" + String.fromCharCode(64 + t[2].length)); } catch (e) { rows = []; }
+      out[t[0]] = rows.filter(anyCell_).map(function (r) { return zip_(t[2], r); });
+    }
+    return out;
+  }
   async function mCheck_(row, expected) {
     var cur = await sv_(MUSIC_ID, 'PROJECTS!C' + row);
     if (!cur.length || !cur[0].length || pstr_(cur[0][0]).trim() !== String(expected).trim()) throw new Error('That task moved in the sheet. Refresh and try again.');
@@ -801,6 +813,7 @@
     driveCreateRoot: driveCreateRoot, createFolder: ensureFolder_, submitDeliverable: submitDeliverable, uploadDeliverableData: uploadDeliverableData,
     appVersion: function () { return Promise.resolve({ version: WEB_VERSION, web: true }); },
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
+    databaseData: databaseData,
     musicData: musicData, musicSet: musicSet, musicAddTask: musicAddTask, musicAddArtist: musicAddArtist, musicDelTask: musicDelTask,
     labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, labelAddSong: labelAddSong,
     labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
@@ -813,8 +826,8 @@
     splashPlate: function () { return Promise.resolve({ ok: false }); },
     openUrl: function (u) { window.open(u, '_blank', 'noopener'); return Promise.resolve({ ok: true }); },
     log: function () { return Promise.resolve({ ok: true }); },
-    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'plus', 'music', 'label'].indexOf(w) > -1 ? w : ''); },
-    setWorkspace: function (ws) { if (['dash', 'plus', 'music', 'label'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
+    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'plus', 'music', 'label', 'db'].indexOf(w) > -1 ? w : ''); },
+    setWorkspace: function (ws) { if (['dash', 'plus', 'music', 'label', 'db'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
     signOut: function () {
       try { if (token && window.google && google.accounts) google.accounts.oauth2.revoke(token, function () { }); } catch (e) { }
       token = ''; lsSet('ta_signed', ''); try { sessionStorage.clear(); } catch (e) { }
