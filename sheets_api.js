@@ -703,8 +703,8 @@
   async function musicDelTask(row, expected) { await mCheck_(row, expected); await sDelRow_(MUSIC_ID, 'PROJECTS', row); return { ok: true }; }
 
   var LABEL_TABS = {
-    songs: ['SONGS', ['acode', 'artist', 'song', 'release', 'status', 'demo', 'mix', 'splitsheet', 'ingestion', 'master', 'visual', 'notes'], 'C',
-      { release: 'D', status: 'E', demo: 'F', mix: 'G', splitsheet: 'H', ingestion: 'I', master: 'J', visual: 'K', notes: 'L' }],
+    songs: ['SONGS', ['acode', 'artist', 'song', 'release', 'status', 'demo', 'mix', 'splitsheet', 'ingestion', 'master', 'visual', 'notes', 'tiktok'], 'C',
+      { release: 'D', status: 'E', demo: 'F', mix: 'G', splitsheet: 'H', ingestion: 'I', master: 'J', visual: 'K', notes: 'L', tiktok: 'M' }],
     releases: ['RELEASES', ['acode', 'artist', 'release', 'type', 'date', 'status', 'folder', 'notes', 'spotify'], 'C',
       { type: 'D', date: 'E', status: 'F', folder: 'G', notes: 'H', spotify: 'I' }],
     assets: ['RELEASE_ASSETS', ['acode', 'artist', 'release', 'item', 'desc', 'due', 'owner', 'link', 'progress'], 'D',

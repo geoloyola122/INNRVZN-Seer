@@ -962,6 +962,7 @@ function lSongDr(row){var x=LBL.songs.filter(function(z){return z.row===+row})[0
     lSel('songs',x.row,x.song,'status','Status',LSONG_ST,x.status)+lSel('songs',x.row,x.song,'release','Release',[''].concat(LBL.releases.filter(function(r){return r.acode===x.acode}).map(function(r){return r.release})),x.release)+
     '<h3>Stats</h3>'+(['Streams','Listeners','TikTok creates'].map(function(m){var sr=lSeries(x.acode,m,x.song);return sr.length?'<div><b>'+lK(sr[sr.length-1].v)+'</b> <span class="m">'+(m==='TikTok creates'?'TikTok videos made':m.toLowerCase())+' · '+esc(sr[sr.length-1].d)+'</span>'+lDelta(sr)+lSpark(sr)+'</div>':''}).join('')||'<div class="m">No stats yet.</div>')+
     '<form class="madd" data-lstat="1"><select name="m"><option>Streams</option><option>Listeners</option><option>TikTok creates</option></select><input name="v" placeholder="Number"><button class="b">Add</button></form>'+
+    lField('songs',x.row,x.song,'tiktok','TikTok sound link',x.tiktok,'link')+
     '<h3>Files</h3>'+LSONG_LINKS.map(function(k){return lField('songs',x.row,x.song,k[0],k[1],x[k[0]],'link')}).join('')+
     '<h3>Notes</h3>'+lField('songs',x.row,x.song,'notes','Notes',x.notes)+
     '<div style="margin-top:14px"><button class="b delb" data-ldel="songs" data-lr="'+x.row+'" data-lk="'+esc(x.song)+'">Delete song</button></div>')}
