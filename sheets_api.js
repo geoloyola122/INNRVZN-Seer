@@ -186,8 +186,9 @@
   }
   async function people_() { return (await vals_('LISTS!E2:E')).map(function (r) { return pstr_(r[0]); }).filter(function (x) { return x; }); }
   async function meName_() {
-    var e = (email || '').toLowerCase(), p = await people_();
-    for (var i = 0; i < p.length; i++) if (e.indexOf(p[i].toLowerCase()) > -1) return p[i];
+    var loc = (email || '').toLowerCase().split('@')[0].replace(/[^a-z0-9]/g, ''), p = await people_(), cl = function (s) { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); };
+    for (var i = 0; i < p.length; i++) if (cl(p[i]) && loc.indexOf(cl(p[i])) > -1) return p[i];
+    for (var j = 0; j < p.length; j++) { var f = cl(String(p[j]).split(/\s+/)[0]); if (f && loc.indexOf(f) > -1) return p[j]; }
     return '';
   }
 
