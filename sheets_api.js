@@ -333,7 +333,12 @@
     var forOpts = [], people = [];
     l.forEach(function (r) { r = pad_(r, 5); if (r[0]) forOpts.push(pstr_(r[0])); if (r[4]) people.push(pstr_(r[4])); });
     var me = '';
-    for (var i = 0; i < people.length; i++) if (email.toLowerCase().indexOf(people[i].toLowerCase()) > -1) { me = people[i]; break; }
+    if (ACCESS && ACCESS.ok && ACCESS.name && people.indexOf(ACCESS.name) > -1) me = ACCESS.name;
+    else {
+      var loc = (email || '').toLowerCase().split('@')[0].replace(/[^a-z0-9]/g, ''), cl = function (x) { return String(x).toLowerCase().replace(/[^a-z0-9]/g, ''); };
+      for (var i = 0; i < people.length && !me; i++) if (cl(people[i]) && loc.indexOf(cl(people[i])) > -1) me = people[i];
+      for (var j = 0; j < people.length && !me; j++) { var f = cl(String(people[j]).split(/\s+/)[0]); if (f && loc.indexOf(f) > -1) me = people[j]; }
+    }
     return { tasks: tasks, campaigns: camps, forOptions: forOpts, people: people, clients: clients, meetings: meetings, ams: ams,
       log: log, me: me, email: email, loaded: Date.now() / 1000 };
   }
@@ -923,6 +928,7 @@
     getData: getData, addTask: addTask, completeTask: completeTask, snoozeTask: snoozeTask, setCampaignStatus: setCampaignStatus,
     driveStatus: driveStatus, driveConnect: driveStatus, driveDisconnect: driveStatus, driveFind: driveFind, driveSetRoot: driveSetRoot,
     driveCreateRoot: driveCreateRoot, createFolder: ensureFolder_, submitDeliverable: submitDeliverable, uploadDeliverableData: uploadDeliverableData,
+    authStatus: async function () { var a = await accessCheck_(); return { ok: !!a.ok, email: email, name: a.name || '', role: a.role || '' }; },
     appVersion: function () { return Promise.resolve({ version: WEB_VERSION, web: true }); },
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
     databaseData: databaseData,

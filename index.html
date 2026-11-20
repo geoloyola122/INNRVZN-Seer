@@ -337,6 +337,8 @@ function parseDue(s){ // accepts yyyy-MM-dd or "Sat, Nov 14"
   var d=new Date(today().getFullYear(),MON.indexOf(m[1]),+m[2]);if(d<today()-200*864e5)d.setFullYear(d.getFullYear()+1);return d}
 function fmt(d){return d?d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}):'No date'}
 function load(force){document.getElementById('rf').textContent='…';return run('getData').then(function(d){D=d;classify(D);
+  var em=String(d.email||'').toLowerCase(),lastEm='';try{lastEm=localStorage.getItem('ta_who_acct')||''}catch(e){}
+  if(em&&lastEm!==em){who=d.me||'';try{localStorage.setItem('ta_who',who);localStorage.setItem('ta_who_acct',em)}catch(e){}}
   if(who&&d.people.indexOf(who)<0){var wl=who.toLowerCase(),hit=d.people.filter(function(p){return p.toLowerCase().split(' ')[0]===wl})[0];who=hit||'';try{localStorage.setItem('ta_who',who)}catch(e){}}
   if(!who)who=d.me||'';var w=document.getElementById('who');
   w.innerHTML='<option value="">Everyone</option>'+d.people.map(function(p){return'<option'+(p===who?' selected':'')+'>'+esc(p)+'</option>'}).join('');
@@ -1411,8 +1413,8 @@ document.addEventListener('click',function(e){
     run('signIn').then(function(r){toast('Signed in'+(r.email?' as '+r.email:''));startApp()}).catch(function(err){b.disabled=false;document.getElementById('lgmsg').textContent=String(err&&err.message||err)})}
   else if(e.target.closest('[data-signout]')){if(!confirm('Sign out of INNRVZN Seer on this computer?'))return;run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin('Signed out.')})}
   else if(e.target.closest('[data-switchacct]')){run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin();document.querySelector('[data-signin]').click()})}});
-var _renderMore=renderMore;renderMore=function(v){_renderMore(v);if(!window.pywebview)return;run('authStatus').then(function(a){if(!a.ok||view!=='more')return;
-  v.insertAdjacentHTML('afterbegin','<div class="card acct"><div><div class="m">Signed in as</div><b>'+esc(a.email||'Google account')+'</b></div><span style="flex:1"></span><button class="b" data-switchacct>Switch account</button><button class="b delb" data-signout>Sign out</button></div>')})};
+var _renderMore=renderMore;renderMore=function(v){_renderMore(v);run('authStatus').then(function(a){if(!a.ok||view!=='more')return;
+  v.insertAdjacentHTML('afterbegin','<div class="card acct"><div><div class="m">Signed in as</div><b>'+esc(a.name||(D&&D.me)||a.email||'Google account')+'</b><div class="m">'+esc(a.email||'')+(a.role?' \u00b7 '+esc(a.role):'')+'</div></div><span style="flex:1"></span><button class="b" data-switchacct>Switch account</button><button class="b delb" data-signout>Sign out</button></div>')})};
 render();
 run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
 if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
