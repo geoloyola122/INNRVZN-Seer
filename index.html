@@ -1273,7 +1273,7 @@ function musNav(on){var n=document.querySelector('nav');if(!PLUSNAV)PLUSNAV=n.in
   document.getElementById('qi').placeholder='Add a task: Shoot BTS #Feel Like Roll-out @Ashley dec 5   (Ctrl+K)'}
 function musLoad(){document.getElementById('rf').textContent='…';
   return run('musicData').then(function(d){MUS=d;document.getElementById('rf').textContent='↻';if(WS==='music'||view==='dash'){render();if(MDR)musReDr()}})
-    .catch(function(e){document.getElementById('rf').textContent='↻';if(WS!=='music'){MUS={artists:[],tasks:[],url:''};if(view==='dash')render();return}if(WS==='music')document.getElementById('v').innerHTML='<div class="empty">Could not load the Music sheet: '+esc(e&&e.message||e)+'</div>'})}
+    .catch(function(e){document.getElementById('rf').textContent='↻';if(WS!=='music'){MUS={artists:[],tasks:[],url:''};if(view==='dash')render();return}if(WS==='music')document.getElementById('v').innerHTML='<div class="errcard"><div class="errtt">Could not load the Music sheet</div><div class="m">'+esc(/403|permission/i.test(String(e&&e.message||e))?'This Google account does not have access to the Music Tracker sheet. Ask the sheet owner to share it with your email, then try again.':(e&&e.message||e))+'</div><button class="b pri" onclick="musLoad()">Try again</button></div>'})}
 function mProjects(){var o={};MUS.tasks.forEach(function(t){var k=t.artist+'\u0001'+t.project;(o[k]=o[k]||{artist:t.artist,name:t.project,tasks:[]}).tasks.push(t)});
   return Object.keys(o).map(function(k){var p=o[k],open=p.tasks.filter(function(t){return t.status!=='Done'});p.done=p.tasks.length-open.length;p.open=open;
     p.status=!open.length?'Done':p.tasks.some(function(t){return t.status!=='Not started'})?'In progress':'Not started';
