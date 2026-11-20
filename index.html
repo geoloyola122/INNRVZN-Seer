@@ -520,7 +520,7 @@ function cliDr(i){var c=D.clients[i],lc=lastContact(c.name),ts=linkedTasks(c.nam
   '<details class="allf"><summary>Show advanced</summary><div id="edA"></div></details>');
   editSplit(tab,c.row,ESS[tab],function(one){return{used:{},html:LKEYS[tab]?linksRow(tab,c.links,['bill']):''}})}
 var CTAB={'Clients & Partnerships':'CLIENTS & PARTNERSHIPS','Brand Outreach':'BRAND OUTREACH CLIENTS','PME':'PME CLIENTS','Agencies':'AGENCIES'};
-function taskDr(row){var t=D.tasks.find(function(x){return x.row===row});openDr('<div class="m" style="color:var(--mute);font-size:12px">Task</div><h2>'+esc(t?t.task:'Task')+'</h2><div id="ed"></div>');editRecord('TASKS',row)}
+function taskDr(row){if(!(row>0))return;var t=D.tasks.find(function(x){return x.row===row});openDr('<div class="m" style="color:var(--mute);font-size:12px">Task</div><h2>'+esc(t?t.task:'Task')+'</h2><div id="ed"></div>');editRecord('TASKS',row)}
 function meetDr(row){var m=(D.meetings||[]).find(function(x){return x.row===row});if(m)cxPanel({m:m})}
 function amDr(row){var a=(D.ams||[]).find(function(x){return x.row===row});openDr('<div class="m" style="color:var(--mute);font-size:12px">Account manager</div><h2>'+esc(a?a.name:'')+'</h2><div id="ed"></div>');editRecord('ACCOUNT MANAGERS',row)}
 function newBar(v){return''}
@@ -1087,7 +1087,7 @@ document.getElementById('who').onchange=function(){who=this.value;try{localStora
 document.getElementById('rf').onclick=function(){if(WS==='music')lblLoad();if(WS!=='plus')musLoad();if(WS!=='music')load(true)};
 function navClick(e){var nb=e.target.closest('[data-new]');if(nb){newRecord(nb.dataset.new,nb.dataset.t,nb.dataset.date?{D:nb.dataset.date}:(nb.dataset.for?{D:nb.dataset.for}:(nb.dataset.new==='TASKS'?{}:null)));return true}
   var og=e.target.closest('[data-orph]');if(og){orphDr();return true}
-  var tk=e.target.closest('[data-task]');if(tk){taskDr(+tk.dataset.task);return true}
+  var tk=e.target.closest('[data-task]');if(tk&&/^\d+$/.test(tk.dataset.task)&&!tk.classList.contains('mtask')){taskDr(+tk.dataset.task);return true}
   var mt=e.target.closest('[data-meet]');if(mt&&!e.target.closest('#dr')){meetDr(+mt.dataset.meet);return true}
   var am=e.target.closest('[data-am]');if(am){amDr(+am.dataset.am);return true}
   var el=e.target.closest('[data-cli],[data-camp],[data-who],.card');if(!el||e.target.type==='checkbox'||e.target.dataset.s)return false;
