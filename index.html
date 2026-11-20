@@ -302,6 +302,7 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 .mhead .pri{background:var(--acc);border-color:transparent;color:#fff;font-weight:600}
 .mrow{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:var(--chip);border:1px solid var(--line);margin-bottom:5px;cursor:pointer}.mrow:hover{border-color:var(--rim)}
 .mrow .tm{min-width:84px;font-size:12px;font-weight:600}.mrow.cn{opacity:.55}.mrow .nm{flex:1;min-width:0}
+.mtsm{display:flex;gap:6px;flex-wrap:wrap;min-height:4px}.mtsm:not(:empty){margin-top:2px}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -747,7 +748,7 @@ function cxPanel(o){o=o||{};var m=o.m||null,t=cxTimes(),proj=m?m.project:(o.proj
   MTP={m:m,back:o.back||null,client:cl,lock:!!o.lock};
   openDr('<div class="m" style="color:var(--mute);font-size:12px">'+(m?'Meeting':'New meeting')+'</div><h2>'+esc(m?(m.subject||'Meeting'):'Set a meeting')+'</h2>'+
   '<form class="mtf" id="mtf" novalidate>'+
-  '<label>Title<input id="mt_t" value="'+esc(m?m.subject:'')+'" placeholder="e.g. Release planning" autocomplete="off"></label>'+
+  '<label>Title<div style="position:relative"><input id="mt_t" value="'+esc(m?m.subject:'')+'" placeholder="e.g. Release planning #Mahou Idol @Geo tomorrow 3-4pm" autocomplete="off"><div id="mtS" class="rsug"></div></div><div id="mtsm" class="mtsm"></div></label>'+
   '<div class="r2"><label>Category<select id="mt_c">'+CXN.map(function(c){return'<option'+(c===cat?' selected':'')+'>'+c+'</option>'}).join('')+'</select></label>'+
   '<label>Project'+(o.lock?' (from this project)':'')+'<select id="mt_p"'+(o.lock?' disabled':'')+'>'+pOpt+'</select></label></div>'+
   '<div class="r3"><label>Date<input type="date" id="mt_d" value="'+esc(m?(m.date||''):(o.date||iso(today())))+'"></label><label>Start'+mk('mt_s',m?m.time:(o.time||''))+'</label><label>End'+mk('mt_e',m?m.end:(o.end||''))+'</label></div>'+
@@ -761,9 +762,10 @@ function cxPanel(o){o=o||{};var m=o.m||null,t=cxTimes(),proj=m?m.project:(o.proj
   setTimeout(function(){var i=document.getElementById('mt_t');if(i&&!m)i.focus()},50)}
 function mtErr(msg,id){var e=document.getElementById('mterr');if(e)e.textContent=msg||'';[].forEach.call(document.querySelectorAll('#mtf .bad'),function(x){x.classList.remove('bad')});if(id){var f=document.getElementById(id);if(f)f.classList.add('bad')}}
 function mtAfter(msg){toast(msg);var b=MTP&&MTP.back;MTP=null;return load().then(function(){if(b&&b.k==='camp')campDr(b.i);else if(b&&b.k==='mus')mProjDr(b.a,b.p);else{closeDr();render()}})}
-function mtSave(force){var m=MTP.m,g=function(id){var e=document.getElementById(id);return e?e.value:''},pe=document.getElementById('mt_p'),proj=pe.value,opt=pe.options[pe.selectedIndex],cl=(opt&&opt.dataset.cl)||MTP.client||(proj?'':'Internal'),
+function mtSave(force){var m=MTP.m,g=function(id){var e=document.getElementById(id);return e?e.value:''};mtApply();var pe=document.getElementById('mt_p'),proj=pe.value,opt=pe.options[pe.selectedIndex],cl=(opt&&opt.dataset.cl)||MTP.client||(proj?'':'Internal'),
     att=[].map.call(document.querySelectorAll('#mt_a .chip.on'),function(c){return c.dataset.pp}).concat(g('mt_x').split(/\s*,\s*/).filter(Boolean)).join(', ');
-  var ent={row:m?m.row:null,expected:m?m.subject:null,title:g('mt_t').trim(),category:g('mt_c'),project:proj,client:cl,date:g('mt_d'),time:g('mt_s'),endTime:g('mt_e'),attendees:att,place:g('mt_l').trim(),agenda:g('mt_g'),reminder:g('mt_r'),force:!!force};
+  var sm=mtParse(g('mt_t'));if(sm.projBad.length&&!MTP.lock)return mtErr('No project called "'+sm.projBad[0]+'". Pick one from the list after # or remove it.','mt_t');
+  var ent={row:m?m.row:null,expected:m?m.subject:null,title:(sm.title||'').trim(),category:g('mt_c'),project:proj,client:cl,date:g('mt_d'),time:g('mt_s'),endTime:g('mt_e'),attendees:att,place:g('mt_l').trim(),agenda:g('mt_g'),reminder:g('mt_r'),force:!!force};
   if(m){ent.status=g('mt_st');ent.outcome=g('mt_o')}
   if(!ent.title)return mtErr('Give the meeting a title.','mt_t');if(!ent.date)return mtErr('Pick a date.','mt_d');
   if(ent.endTime&&!ent.time)return mtErr('Add a start time before the end time.','mt_s');if(ent.endTime&&tmin(ent.endTime)<=tmin(ent.time))return mtErr('The end time must be after the start time.','mt_e');
@@ -798,6 +800,52 @@ document.addEventListener('drop',function(e){if(!CXDRAG)return;var m=CXDRAG,col=
   else if(cell){e.preventDefault();date=cell.dataset.cxday}else return;
   if(date===m.date&&time===m.time)return;
   run('meetingMove',m.row,m.subject,date,time||'',end||'').then(function(){toast('Rescheduled to '+fmt(parseDue(date))+(time?' '+time:''));return load()}).catch(function(x){toast(x.message||'Could not reschedule')})});
+
+/* smart title: # project, @ person, date words and times are sorted into the form fields */
+var MS={sug:[],si:0,at:0,ch:'#',proj:null};
+var MWD=['sun','mon','tue','wed','thu','fri','sat'],MMO=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+function mtCands(){var c=[];cxProjects().forEach(function(x){c.push({n:x.v,l:x.l,k:'Project',cl:x.client})});
+  ((D&&D.clients)||[]).forEach(function(x){if(x.name&&!c.some(function(y){return y.n===x.name}))c.push({n:x.name,l:x.name,k:x.kind||'Client',cl:x.name})});return c}
+function mtNorm(t){return String(t||'').replace(/_/g,' ').trim().toLowerCase()}
+function mtParse(text){var r={title:text,project:null,projBad:[],people:[],others:[],date:null,time:'',end:'',notes:[]},m,cs=mtCands(),pe=(D&&D.people)||[];
+  r.title=r.title.replace(/(^|\s)#([^\s#@]+)/g,function(_,a,t){var q=mtNorm(t),hit=cs.filter(function(c){return c.n.toLowerCase()===q})[0]||(function(){var h=cs.filter(function(c){return c.n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})();
+    if(hit&&!r.project)r.project=hit;else if(!hit)r.projBad.push(t);return a});
+  r.title=r.title.replace(/(^|\s)@([^\s#@]+)/g,function(_,a,t){var q=mtNorm(t),hit=pe.filter(function(n){return n.toLowerCase()===q})[0]||(function(){var h=pe.filter(function(n){return n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})();
+    if(hit){if(r.people.indexOf(hit)<0)r.people.push(hit)}else if(r.others.indexOf(t)<0)r.others.push(t.replace(/_/g,' '));return a});
+  /* times need am/pm so numbers in a title are left alone */
+  r.title=r.title.replace(/(^|\s)(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:-|\u2013|to)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)(?=\s|$)/i,function(_,a,h1,m1,ap1,h2,m2,ap2){var e=ap2.toLowerCase(),s2=(ap1||ap2).toLowerCase();r.time=mtFmt(+h1,m1,s2);r.end=mtFmt(+h2,m2,e);if(tmin(r.end)<=tmin(r.time)&&!ap1){r.time=mtFmt(+h1,m1,e==='pm'?'am':'pm')}return a});
+  if(!r.time)r.title=r.title.replace(/(^|\s)(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)(?=\s|$)/i,function(_,a,h,mm,ap){r.time=mtFmt(+h,mm,ap.toLowerCase());return a});
+  r.title=r.title.replace(/(^|\s)(?:on\s+)?(today|tomorrow|tmr|(?:mon|tue|wed|thu|fri|sat|sun)(?:day|sday|nesday|rsday|urday)?|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2})(?=\s|$)/,function(all,a,w){
+    var lw=w.toLowerCase(),t=today();if(/^(today|tomorrow|tmr)$/i.test(w)||w===lw){var d=null;
+      if(lw==='today')d=t;else if(lw==='tomorrow'||lw==='tmr'){d=new Date(t);d.setDate(d.getDate()+1)}
+      else if(/\d/.test(lw)){var mo=MMO.indexOf(lw.slice(0,3)),dy=+lw.match(/\d+/)[0];if(mo>-1&&dy>=1&&dy<=31){d=new Date(t.getFullYear(),mo,dy);if(d<t)d=new Date(t.getFullYear()+1,mo,dy)}}
+      else{var wi=MWD.indexOf(lw.slice(0,3));if(wi>-1){d=new Date(t);var diff=(wi-t.getDay()+7)%7;d.setDate(d.getDate()+(diff||7))}}
+      if(d){r.date=iso(d);return a}}return all});
+  /* "Today"/"Tomorrow" typed with a capital are accepted; a capitalised weekday is left in the title (e.g. "Sun Records") */
+  r.title=r.title.replace(/\s{2,}/g,' ').trim();return r}
+function mtFmt(h,mm,ap){h=h%12;if(ap==='pm')h+=12;return m2t(h*60+(+mm||0))}
+function mtApply(){var inp=document.getElementById('mt_t');if(!inp||!MTP)return;var r=mtParse(inp.value),notes=[],g=function(id){return document.getElementById(id)};
+  if(r.project&&!MTP.lock){var pe=g('mt_p');if(pe){var has=[].some.call(pe.options,function(o){return o.value===r.project.n});if(!has){var o=document.createElement('option');o.value=r.project.n;o.textContent=r.project.l;o.dataset.cl=r.project.cl||'';pe.appendChild(o)}pe.value=r.project.n;MTP.client=r.project.cl||''}}
+  if(r.project)notes.push('<span class="rc ok">'+(MTP.lock?'Project locked':'#'+esc(r.project.l))+'</span>');
+  r.projBad.forEach(function(t){notes.push('<span class="rc bad" title="No match: pick one from the list">#'+esc(t)+' ?</span>')});
+  r.people.forEach(function(n){var c=document.querySelector('#mt_a .chip[data-pp="'+n.replace(/"/g,'')+'"]');if(c)c.classList.add('on');notes.push('<span class="rc pp">@'+esc(n)+'</span>')});
+  if(r.others.length){var x=g('mt_x'),cur=x.value.split(/\s*,\s*/).filter(Boolean);r.others.forEach(function(n){if(cur.indexOf(n)<0)cur.push(n)});x.value=cur.join(', ');r.others.forEach(function(n){notes.push('<span class="rc">+ '+esc(n)+'</span>')})}
+  if(r.date){g('mt_d').value=r.date;notes.push('<span class="rc">'+esc(fmt(parseDue(r.date)))+'</span>')}
+  if(r.time){var ss=g('mt_s');if(![].some.call(ss.options,function(o){return o.value===r.time}))ss.appendChild(new Option(r.time,r.time));ss.value=r.time;
+    var tx=r.time;if(r.end){var ee=g('mt_e');if(![].some.call(ee.options,function(o){return o.value===r.end}))ee.appendChild(new Option(r.end,r.end));ee.value=r.end;tx+=' - '+r.end}notes.push('<span class="rc">'+esc(tx)+'</span>')}
+  var sm=g('mtsm');if(sm)sm.innerHTML=notes.join('')}
+function mtSugShow(inp){var pos=inp.selectionStart,m=/[#@][^\s#@]*$/.exec(inp.value.slice(0,pos)),box=document.getElementById('mtS');
+  if(!m){MS.sug=[];box.style.display='none';return}
+  var ch=m[0][0],q=mtNorm(m[0].slice(1)),src=ch==='#'?mtCands():((D&&D.people)||[]).map(function(n){return{n:n,l:n,k:'Person'}});
+  MS.sug=src.filter(function(c){return!q||c.n.toLowerCase().indexOf(q)>-1||(c.l||'').toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,8);MS.si=0;MS.at=pos-m[0].length;MS.ch=ch;
+  box.innerHTML=MS.sug.map(function(c,i){return'<div class="ri'+(i===0?' on':'')+'" data-mi="'+i+'"><span>'+esc(c.l||c.n)+'</span><span class="m">'+esc(c.k)+'</span></div>'}).join('');box.style.display=MS.sug.length?'block':'none'}
+function mtPick(i){var c=MS.sug[i],inp=document.getElementById('mt_t');if(!c||!inp)return;var pos=inp.selectionStart,ins=MS.ch+String(c.n).replace(/\s+/g,'_')+' ';
+  inp.value=inp.value.slice(0,MS.at)+ins+inp.value.slice(pos);inp.focus();inp.selectionStart=inp.selectionEnd=MS.at+ins.length;MS.sug=[];document.getElementById('mtS').style.display='none';mtApply()}
+document.addEventListener('input',function(e){if(e.target.id==='mt_t'){mtApply();mtSugShow(e.target)}});
+document.addEventListener('keydown',function(e){if(e.target.id!=='mt_t')return;var box=document.getElementById('mtS');
+  if(MS.sug.length&&box.style.display==='block'){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();MS.si=(MS.si+(e.key==='ArrowDown'?1:MS.sug.length-1))%MS.sug.length;[].forEach.call(box.children,function(c,i){c.classList.toggle('on',i===MS.si)});return}
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();return mtPick(MS.si)}if(e.key==='Escape'){MS.sug=[];box.style.display='none';e.stopPropagation()}}});
+document.addEventListener('mousedown',function(e){var r=e.target.closest&&e.target.closest('[data-mi]');if(r){e.preventDefault();mtPick(+r.dataset.mi)}});
 /* project window: Meetings section */
 function meetBlock(list,kind,attrs){var f=UI.mf||'up',td=today(),cnt={up:0,past:0,canc:0},rows=[];
   list.forEach(function(m){var d=parseDue(m.date),cn=cxCanc(m),k=cn?'canc':(d&&d<td?'past':'up');cnt[k]++;if(k===f)rows.push(m)});
