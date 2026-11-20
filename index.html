@@ -256,6 +256,13 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 .setc{max-width:820px}.drow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0;font-size:13px}.drow input{flex:1;min-width:220px}.dlab{opacity:.6;min-width:90px}.derr{color:#ff7a7a}.dfold{text-align:left}.drvp{margin-top:6px}
 .fldrow{margin:10px 0 2px}.fldb{text-decoration:none;display:inline-block}.dlvb{width:22px;height:22px;border-radius:6px;border:1px solid var(--acc,#8b7bff);background:transparent;color:var(--acc,#8b7bff);cursor:pointer;font-size:12px;padding:0;flex:none;margin-top:2px}.dlvb:hover{background:var(--acc,#8b7bff);color:#fff}.dlvtag{font-size:10px;padding:1px 6px;border-radius:8px;background:rgba(139,123,255,.18);color:var(--acc,#8b7bff)}.dlvp{margin:6px 0 4px}
 #updbn{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;padding:10px 12px 10px 16px;border-radius:12px;background:var(--solid,#1b1c2a);border:1px solid rgba(139,123,255,.45);box-shadow:0 8px 30px rgba(0,0,0,.35);font-size:13px}
+#rptT{width:100%;resize:vertical;background:var(--chip);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px;font:inherit;box-shadow:inset 0 1px 0 var(--hi)}
+#rptT:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 25%,transparent)}
+.rsug{display:none;position:absolute;left:0;top:100%;margin-top:4px;z-index:60;min-width:280px;max-width:100%;padding:5px;border-radius:14px;background:var(--glass2);border:1px solid var(--rim);box-shadow:0 18px 40px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4)}
+.rsug .ri{display:flex;justify-content:space-between;gap:12px;padding:7px 10px;border-radius:9px;cursor:pointer}.rsug .ri.on,.rsug .ri:hover{background:var(--chip)}
+.rc{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--chip);border:1px solid var(--line)}
+.rc.ok{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 40%,transparent)}.rc.pp{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}.rc.bad{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
+.rrow{padding:9px 12px;border-radius:12px;background:var(--chip);border:1px solid var(--line);margin-top:6px}.rrow.mn{border-color:color-mix(in srgb,var(--acc) 55%,transparent)}.rtx{white-space:pre-wrap;margin-top:2px}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -627,6 +634,7 @@ function renderCal(v){v.innerHTML='<div class="bar"><button class="chip'+(UI.cal
 
 /* ---------- Dashboard: my tasks + my meetings calendar ---------- */
 function renderDash(v){
+  if(document.activeElement&&document.activeElement.id==='rptT')return;
   var pt=D?D.tasks.filter(vis).filter(mine).map(function(t){t._ws='plus';return t}):[],
     mt=MUS?MUS.tasks.filter(function(t){return t.status!=='Done'&&(!who||has(t.owner,who))}).map(function(t){t._ws='music';return t}):[],
     f=UI.dws||'all',all=(f==='music'?[]:pt).concat(f==='plus'?[]:mt),g=buckets(all),ks=Object.keys(g).filter(function(k){return g[k].length}),
@@ -635,7 +643,59 @@ function renderDash(v){
   var left='<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s tasks":'All tasks')+'</b><span class="m">'+all.length+' open · '+g.Overdue.length+' overdue</span>'+seg+'</div>'+
     (!D||!MUS?'<div class="m" style="padding:4px 2px">Loading '+(!D?'INNRVZN Plus':'INNRVZN Music')+'…</div>':'')+
     (ks.length?ks.map(function(k){return'<h3>'+k+' ('+g[k].length+')</h3>'+g[k].map(row).join('')}).join(''):'<div class="empty">No open tasks.</div>')+'</div>';
-  v.innerHTML='<div class="dash">'+left+'<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s meetings":'Meetings')+'</b></div>'+(D?calHtml(false):'<div class="empty">Loading…</div>')+'</div></div>'}
+  v.innerHTML=reportBox()+'<div class="dash">'+left+'<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s meetings":'Meetings')+'</b></div>'+(D?calHtml(false):'<div class="empty">Loading…</div>')+'</div></div>'}
+/* ---------- Report form (Dashboard, Seer-wide: Plus + Label) ---------- */
+var REP=null,RPT={text:'',date:'',filt:'all',sug:[],si:0};
+function repLoad(){return run('reportsData').then(function(d){REP=d.reports||[];if(view==='dash'&&WS==='dash')render()}).catch(function(){if(!REP)REP=[]})}
+function repCands(){var c=[],seen={};function add(n,k,x){n=String(n||'').trim();if(!n)return;var key=k+'|'+n.toLowerCase();if(seen[key])return;seen[key]=1;c.push({n:n,k:k,x:x||''})}
+  ((D&&D.clients)||[]).forEach(function(x){add(x.name,'Client')});((D&&D.campaigns)||[]).forEach(function(x){add(x.name,'Campaign',x.code);add(x.code,'Campaign',x.name)});
+  ((LBL&&LBL.artists)||[]).forEach(function(a){add(a.name,'Artist',a.code);add(a.code,'Artist',a.name)});((LBL&&LBL.songs)||[]).forEach(function(x){add(x.song,'Song',x.artist)});return c}
+function repNorm(t){return String(t||'').replace(/_/g,' ').trim().toLowerCase()}
+function repTok(n){return String(n).replace(/\s+/g,'_')}
+function repParse(text){var cs=repCands(),tags=[],bad=[],ppl=[],badp=[],m,re=/#([^\s#@]+)/g;
+  while((m=re.exec(text))){var q=repNorm(m[1]),hit=cs.filter(function(c){return c.n.toLowerCase()===q})[0]||(function(){var h=cs.filter(function(c){return c.n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})();
+    if(hit){if(tags.indexOf(hit.n)<0)tags.push(hit.n)}else if(bad.indexOf(m[1])<0)bad.push(m[1])}
+  var pe=((D&&D.people)||[]),re2=/@([^\s#@]+)/g;
+  while((m=re2.exec(text))){var q2=repNorm(m[1]),h2=pe.filter(function(n){return n.toLowerCase()===q2})[0]||(function(){var h=pe.filter(function(n){return n.toLowerCase().indexOf(q2)===0});return h.length===1?h[0]:null})();
+    if(h2){if(ppl.indexOf(h2)<0)ppl.push(h2)}else if(badp.indexOf(m[1])<0)badp.push(m[1])}
+  return{tags:tags,bad:bad,people:ppl,badp:badp}}
+function repPrev(){var r=repParse(RPT.text||'');return(r.tags.map(function(t){return'<span class="rc ok">#'+esc(t)+'</span>'}).concat(r.people.map(function(t){return'<span class="rc pp">@'+esc(t)+'</span>'}),r.bad.map(function(t){return'<span class="rc bad" title="Not found: pick one from the list">#'+esc(t)+' ?</span>'}),r.badp.map(function(t){return'<span class="rc bad" title="Not found">@'+esc(t)+' ?</span>'}))).join('')||'<span class="m">Tag with # (artist, song, client, campaign) and @ (person).</span>'}
+function isoToday(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function reportBox(){
+  if(!RPT.date)RPT.date=isoToday();
+  var list=(REP||[]).slice().reverse(),me=who&&who.toLowerCase(),f=RPT.filt;
+  if(f==='me')list=list.filter(function(r){return me&&r.people.some(function(p){return p.toLowerCase().indexOf(me)>-1})});
+  if(f==='mine')list=list.filter(function(r){return me&&String(r.by).toLowerCase().indexOf(me)>-1});
+  var seg='<span class="seg">'+[['all','All'],['me','Mentions me'],['mine','My reports']].map(function(x){return'<button class="chip'+(f===x[0]?' on':'')+'" data-rpf="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</span>';
+  var feed=REP===null?'<div class="m">Loading reports…</div>':(list.slice(0,12).map(function(r){
+    var mn=me&&r.people.some(function(p){return p.toLowerCase().indexOf(me)>-1}),tx=esc(r.text).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){return a+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'">'+b.replace(/_/g,' ')+'</span>'});
+    return'<div class="rrow'+(mn?' mn':'')+'"><div class="m">'+esc(r.date)+' · '+esc(r.by||'')+(mn?' · <b style="color:var(--acc)">mentions you</b>':'')+'</div><div class="rtx">'+tx+'</div></div>'}).join('')||'<div class="empty">No reports yet. Write the first one above.</div>');
+  return'<div class="pane" id="rptPane"><div class="panehd"><b>Report</b><span class="m">Seer-wide: artists, songs, clients and people</span></div>'+
+    '<div style="position:relative"><textarea id="rptT" rows="3" placeholder="What happened? e.g. Met @Gab about #Matt_Habit release plan. Follow up Friday.">'+esc(RPT.text)+'</textarea><div id="rptS" class="rsug"></div></div>'+
+    '<div class="bar" style="margin:8px 0 0;align-items:center"><div id="rptP" style="flex:1;display:flex;gap:6px;flex-wrap:wrap;min-width:200px">'+repPrev()+'</div><input type="date" id="rptD" value="'+esc(RPT.date)+'" style="min-width:0;width:auto"><button class="b" id="rptB" style="background:var(--acc);color:#fff;border-color:transparent">Save report</button></div>'+
+    '<div class="panehd" style="margin-top:14px"><b style="font-size:13px">Recent reports</b>'+seg+'</div><div id="rptF">'+feed+'</div></div>'}
+function repSugShow(ta){var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.exec(ta.value.slice(0,pos)),box=document.getElementById('rptS');
+  if(!m){RPT.sug=[];box.style.display='none';return}
+  var ch=m[0][0],q=repNorm(m[0].slice(1)),src=ch==='#'?repCands():((D&&D.people)||[]).map(function(n){return{n:n,k:'Person',x:''}});
+  RPT.sug=src.filter(function(c){return!q||c.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,8);RPT.si=0;RPT.at=pos-m[0].length;RPT.ch=ch;
+  box.innerHTML=RPT.sug.map(function(c,i){return'<div class="ri'+(i===0?' on':'')+'" data-ri="'+i+'"><span>'+esc(c.n)+'</span><span class="m">'+c.k+(c.x?' · '+esc(c.x):'')+'</span></div>'}).join('');box.style.display=RPT.sug.length?'block':'none'}
+function repPick(i){var c=RPT.sug[i],ta=document.getElementById('rptT');if(!c||!ta)return;var pos=ta.selectionStart,ins=RPT.ch+repTok(c.n)+' ';
+  ta.value=ta.value.slice(0,RPT.at)+ins+ta.value.slice(pos);ta.focus();ta.selectionStart=ta.selectionEnd=RPT.at+ins.length;RPT.text=ta.value;RPT.sug=[];document.getElementById('rptS').style.display='none';document.getElementById('rptP').innerHTML=repPrev()}
+function repSave(){var r=repParse(RPT.text||'');if(!RPT.text.trim())return toast('Write the report first');
+  if(r.bad.length||r.badp.length)return toast('Fix the tags marked ? (pick one from the list, or remove the # or @)');
+  var b=document.getElementById('rptB');b.disabled=true;var text=RPT.text.trim();
+  run('reportAdd',{date:RPT.date,text:text,tags:r.tags,people:r.people}).then(function(){
+    var cl=((D&&D.clients)||[]).filter(function(c){return r.tags.indexOf(c.name)>-1}),p=Promise.resolve();
+    cl.forEach(function(c){p=p.then(function(){return run('addLog',{client:c.name,type:'Report',summary:text,followUp:''})})});return p}).then(function(){
+    RPT.text='';toast('Report saved');return Promise.all([repLoad(),load()])}).catch(function(e){b.disabled=false;toast(e.message||'Could not save')})}
+document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;RPT.text=e.target.value;document.getElementById('rptP').innerHTML=repPrev();repSugShow(e.target)});
+document.addEventListener('keydown',function(e){if(e.target.id!=='rptT')return;var box=document.getElementById('rptS');
+  if(RPT.sug.length&&box.style.display==='block'){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();RPT.si=(RPT.si+(e.key==='ArrowDown'?1:RPT.sug.length-1))%RPT.sug.length;[].forEach.call(box.children,function(c,i){c.classList.toggle('on',i===RPT.si)});return}
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();return repPick(RPT.si)}if(e.key==='Escape'){RPT.sug=[];box.style.display='none';return}}
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();repSave()}});
+document.addEventListener('mousedown',function(e){var r=e.target.closest&&e.target.closest('[data-ri]');if(r){e.preventDefault();repPick(+r.dataset.ri)}});
+document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('[data-rpf]');if(f){RPT.filt=f.dataset.rpf;return render()}if(e.target.id==='rptB')repSave()});
+document.addEventListener('change',function(e){if(e.target.id==='rptD')RPT.date=e.target.value});
 function mDashRow(t){var d=parseDue(t.due),od=d&&d<today();
   return'<div class="t mtask'+(od?' od':'')+'" data-row="'+t.row+'" data-task="'+esc(t.task)+'"><input type="checkbox" data-mf="done" title="Complete"><div class="n"><span class="wtag mus">Music</span><span class="tn" data-mp="'+esc(t.artist)+'\u0001'+esc(t.project)+'" style="cursor:pointer">'+esc(t.task)+'</span>'+
     '<div class="m">'+esc(t.artist)+' · '+esc(t.project)+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
@@ -824,7 +884,7 @@ function enterWS(ws){if(ws==='label')ws='music';/*MERGED_LABEL*/WS=ws;wsLabel();
   if(ws==='music'&&document.getElementById('splash')){setTimeout(function(){enterWS(ws)},150);return Promise.resolve()}
   if(m)m.style.display='none';closeDr();MDR=null;LDR=null;Q='';
   var n=document.querySelector('nav');n.style.display=ws==='dash'?'none':'';
-  if(ws==='dash'){view='dash';render();musLoad();return load()}
+  if(ws==='dash'){view='dash';render();musLoad();repLoad();lblLoad();return load()}
   if(ws==='music'){musNav(true);render();return Promise.all([musLoad(),lblLoad()])}
   if(ws==='db'){dbNav();render();dbLoad();return load()}
   musNav(false);render();return load()}
@@ -981,7 +1041,7 @@ function lblNav(on){var n=document.querySelector('nav');if(!PLUSNAV)PLUSNAV=n.in
   view='lsong';n.innerHTML=LBLNAV.map(function(x){return'<button data-v="'+x[0]+'"'+(x[0]===view?' class="on"':'')+'><svg class="ic" viewBox="0 0 24 24"><use href="#'+x[1]+'"/></svg><span>'+x[2]+'</span></button>'}).join('');
   document.getElementById('qi').placeholder='Add a song: Feel Like #Matt Habit   (Ctrl+K)'}
 function lblLoad(){document.getElementById('rf').textContent='…';
-  return run('labelData').then(function(d){LBL=d;document.getElementById('rf').textContent='↻';if(WS==='music'){render();if(LDR)lblReDr()}})
+  return run('labelData').then(function(d){LBL=d;document.getElementById('rf').textContent='↻';if(WS==='music'||view==='dash'){render();if(LDR)lblReDr()}})
     .catch(function(e){document.getElementById('rf').textContent='↻';if(WS==='music')document.getElementById('v').innerHTML='<div class="empty">Could not load the Label sheet: '+esc(e&&e.message||e)+'</div>'})}
 function lErr(e){toast(String(e&&e.message||e));lblLoad()}
 function lIso(x){var d=parseDue(x);return d?d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2):''}
@@ -1126,6 +1186,6 @@ render();
 run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
 if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
   if(ws==='plus'||ws==='music'||ws==='label'||ws==='db')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
-setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash')load()},60000);
+setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash')load();if(WS==='dash')repLoad()},60000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script><script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>

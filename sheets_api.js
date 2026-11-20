@@ -479,6 +479,32 @@
     await vAppend("'" + LOG_TAB + "'!A:F", [[dateNow(), entry.client, entry.type || 'Note', entry.summary || '', who, entry.followUp || '']], 'USER_ENTERED');
     return { ok: true };
   }
+  var REPORTS_TAB = 'REPORTS';
+  async function reportsData() {
+    var ids = await sheetIds_();
+    if (!(REPORTS_TAB in ids)) return { reports: [] };
+    var rows = await vals_("'" + REPORTS_TAB + "'!A2:F"), out = [];
+    rows.forEach(function (r, i) {
+      r = pad_(r, 6);
+      if (pstr_(r[4]).trim()) out.push({ row: i + 2, date: serialToIso_(r[0]), by: pstr_(r[1]),
+        tags: pstr_(r[2]).split('|').map(function (t) { return t.trim(); }).filter(Boolean),
+        people: pstr_(r[3]).split('|').map(function (t) { return t.trim(); }).filter(Boolean), text: pstr_(r[4]) });
+    });
+    return { reports: out };
+  }
+  async function reportAdd(entry) {
+    var text = String((entry && entry.text) || '').trim();
+    if (!text) throw new Error('Write the report first.');
+    var ids = await sheetIds_();
+    if (!(REPORTS_TAB in ids)) {
+      await sBatch([{ addSheet: { properties: { title: REPORTS_TAB, gridProperties: { frozenRowCount: 1 } } } }]);
+      await vUpdate("'" + REPORTS_TAB + "'!A1:F1", [['DATE', 'BY', 'TAGS', 'PEOPLE', 'REPORT', 'ADDED']], 'RAW');
+    }
+    var who = (await meName_()) || email, day = String(entry.date || dateNow()).slice(0, 10), n = new Date();
+    await vAppend("'" + REPORTS_TAB + "'!A:F", [[day, who, (entry.tags || []).join(' | '), (entry.people || []).join(' | '), text,
+      day === dateNow() ? dateNow() + ' ' + ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2) : '']], 'USER_ENTERED');
+    return { ok: true };
+  }
   async function setClientStatus(src, row, expected, status) {
     var tc_ = CLIENT_TABS[src], tab = tc_[0], col = tc_[1];
     await check_("'" + tab + "'", row, 'C', expected);
@@ -819,7 +845,7 @@
     labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
     labelCheckPlaylists: function () { return Promise.reject(new Error('Checking playlists runs in the Seer desktop app (Windows or Mac). Playlists you add here are kept and checked from there.')); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
-    addLog: addLog, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
+    addLog: addLog, reportsData: reportsData, reportAdd: reportAdd, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
     getBackdrop: function () { return Promise.resolve({ mode: 'solid', theme: 'dark' }); },
     endSplash: function () { return Promise.resolve({ ok: true }); },
