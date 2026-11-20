@@ -268,7 +268,7 @@
 
   async function getData() {
     var ranges = ['TASKS!A2:L', 'CAMPAIGNS!A2:U', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
-      'MEETINGS!A2:J', "'ACCOUNT MANAGERS'!A2:K", "'PME CLIENTS'!A2:P", 'AGENCIES!A2:Y'];
+      'MEETINGS!A2:O', "'ACCOUNT MANAGERS'!A2:K", "'PME CLIENTS'!A2:P", 'AGENCIES!A2:Y'];
     var q = { ranges: ranges, valueRenderOption: 'UNFORMATTED_VALUE', dateTimeRenderOption: 'SERIAL_NUMBER' };
     var all = await Promise.all([api('GET', '/values:batchGet', q), links_(), readLog_()]);
     var vr = all[0].valueRanges.map(function (x) { return x.values || []; }), lk = all[1], log = all[2];
@@ -304,9 +304,10 @@
     });
     var meetings = [];
     mt.forEach(function (r, i) {
-      r = pad_(r, 10);
+      r = pad_(r, 15);
       if (r[0] || r[1]) meetings.push({ row: i + 2, client: pstr_(r[0]), subject: pstr_(r[1]), status: pstr_(r[2]), date: serialToIso_(r[3]),
-        time: timeStr_(r[4]), attendees: pstr_(r[5]), link: pstr_(r[6]), project: pstr_(r[7]), agenda: pstr_(r[8]), outcome: pstr_(r[9]) });
+        time: timeStr_(r[4]), attendees: pstr_(r[5]), link: pstr_(r[6]), project: pstr_(r[7]), agenda: pstr_(r[8]), outcome: pstr_(r[9]),
+        end: timeStr_(r[11]), category: pstr_(r[12]), reminder: pstr_(r[13]), by: pstr_(r[14]) });
     });
     var ams = [];
     am.forEach(function (r, i) {
@@ -481,6 +482,56 @@
       }
     }
     return { ok: true, row: row, code: gen ? values[gen[0]] : '' };
+  }
+
+  // ------------------------------------------------------------ calendar / meetings (one record per meeting: the MEETINGS tab)
+  var MEET_STATUS = ['To Set', 'To Bump', 'Confirmed', 'Canceled'], MEET_CATS = ['Meeting', 'Internal Discussion', 'Project Deadline', 'Production Schedule', 'General Event'],
+    MEET_REMS = ['None', '15 minutes before', '1 hour before', '1 day before'];
+  function tmins_(s) {
+    var m = String(s || '').match(/^\s*(\d{1,2}):(\d{2})\s*(AM|PM)\s*$/i);
+    return m ? ((+m[1] % 12) + (/pm/i.test(m[3]) ? 12 : 0)) * 60 + (+m[2]) : null;
+  }
+  function meetCheck_(e) {
+    var title = String(e.title || '').trim();
+    if (!title) throw new Error('Give the meeting a title.');
+    var date = String(e.date || '').trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error('Pick a date.');
+    var start = String(e.time || '').trim(), end = String(e.endTime || '').trim();
+    if (start && tmins_(start) === null) throw new Error('The start time looks wrong. Use a time like 3:30 PM.');
+    if (end && !start) throw new Error('Add a start time before the end time.');
+    if (end && (tmins_(end) === null || tmins_(end) <= tmins_(start))) throw new Error('The end time must be after the start time.');
+    return { title: title, date: date, start: start, end: end };
+  }
+  async function meetingSave(e) {
+    var c = meetCheck_(e), status = String(e.status || (c.start ? 'Confirmed' : 'To Set'));
+    if (MEET_STATUS.indexOf(status) < 0) throw new Error('Unknown status.');
+    var cat = MEET_CATS.indexOf(e.category) > -1 ? e.category : 'Meeting', rem = MEET_REMS.indexOf(e.reminder) > -1 ? e.reminder : 'None';
+    var project = String(e.project || '').trim(), row = e.row ? +e.row : null;
+    var rows = await vals_("'MEETINGS'!A2:H");
+    if (!e.force) rows.forEach(function (r, i) {
+      r = pad_(r, 8);
+      if (row === i + 2 || pstr_(r[2]) === 'Canceled') return;
+      if (pstr_(r[1]).trim().toLowerCase() === c.title.toLowerCase() && serialToIso_(r[3]) === c.date && timeStr_(r[4]) === c.start && pstr_(r[7]).trim().toLowerCase() === project.toLowerCase())
+        throw new Error('DUPLICATE: "' + c.title + '" is already scheduled at that time. Save it anyway?');
+    });
+    var who = (await meName_()) || email;
+    if (row) await check_("'MEETINGS'", row, 'B', e.expected);
+    else row = (await vals_("'MEETINGS'!B:B")).length + 1;
+    var f = { A: String(e.client || (project ? '' : 'Internal')).trim(), B: c.title, C: status, D: c.date, E: c.start, F: String(e.attendees || ''), G: String(e.place || ''),
+      H: project, I: String(e.agenda || ''), L: c.end, M: cat, N: rem }, data = Object.keys(f).map(function (k) { return { range: "'MEETINGS'!" + k + row, values: [[f[k]]] }; });
+    if ('outcome' in e) data.push({ range: "'MEETINGS'!J" + row, values: [[String(e.outcome || '')]] });
+    if (!e.row) {
+      data.push({ range: "'MEETINGS'!O" + row, values: [[who]] });
+      data.push({ range: "'MEETINGS'!K" + row, values: [['=IF(AND($A' + row + '="",$B' + row + '=""),"",IFERROR(MATCH($C' + row + ',{"Confirmed";"To Bump";"To Set";"Canceled"},0),5)*100000+IF(ISNUMBER($D' + row + '),$D' + row + '+IFERROR(TIMEVALUE($E' + row + '&""),0.9999),99999))']] });
+    }
+    await vBatch(data, 'USER_ENTERED');
+    return { ok: true, row: row };
+  }
+  async function meetingMove(row, expected, date, time, endTime) {
+    meetCheck_({ title: expected, date: date, time: time, endTime: endTime });
+    await check_("'MEETINGS'", row, 'B', expected);
+    await vBatch([{ range: "'MEETINGS'!D" + row, values: [[date]] }, { range: "'MEETINGS'!E" + row, values: [[time || '']] }, { range: "'MEETINGS'!L" + row, values: [[endTime || '']] }], 'USER_ENTERED');
+    return { ok: true };
   }
 
   // ------------------------------------------------------------ project codes
@@ -880,15 +931,15 @@
     labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
     labelCheckPlaylists: function () { return Promise.reject(new Error('Checking playlists runs in the Seer desktop app (Windows or Mac). Playlists you add here are kept and checked from there.')); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
-    addLog: addLog, connections: connections, reportsData: reportsData, reportAdd: reportAdd, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
+    addLog: addLog, meetingSave: meetingSave, meetingMove: meetingMove, connections: connections, reportsData: reportsData, reportAdd: reportAdd, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
     getBackdrop: function () { return Promise.resolve({ mode: 'solid', theme: 'dark' }); },
     endSplash: function () { return Promise.resolve({ ok: true }); },
     splashPlate: function () { return Promise.resolve({ ok: false }); },
     openUrl: function (u) { window.open(u, '_blank', 'noopener'); return Promise.resolve({ ok: true }); },
     log: function () { return Promise.resolve({ ok: true }); },
-    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'plus', 'music', 'label', 'db'].indexOf(w) > -1 ? w : ''); },
-    setWorkspace: function (ws) { if (['dash', 'plus', 'music', 'label', 'db'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
+    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'cal', 'plus', 'music', 'label', 'db'].indexOf(w) > -1 ? w : ''); },
+    setWorkspace: function (ws) { if (['dash', 'cal', 'plus', 'music', 'label', 'db'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
     signOut: function () {
       try { if (token && window.google && google.accounts) google.accounts.oauth2.revoke(token, function () { }); } catch (e) { }
       token = ''; lsSet('ta_signed', ''); try { sessionStorage.clear(); } catch (e) { }

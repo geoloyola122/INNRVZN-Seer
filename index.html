@@ -263,6 +263,45 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 .rc{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--chip);border:1px solid var(--line)}
 .rc.ok{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 40%,transparent)}.rc.pp{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}.rc.bad{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
 .rrow{padding:9px 12px;border-radius:12px;background:var(--chip);border:1px solid var(--line);margin-top:6px}.rrow.mn{border-color:color-mix(in srgb,var(--acc) 55%,transparent)}.rtx{white-space:pre-wrap;margin-top:2px}
+
+/* ===== Calendar section + meeting panel ===== */
+.cxbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.cxbar .sp{flex:1}
+.cxttl{font-size:17px;font-weight:700;min-width:170px}
+.cxleg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.cxleg .chip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--c)}
+.cxleg .chip.off{opacity:.45;text-decoration:line-through}
+.cxe{display:block;font-size:11px;line-height:1.25;border-radius:6px;padding:2px 6px;margin-top:2px;background:color-mix(in srgb,var(--c) 26%,transparent);border-left:3px solid var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cxe.ro{border-left-style:dashed;cursor:default;opacity:.85}.cxe.cn{text-decoration:line-through;opacity:.6}
+.cxe[draggable=true]{cursor:grab}
+.cell.dropover{outline:2px dashed var(--acc)}
+.cxgrid{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.cxhead{display:grid;gap:0;background:var(--chip);border-bottom:1px solid var(--line)}
+.cxhead>div{padding:6px 8px;font-size:12px;text-align:center;border-left:1px solid var(--line)}.cxhead>div.today b{color:var(--acc)}
+.cxallday{display:grid;border-bottom:1px solid var(--line);min-height:24px}.cxallday>div{border-left:1px solid var(--line);padding:2px 4px}
+.cxscroll{max-height:62vh;overflow:auto;position:relative}
+.cxbody{display:grid;position:relative}
+.cxtime{position:relative}.cxtime span{position:absolute;right:6px;font-size:10px;color:var(--mute);transform:translateY(-6px)}
+.cxcol{position:relative;border-left:1px solid var(--line);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 44px}
+.cxcol.dropover{background-color:color-mix(in srgb,var(--acc) 9%,transparent)}
+.cxblk{position:absolute;border-radius:7px;padding:2px 6px;font-size:11px;line-height:1.25;overflow:hidden;background:color-mix(in srgb,var(--c) 32%,var(--solid));border-left:3px solid var(--c);cursor:grab}
+.cxblk b{display:block;font-weight:600}.cxblk.cn{text-decoration:line-through;opacity:.55}
+.cxnow{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:2;pointer-events:none}
+.cxag{margin-bottom:14px}.cxag h3{margin:12px 0 6px}
+.cxcard{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--chip);border:1px solid var(--line);border-left:4px solid var(--c);margin-bottom:6px;cursor:pointer}
+.cxcard:hover{border-color:var(--rim);border-left-color:var(--c)}.cxcard .tm{min-width:92px;font-weight:600}.cxcard.cn{opacity:.55}.cxcard.ro{cursor:default}
+.cxpill{display:inline-block;font-size:11px;padding:0 8px;border-radius:999px;border:1px solid var(--c);color:var(--c)}
+.mtf{display:grid;gap:10px;margin-top:8px}.mtf label{display:grid;gap:4px;font-size:12px;color:var(--mute)}
+.mtf input,.mtf select,.mtf textarea{background:var(--chip);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px;font:inherit;width:100%;min-width:0}
+.mtf input:focus,.mtf select:focus,.mtf textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 25%,transparent)}
+.mtf .r3{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px}.mtf .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mtf .ppl{display:flex;gap:6px;flex-wrap:wrap}.mtf .ppl .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.mterr{color:var(--red);font-size:12px;min-height:16px}.mtf .bad{border-color:var(--red)!important}
+.mtf .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.mtf .acts .pri{background:var(--acc);border-color:transparent;color:#fff}
+.mtf .acts .dng{color:var(--red)}
+.mhead{display:flex;align-items:center;gap:8px;margin:14px 0 6px}.mhead h3{margin:0;flex:1}
+.mhead .pri{background:var(--acc);border-color:transparent;color:#fff;font-weight:600}
+.mrow{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:var(--chip);border:1px solid var(--line);margin-bottom:5px;cursor:pointer}.mrow:hover{border-color:var(--rim)}
+.mrow .tm{min-width:84px;font-size:12px;font-weight:600}.mrow.cn{opacity:.55}.mrow .nm{flex:1;min-width:0}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -409,7 +448,7 @@ function campDr(i){var c=D.campaigns[i],ts=D.tasks.filter(function(t){return sam
   (ci>-1?'<div class="m" style="color:var(--mute);font-size:12px">Client: <span class="lnk" data-cli="'+ci+'">'+esc(c.client)+'</span></div>':'')+(c.next?'<div class="m" style="color:var(--mute);font-size:12px">Next up: '+esc(c.next)+'</div>':'')+
   folderBtn('CAMPAIGNS',c)+'<div id="edE"></div>'+updBlock(c.name)+
   '<h3>Tasks ('+ts.length+')</h3>'+(ts.length?ts.map(taskHtml).join(''):'<div class="empty">No open tasks</div>')+addTaskBtn(c.name)+
-  '<h3>Meetings</h3>'+meetList((D.meetings||[]).filter(function(m){return same(m.client,c.name)||same(m.project,c.name)||same(m.client,c.client)}))+
+  meetBlock((D.meetings||[]).filter(function(m){return same(m.client,c.name)||same(m.project,c.name)||same(m.client,c.client)}),{k:'camp',i:i},'data-k="camp" data-i="'+i+'"')+
   '<details class="allf"><summary>Show advanced</summary><div id="edA"></div></details>');
   editSplit('CAMPAIGNS',c.row,ESS.CAMPAIGNS,function(one){return{used:{J:1},html:linksRow('CAMPAIGNS',c.links,['master','deck','bill']).replace('<div id="lkform"></div>','')+'<div class="partners">'+one('J')+linkChip('CAMPAIGNS',c.links,'infl')+'</div><div id="lkform"></div>'}})}
 function relCamps(c){return D.campaigns.filter(function(x){return same(x.client,c.name)||same(x.clipping,c.name)})}
@@ -422,7 +461,7 @@ function cliDr(i){var c=D.clients[i],lc=lastContact(c.name),ts=linkedTasks(c.nam
   editSplit(tab,c.row,ESS[tab],function(one){return{used:{},html:LKEYS[tab]?linksRow(tab,c.links,['bill']):''}})}
 var CTAB={'Clients & Partnerships':'CLIENTS & PARTNERSHIPS','Brand Outreach':'BRAND OUTREACH CLIENTS','PME':'PME CLIENTS','Agencies':'AGENCIES'};
 function taskDr(row){var t=D.tasks.find(function(x){return x.row===row});openDr('<div class="m" style="color:var(--mute);font-size:12px">Task</div><h2>'+esc(t?t.task:'Task')+'</h2><div id="ed"></div>');editRecord('TASKS',row)}
-function meetDr(row){var m=(D.meetings||[]).find(function(x){return x.row===row});openDr('<div class="m" style="color:var(--mute);font-size:12px">Meeting</div><h2>'+esc(m?(m.subject||m.client):'Meeting')+'</h2><div id="ed"></div>');editRecord('MEETINGS',row)}
+function meetDr(row){var m=(D.meetings||[]).find(function(x){return x.row===row});if(m)cxPanel({m:m})}
 function amDr(row){var a=(D.ams||[]).find(function(x){return x.row===row});openDr('<div class="m" style="color:var(--mute);font-size:12px">Account manager</div><h2>'+esc(a?a.name:'')+'</h2><div id="ed"></div>');editRecord('ACCOUNT MANAGERS',row)}
 function newBar(v){return''}
 function meetList(ms){if(!ms.length)return'<div class="empty">None</div>';return ms.map(function(m){var d=parseDue(m.date),ts=/to set/i.test(m.status);
@@ -637,6 +676,137 @@ function calHtml(big){calInit();var all=big?UI.calAll:false,mm=calMeet(all),dm=(
   return'<div class="calwrap'+(big?' big':'')+'"><div class="calmain">'+hd+g+'</div>'+ag+'</div></div>'}
 function renderCal(v){v.innerHTML='<div class="bar"><button class="chip'+(UI.calAll?' on':'')+'" data-calall>Everyone\'s meetings</button><button class="chip'+(UI.calTasks?' on':'')+'" data-caltasks>Task due dates</button></div><div class="pane">'+calHtml(true)+'</div>'}
 
+
+/* ---------- Calendar section (own workspace) + meeting panel; one record per meeting = MEETINGS tab ---------- */
+var CXC={'Meeting':'#ff6a45','Internal Discussion':'#3fd49a','Project Deadline':'#ff5a5f','Production Schedule':'#8b7cff','General Event':'#4db8ff'},CXN=['Meeting','Internal Discussion','Project Deadline','Production Schedule','General Event'];
+var CX={view:'month',d:null,hide:{},proj:'',mine:false,tasks:true,rel:true,canceled:false},CXDRAG=null,HR0=7,HR1=22,HPX=44;
+function cxInit(){if(!CX.d)CX.d=today()}
+function m2t(n){var h=Math.floor(n/60),mm=n%60;return((h%12)||12)+':'+(mm<10?'0':'')+mm+' '+(h<12?'AM':'PM')}
+function cxTimes(){var a=[];for(var n=6*60;n<=23*60+30;n+=30)a.push(m2t(n));return a}
+function cxCat(m){return CXC[m.category]?m.category:(same(m.client,'Internal')?'Internal Discussion':'Meeting')}
+function cxCanc(m){return/^cancel/i.test(m.status||'')}
+function cxProjects(){var o=[];((D&&D.campaigns)||[]).forEach(function(c){if(c.name)o.push({v:c.name,l:c.name,client:c.client||''})});
+  if(MUS){try{mProjects().forEach(function(x){o.push({v:x.artist+' \u00b7 '+x.name,l:'Music: '+x.artist+' \u00b7 '+x.name,client:x.artist})})}catch(e){}}return o}
+function cxEvents(){var out=[];
+  (D.meetings||[]).forEach(function(m){var d=parseDue(m.date);if(!d||hid(m.client))return;var cn=cxCanc(m);if(cn&&!CX.canceled)return;var cat=cxCat(m);if(CX.hide[cat])return;
+    if(CX.proj&&!same(m.project,CX.proj)&&!same(m.client,CX.proj))return;if(CX.mine&&who&&!has(m.attendees,who))return;
+    var s=tmin(m.time),e=m.end?tmin(m.end):null;if(s===9999)s=null;if(e===9999)e=null;if(s!==null&&(e===null||e<=s))e=s+60;
+    out.push({k:'m',id:'m'+m.row,m:m,date:iso(d),s:s,e:e,title:m.subject||m.client||'Meeting',cat:cat,cn:cn})});
+  if(CX.tasks&&!CX.hide['Project Deadline'])(D.tasks||[]).filter(vis).forEach(function(t){if(CX.mine&&who&&!mine(t))return;var d=parseDue(t.due);if(!d)return;if(CX.proj&&!same(t.forName,CX.proj))return;
+    out.push({k:'t',id:'t'+t.row,t:t,date:iso(d),s:null,e:null,title:'Due: '+t.task,cat:'Project Deadline'})});
+  if(CX.tasks&&!CX.hide['Production Schedule']&&MUS)(MUS.tasks||[]).forEach(function(t){if(t.status==='Done'||!t.due)return;if(CX.mine&&who&&!has(t.owner,who))return;var d=parseDue(t.due);if(!d)return;if(CX.proj&&CX.proj!==(t.artist+' \u00b7 '+t.project))return;
+    out.push({k:'x',id:'x'+t.row,date:iso(d),s:null,e:null,title:'Due: '+t.task+' ('+t.artist+')',cat:'Production Schedule'})});
+  if(CX.rel&&!CX.hide['General Event']&&typeof LBL!=='undefined'&&LBL&&!CX.proj)(LBL.releases||[]).forEach(function(r){var d=parseDue(r.date);if(!d)return;out.push({k:'r',id:'r'+r.row,date:iso(d),s:null,e:null,title:'Release: '+r.release+' ('+r.artist+')',cat:'General Event'})});
+  return out}
+function cxChip(e,withTime){var c=CXC[e.cat],tt=(withTime&&e.s!==null?m2t(e.s).replace(/ (AM|PM)/,'$1').toLowerCase()+' ':'');
+  return'<span class="cxe'+(e.k!=='m'?' ro':'')+(e.cn?' cn':'')+'" style="--c:'+c+'" data-ev="'+e.id+'"'+(e.k==='m'?' draggable="true"':'')+' title="'+esc(e.title)+'">'+tt+esc(e.title)+'</span>'}
+function cxBarHtml(label){var v=[['month','Month'],['week','Week'],['day','Day'],['agenda','Agenda']];
+  return'<div class="cxbar"><span class="seg">'+v.map(function(x){return'<button class="chip'+(CX.view===x[0]?' on':'')+'" data-cxv="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</span>'+
+    '<span class="seg"><button class="chip" data-cxn="-1">\u2039</button><button class="chip" data-cxn="0">Today</button><button class="chip" data-cxn="1">\u203a</button></span><span class="cxttl">'+esc(label)+'</span><span class="sp"></span>'+
+    '<select id="cxproj" title="Filter by project"><option value="">All projects</option>'+cxProjects().map(function(x){return'<option value="'+esc(x.v)+'"'+(CX.proj===x.v?' selected':'')+'>'+esc(x.l)+'</option>'}).join('')+'</select>'+
+    '<button class="chip'+(CX.mine?' on':'')+'" data-cxmine>Mine</button><button class="b" data-cxnew style="background:var(--acc);border-color:transparent;color:#fff;font-weight:600">+ Event</button></div>'+
+    '<div class="cxleg">'+CXN.map(function(c){return'<button class="chip'+(CX.hide[c]?' off':'')+'" data-cxcat="'+esc(c)+'" style="--c:'+CXC[c]+'"><i></i>'+c+'</button>'}).join('')+
+    '<button class="chip'+(CX.tasks?' on':'')+'" data-cxlay="tasks" title="Task due dates from Plus and Music">Task dates</button><button class="chip'+(CX.rel?' on':'')+'" data-cxlay="rel" title="Release dates from Music">Releases</button><button class="chip'+(CX.canceled?' on':'')+'" data-cxlay="canceled">Show canceled</button></div>'}
+function cxWeekStart(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()-d.getDay());return x}
+function cxMonth(ev){var d=CX.d,first=new Date(d.getFullYear(),d.getMonth(),1),st=new Date(first.getFullYear(),first.getMonth(),1-first.getDay()),tk=iso(today()),by={};
+  ev.forEach(function(e){(by[e.date]=by[e.date]||[]).push(e)});
+  var g='<div class="cal big">'+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(function(x){return'<div class="dow">'+x+'</div>'}).join('');
+  for(var i=0;i<42;i++){var c=new Date(st.getFullYear(),st.getMonth(),st.getDate()+i),k=iso(c),es=(by[k]||[]).sort(function(a,b){return(a.s===null?-1:a.s)-(b.s===null?-1:b.s)});
+    g+='<div class="cell'+(c.getMonth()!==d.getMonth()?' oth':'')+(k===tk?' today':'')+'" data-cxday="'+k+'"><span class="dn">'+c.getDate()+'</span>'+es.slice(0,3).map(function(e){return cxChip(e,true)}).join('')+(es.length>3?'<span class="more" data-cxgo="'+k+'">+'+(es.length-3)+' more</span>':'')+'</div>'}
+  return g+'</div>'}
+function cxLanes(es){es=es.slice().sort(function(a,b){return a.s-b.s||a.e-b.e});var lanes=[],out=[];
+  es.forEach(function(e){var l=0;while(lanes[l]!==undefined&&lanes[l]>e.s)l++;lanes[l]=e.e;out.push({e:e,l:l})});
+  out.forEach(function(o){var n=1;out.forEach(function(p){if(p.e.s<o.e.e&&p.e.e>o.e.s)n=Math.max(n,p.l+1)});o.n=Math.max(n,o.l+1)});return out}
+function cxTimeGrid(days,ev){var tk=iso(today()),n=days.length,cols='54px repeat('+n+',minmax(0,1fr))',head='<div class="cxhead" style="grid-template-columns:'+cols+'"><div style="border:0"></div>'+days.map(function(d){var k=iso(d);return'<div class="'+(k===tk?'today':'')+'"><b>'+d.toLocaleDateString('en-US',{weekday:'short'})+' '+d.getDate()+'</b></div>'}).join('')+'</div>',
+    all='<div class="cxallday" style="grid-template-columns:'+cols+'"><div style="border:0;font-size:10px;color:var(--mute);padding-top:6px">all day</div>'+days.map(function(d){var k=iso(d);return'<div data-cxday="'+k+'">'+ev.filter(function(e){return e.date===k&&e.s===null}).map(function(e){return cxChip(e,false)}).join('')+'</div>'}).join('')+'</div>',
+    hours='';for(var h=HR0;h<=HR1;h++)hours+='<span style="top:'+((h-HR0)*HPX)+'px">'+m2t(h*60).replace(':00','')+'</span>';
+  var body='<div class="cxbody" style="grid-template-columns:'+cols+';height:'+((HR1-HR0+1)*HPX)+'px"><div class="cxtime">'+hours+'</div>'+days.map(function(d){var k=iso(d),es=ev.filter(function(e){return e.date===k&&e.s!==null});
+    return'<div class="cxcol" data-cxcol="'+k+'">'+cxLanes(es).map(function(o){var e=o.e,top=Math.max(0,(e.s-HR0*60)/60*HPX),ht=Math.max(22,(e.e-e.s)/60*HPX-2);
+      return'<div class="cxblk'+(e.cn?' cn':'')+'" style="--c:'+CXC[e.cat]+';top:'+top+'px;height:'+ht+'px;left:calc('+(o.l*100/o.n)+'% + 2px);width:calc('+(100/o.n)+'% - 4px)" data-ev="'+e.id+'" draggable="true" title="'+esc(e.title)+'"><b>'+esc(e.title)+'</b>'+m2t(e.s).replace(' ','').toLowerCase()+' - '+m2t(e.e).replace(' ','').toLowerCase()+'</div>'}).join('')+(k===tk?'<div class="cxnow" style="top:'+(((new Date().getHours()*60+new Date().getMinutes())-HR0*60)/60*HPX)+'px"></div>':'')+'</div>'}).join('')+'</div>';
+  return'<div class="cxgrid">'+head+all+'<div class="cxscroll" id="cxsc">'+body+'</div></div>'}
+function cxAgenda(ev){var from=iso(CX.d),to=iso(new Date(CX.d.getFullYear(),CX.d.getMonth(),CX.d.getDate()+60)),by={},ks=[];
+  ev.filter(function(e){return e.date>=from&&e.date<=to}).forEach(function(e){if(!by[e.date]){by[e.date]=[];ks.push(e.date)}by[e.date].push(e)});ks.sort();
+  if(!ks.length)return'<div class="empty">Nothing scheduled in the next 60 days.</div>';
+  return ks.map(function(k){return'<div class="cxag"><h3>'+fmt(parseDue(k))+(k===iso(today())?' \u00b7 Today':'')+'</h3>'+by[k].sort(function(a,b){return(a.s===null?-1:a.s)-(b.s===null?-1:b.s)}).map(function(e){var m=e.m;
+    return'<div class="cxcard'+(e.cn?' cn':'')+(e.k!=='m'?' ro':'')+'" style="--c:'+CXC[e.cat]+'" data-ev="'+e.id+'"><div class="tm">'+(e.s!==null?m2t(e.s)+(e.e?' - '+m2t(e.e):''):'All day')+'</div><div class="nm"><b>'+esc(e.title)+'</b> <span class="cxpill" style="--c:'+CXC[e.cat]+'">'+esc(e.cat)+'</span>'+(e.cn?' <span class="stat">Canceled</span>':'')+
+      (m?'<div class="m">'+(m.project?esc(m.project)+' \u00b7 ':'')+(m.attendees?esc(m.attendees):'')+(m.link?' \u00b7 '+esc(m.link):'')+'</div>':'')+'</div></div>'}).join('')+'</div>'}).join('')}
+function renderCalx(v){if(!D){v.innerHTML='<div class="empty">Loading\u2026</div>';return}cxInit();var d=CX.d,ev=cxEvents(),label,body;
+  if(CX.view==='month'){label=MN[d.getMonth()]+' '+d.getFullYear();body=cxMonth(ev)}
+  else if(CX.view==='week'){var ws=cxWeekStart(d),days=[];for(var i=0;i<7;i++)days.push(new Date(ws.getFullYear(),ws.getMonth(),ws.getDate()+i));label=fmt(days[0])+' \u2013 '+fmt(days[6]);body=cxTimeGrid(days,ev)}
+  else if(CX.view==='day'){label=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});body=cxTimeGrid([d],ev)}
+  else{label='Next 60 days from '+fmt(d);body=cxAgenda(ev)}
+  v.innerHTML='<div class="pane">'+cxBarHtml(label)+body+'</div>';
+  var sc=document.getElementById('cxsc');if(sc){sc.scrollTop=Math.max(0,((new Date().getHours()||9)-1-HR0)*HPX)}}
+function cxFind(id){var m=/^m(\d+)$/.exec(id);return m?(D.meetings||[]).find(function(x){return x.row===+m[1]}):null}
+function cxNav(dir){var d=CX.d;if(dir===0){CX.d=today()}else if(CX.view==='month')CX.d=new Date(d.getFullYear(),d.getMonth()+dir,1);else if(CX.view==='week')CX.d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+7*dir);else if(CX.view==='day')CX.d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+dir);else CX.d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+30*dir);render()}
+/* meeting panel: new / edit / cancel / delete. opts: {m, date, time, project, client, lock, back} */
+var MTP=null;
+function cxPanel(o){o=o||{};var m=o.m||null,t=cxTimes(),proj=m?m.project:(o.project||''),cl=m?m.client:(o.client||''),cat=m?cxCat(m):(o.cat||'Meeting'),att=m?(m.attendees||''):'',sel=att.split(/\s*,\s*/).filter(Boolean),
+    mk=function(id,v,extra){return'<select id="'+id+'" '+(extra||'')+'><option value=""></option>'+t.map(function(x){return'<option'+(x===v?' selected':'')+'>'+x+'</option>'}).join('')+(v&&t.indexOf(v)<0?'<option selected>'+esc(v)+'</option>':'')+'</select>'},
+    projs=cxProjects(),pOpt='<option value="">No project (internal)</option>'+projs.map(function(x){return'<option value="'+esc(x.v)+'" data-cl="'+esc(x.client)+'"'+(x.v===proj?' selected':'')+'>'+esc(x.l)+'</option>'}).join('')+(proj&&!projs.some(function(x){return x.v===proj})?'<option value="'+esc(proj)+'" selected>'+esc(proj)+'</option>':'');
+  MTP={m:m,back:o.back||null,client:cl,lock:!!o.lock};
+  openDr('<div class="m" style="color:var(--mute);font-size:12px">'+(m?'Meeting':'New meeting')+'</div><h2>'+esc(m?(m.subject||'Meeting'):'Set a meeting')+'</h2>'+
+  '<form class="mtf" id="mtf" novalidate>'+
+  '<label>Title<input id="mt_t" value="'+esc(m?m.subject:'')+'" placeholder="e.g. Release planning" autocomplete="off"></label>'+
+  '<div class="r2"><label>Category<select id="mt_c">'+CXN.map(function(c){return'<option'+(c===cat?' selected':'')+'>'+c+'</option>'}).join('')+'</select></label>'+
+  '<label>Project'+(o.lock?' (from this project)':'')+'<select id="mt_p"'+(o.lock?' disabled':'')+'>'+pOpt+'</select></label></div>'+
+  '<div class="r3"><label>Date<input type="date" id="mt_d" value="'+esc(m?(m.date||''):(o.date||iso(today())))+'"></label><label>Start'+mk('mt_s',m?m.time:(o.time||''))+'</label><label>End'+mk('mt_e',m?m.end:(o.end||''))+'</label></div>'+
+  '<label>Attendees<div class="ppl" id="mt_a">'+((D&&D.people)||[]).map(function(p){return'<button type="button" class="chip'+(sel.indexOf(p)>-1?' on':'')+'" data-pp="'+esc(p)+'">'+esc(p)+'</button>'}).join('')+'</div><input id="mt_x" placeholder="Others (names or emails, comma separated)" value="'+esc(sel.filter(function(x){return((D&&D.people)||[]).indexOf(x)<0}).join(', '))+'"></label>'+
+  '<label>Location or video link<input id="mt_l" value="'+esc(m?m.link:'')+'" placeholder="Room, address or https://meet.google.com/\u2026"></label>'+
+  '<label>Description / agenda<textarea id="mt_g" rows="3">'+esc(m?m.agenda:'')+'</textarea></label>'+
+  (m?'<label>Outcome / notes<textarea id="mt_o" rows="2">'+esc(m.outcome||'')+'</textarea></label>':'')+
+  '<div class="r2"><label>Reminder<select id="mt_r">'+['None','15 minutes before','1 hour before','1 day before'].map(function(x){return'<option'+((m&&m.reminder?m.reminder:'None')===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></label>'+
+  (m?'<label>Status<select id="mt_st">'+['To Set','To Bump','Confirmed','Canceled'].map(function(x){return'<option'+(x===m.status?' selected':'')+'>'+x+'</option>'}).join('')+'</select></label>':'<div></div>')+'</div>'+
+  '<div class="mterr" id="mterr"></div><div class="acts"><button class="b pri" type="submit">'+(m?'Save changes':'Create meeting')+'</button>'+(m&&!cxCanc(m)?'<button type="button" class="b" data-mtcancel>Cancel meeting</button>':'')+(m?'<button type="button" class="b dng" data-mtdel>Delete</button>':'')+'</div></form>');
+  setTimeout(function(){var i=document.getElementById('mt_t');if(i&&!m)i.focus()},50)}
+function mtErr(msg,id){var e=document.getElementById('mterr');if(e)e.textContent=msg||'';[].forEach.call(document.querySelectorAll('#mtf .bad'),function(x){x.classList.remove('bad')});if(id){var f=document.getElementById(id);if(f)f.classList.add('bad')}}
+function mtAfter(msg){toast(msg);var b=MTP&&MTP.back;MTP=null;return load().then(function(){if(b&&b.k==='camp')campDr(b.i);else if(b&&b.k==='mus')mProjDr(b.a,b.p);else{closeDr();render()}})}
+function mtSave(force){var m=MTP.m,g=function(id){var e=document.getElementById(id);return e?e.value:''},pe=document.getElementById('mt_p'),proj=pe.value,opt=pe.options[pe.selectedIndex],cl=(opt&&opt.dataset.cl)||MTP.client||(proj?'':'Internal'),
+    att=[].map.call(document.querySelectorAll('#mt_a .chip.on'),function(c){return c.dataset.pp}).concat(g('mt_x').split(/\s*,\s*/).filter(Boolean)).join(', ');
+  var ent={row:m?m.row:null,expected:m?m.subject:null,title:g('mt_t').trim(),category:g('mt_c'),project:proj,client:cl,date:g('mt_d'),time:g('mt_s'),endTime:g('mt_e'),attendees:att,place:g('mt_l').trim(),agenda:g('mt_g'),reminder:g('mt_r'),force:!!force};
+  if(m){ent.status=g('mt_st');ent.outcome=g('mt_o')}
+  if(!ent.title)return mtErr('Give the meeting a title.','mt_t');if(!ent.date)return mtErr('Pick a date.','mt_d');
+  if(ent.endTime&&!ent.time)return mtErr('Add a start time before the end time.','mt_s');if(ent.endTime&&tmin(ent.endTime)<=tmin(ent.time))return mtErr('The end time must be after the start time.','mt_e');
+  mtErr('');var btn=document.querySelector('#mtf .pri');if(btn)btn.disabled=true;
+  run('meetingSave',ent).then(function(){return mtAfter(m?'Meeting updated':'Meeting created: it is on the calendar and in its project')}).catch(function(e){if(btn)btn.disabled=false;var msg=String(e&&e.message||e).replace(/^.*?DUPLICATE:\s*/,'DUPLICATE:');
+    if(/^DUPLICATE:/.test(msg)){if(confirm(msg.replace('DUPLICATE: ','')))return mtSave(true);return}mtErr(msg)})}
+document.addEventListener('submit',function(e){if(e.target.id==='mtf'){e.preventDefault();mtSave(false)}});
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  var pp=t.closest('[data-pp]');if(pp){pp.classList.toggle('on');return}
+  if(t.closest('[data-mtcancel]')&&MTP&&MTP.m){var m=MTP.m;if(!confirm('Cancel "'+m.subject+'"? It stays on record as Canceled.'))return;run('updateCell','MEETINGS',m.row,m.subject,'C','Canceled').then(function(){return mtAfter('Meeting canceled')}).catch(function(x){mtErr(x.message)});return}
+  if(t.closest('[data-mtdel]')&&MTP&&MTP.m){var m2=MTP.m;if(!confirm('Delete "'+m2.subject+'" for everyone? This removes the row (it is noted in Task History).'))return;run('deleteRecord','MEETINGS',m2.row,m2.subject).then(function(){return mtAfter('Meeting deleted')}).catch(function(x){mtErr(x.message)});return}
+  var v=t.closest('[data-cxv]');if(v){CX.view=v.dataset.cxv;render();return}
+  var n=t.closest('[data-cxn]');if(n){cxNav(+n.dataset.cxn);return}
+  var cg=t.closest('[data-cxgo]');if(cg){CX.d=parseDue(cg.dataset.cxgo);CX.view='day';render();return}
+  if(t.closest('[data-cxmine]')){CX.mine=!CX.mine;render();return}
+  var ct=t.closest('[data-cxcat]');if(ct){var c=ct.dataset.cxcat;CX.hide[c]=!CX.hide[c];render();return}
+  var ly=t.closest('[data-cxlay]');if(ly){var k=ly.dataset.cxlay;CX[k]=!CX[k];render();return}
+  if(t.closest('[data-cxnew]')){cxPanel({date:iso(CX.d||today())});return}
+  var ev=t.closest('[data-ev]');if(ev&&WS==='cal'){var id=ev.dataset.ev;if(id[0]==='m'){var mm=cxFind(id);if(mm)cxPanel({m:mm})}else if(id[0]==='t'){taskDr(+id.slice(1))}return}
+  var sm=t.closest('[data-setmeet]');if(sm){var a=sm.dataset.setmeet.split(':');if(a[0]==='camp'){var c2=D.campaigns[+a[1]];cxPanel({project:c2.name,client:c2.client||'',lock:true,back:{k:'camp',i:+a[1]}})}else{var pr=JSON.parse(sm.dataset.mp);cxPanel({project:pr.a+' \u00b7 '+pr.p,client:pr.a,lock:true,back:{k:'mus',a:pr.a,p:pr.p}})}return}
+  var mf=t.closest('[data-mf]');if(mf){UI.mf=mf.dataset.mf;if(mf.dataset.k==='camp')campDr(+mf.dataset.i);else mProjDr(mf.dataset.a,mf.dataset.p);return}
+  var cell=t.closest('[data-cxday]');if(cell&&WS==='cal'&&CX.view==='month'&&!t.closest('[data-ev]')){CX.d=parseDue(cell.dataset.cxday);return}
+  var col=t.closest('[data-cxcol]');if(col&&WS==='cal'&&!t.closest('[data-ev]')){var r=col.getBoundingClientRect(),mn=HR0*60+Math.floor((e.clientY-r.top)/HPX*2)*30;cxPanel({date:col.dataset.cxcol,time:m2t(mn),end:m2t(mn+60)})}});
+document.addEventListener('dblclick',function(e){var cell=e.target.closest&&e.target.closest('[data-cxday]');if(cell&&WS==='cal'&&CX.view==='month'&&!e.target.closest('[data-ev]'))cxPanel({date:cell.dataset.cxday})});
+document.addEventListener('change',function(e){if(e.target.id==='cxproj'){CX.proj=e.target.value;render()}if(e.target.id==='mt_p'&&MTP){var o=e.target.options[e.target.selectedIndex];MTP.client=(o&&o.dataset.cl)||''}});
+/* drag and drop: reschedule */
+document.addEventListener('dragstart',function(e){var el=e.target.closest&&e.target.closest('[data-ev]');if(!el||WS!=='cal')return;var m=cxFind(el.dataset.ev);if(!m){e.preventDefault();return}CXDRAG=m;try{e.dataTransfer.setData('text/plain',el.dataset.ev);e.dataTransfer.effectAllowed='move'}catch(x){}});
+document.addEventListener('dragover',function(e){if(!CXDRAG)return;var z=e.target.closest&&(e.target.closest('[data-cxcol]')||e.target.closest('.cell[data-cxday]'));if(z){e.preventDefault();[].forEach.call(document.querySelectorAll('.dropover'),function(x){x.classList.remove('dropover')});z.classList.add('dropover')}});
+document.addEventListener('dragend',function(){CXDRAG=null;[].forEach.call(document.querySelectorAll('.dropover'),function(x){x.classList.remove('dropover')})});
+document.addEventListener('drop',function(e){if(!CXDRAG)return;var m=CXDRAG,col=e.target.closest&&e.target.closest('[data-cxcol]'),cell=e.target.closest&&e.target.closest('.cell[data-cxday]');CXDRAG=null;[].forEach.call(document.querySelectorAll('.dropover'),function(x){x.classList.remove('dropover')});
+  var date,time=m.time,end=m.end;if(col){e.preventDefault();var r=col.getBoundingClientRect(),mn=HR0*60+Math.floor((e.clientY-r.top)/HPX*2)*30,dur=(m.end&&m.time&&tmin(m.end)>tmin(m.time))?tmin(m.end)-tmin(m.time):60;date=col.dataset.cxcol;time=m2t(mn);end=m2t(mn+dur)}
+  else if(cell){e.preventDefault();date=cell.dataset.cxday}else return;
+  if(date===m.date&&time===m.time)return;
+  run('meetingMove',m.row,m.subject,date,time||'',end||'').then(function(){toast('Rescheduled to '+fmt(parseDue(date))+(time?' '+time:''));return load()}).catch(function(x){toast(x.message||'Could not reschedule')})});
+/* project window: Meetings section */
+function meetBlock(list,kind,attrs){var f=UI.mf||'up',td=today(),cnt={up:0,past:0,canc:0},rows=[];
+  list.forEach(function(m){var d=parseDue(m.date),cn=cxCanc(m),k=cn?'canc':(d&&d<td?'past':'up');cnt[k]++;if(k===f)rows.push(m)});
+  rows.sort(function(a,b){var x=parseDue(a.date),y=parseDue(b.date);return f==='past'?(y-x):(x-y)||(tmin(a.time)-tmin(b.time))});
+  var seg='<span class="seg">'+[['up','Upcoming'],['past','Past'],['canc','Cancelled']].map(function(x){return'<button class="chip'+(f===x[0]?' on':'')+'" data-mf="'+x[0]+'" '+attrs+'>'+x[1]+' ('+cnt[x[0]]+')</button>'}).join('')+'</span>';
+  return'<div class="mhead"><h3>Meetings</h3><button class="b pri" data-setmeet="'+(kind.k==='camp'?'camp:'+kind.i:'mus')+'"'+(kind.k==='mus'?' data-mp="'+esc(JSON.stringify({a:kind.a,p:kind.p}))+'"':'')+'>+ Set Meeting</button></div><div style="margin-bottom:8px">'+seg+'</div>'+
+    (rows.length?rows.map(function(m){var d=parseDue(m.date),c=CXC[cxCat(m)];return'<div class="mrow'+(cxCanc(m)?' cn':'')+'" data-meet="'+m.row+'" style="border-left:3px solid '+c+'"><div class="tm">'+fmt(d)+'<br><span class="m">'+(m.time?esc(m.time)+(m.end?' - '+esc(m.end):''):'No time')+'</span></div><div class="nm"><b>'+esc(m.subject||'Meeting')+'</b> <span class="stat'+(/to set/i.test(m.status)?' tset':'')+'">'+esc(m.status||'\u2014')+'</span>'+
+      '<div class="m">'+(m.attendees?esc(m.attendees):'No attendees yet')+(m.link?' \u00b7 '+esc(m.link):'')+'</div></div></div>'}).join(''):'<div class="empty">No '+(f==='up'?'upcoming':f==='past'?'past':'cancelled')+' meetings.</div>')}
+
 /* ---------- Dashboard: my tasks + my meetings calendar ---------- */
 function renderDash(v){
   if(document.activeElement&&document.activeElement.id==='rptT')return;
@@ -706,7 +876,7 @@ function mDashRow(t){var d=parseDue(t.due),od=d&&d<today();
     '<div class="m">'+esc(t.artist)+' · '+esc(t.project)+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-dws]');if(!b)return;UI.dws=b.dataset.dws;render()});
 function setTone(){var p=(view==='tasks'&&UI.pmeProj)||(view==='clients'&&UI.pmeNet),r=document.documentElement;if(p!==(r.getAttribute('data-mode')==='pme')){if(p)r.setAttribute('data-mode','pme');else r.removeAttribute('data-mode');applyBD()}}
-function render(){setTone();var v=document.getElementById('v');if(view==='dash')return renderDash(v);if(WS==='db'){if(!D){v.innerHTML='<div class="empty">Loading…</div>';return}return renderDb(v)}if(WS==='music')return view==='more'?renderMore(v):/^l/.test(view)?renderLabel(v):renderMusic(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
+function render(){setTone();var v=document.getElementById('v');if(WS==='cal')return renderCalx(v);if(view==='dash')return renderDash(v);if(WS==='db'){if(!D){v.innerHTML='<div class="empty">Loading…</div>';return}return renderDb(v)}if(WS==='music')return view==='more'?renderMore(v):/^l/.test(view)?renderLabel(v):renderMusic(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
   if(view==='clients')renderNet(v);else if(view==='tasks')renderProjects(v);else if(view==='cal')renderCal(v);else if(view==='dev')renderDev(v);else if(view==='more')renderMore(v);else renderDash(v)}
 var BL=null;
 function blHtml(){var out=[],open=0,done=0;BL.split('\n').forEach(function(l,i){var m=l.match(/^- \[( |x)\] (.*)$/i);
@@ -881,27 +1051,29 @@ function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 function hideSplash(){if(__sp)return;__sp=true;if(__vd)fadeSplash();else __go=fadeSplash}
 /* Workspaces: INNRVZN Plus = this tracker sheet. INNRVZN Music = placeholder until its sheet exists.
    The choice is remembered (Python side, workspace.json); the header button switches. */
-var WS='',WSN={dash:'Dashboard',music:'INNRVZN Music',plus:'INNRVZN Plus',db:'Database'};
+var WS='',WSN={dash:'Dashboard',cal:'Calendar',music:'INNRVZN Music',plus:'INNRVZN Plus',db:'Database'};
 function wsLabel(){var b=document.getElementById('wsbtn');if(b)b.innerHTML=esc(WSN[WS]||'Workspace')+' <span style="opacity:.6">▾</span>'}
 function showPicker(){if(document.getElementById('splash')){setTimeout(showPicker,150);return} /* only once the splash is gone */
   var o=document.getElementById('wsp');if(!o){o=document.createElement('div');o.id='wsp';document.body.appendChild(o)}
   o.innerHTML='<div class="wsbox"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="wst">Choose a workspace</div><div class="wscards">'+
     '<button class="wscard" data-ws="dash"><b>Dashboard</b><span>Your tasks across Plus and Music</span></button>'+
+    '<button class="wscard" data-ws="cal"><b>Calendar</b><span>Meetings, deadlines and releases in one schedule</span></button>'+
     '<button class="wscard" data-ws="plus"><b>INNRVZN Plus</b><span>Campaigns, network, tasks and CRM</span></button>'+
     '<button class="wscard" data-ws="music"><b>INNRVZN Music</b><span>Label artists, songs, releases and projects</span></button>'+
     '<button class="wscard" data-ws="db"><b>Database</b><span>Clients, talent, brands and contacts</span></button></div></div>';o.style.display='flex'}
-function enterWS(ws){if(ws==='label')ws='music';/*MERGED_LABEL*/WS=ws;wsLabel();var qa0=document.getElementById('qa');if(qa0)qa0.style.display=ws==='db'?'none':'';var o=document.getElementById('wsp');if(o)o.style.display='none';var m=document.getElementById('wsm');
+function enterWS(ws){if(ws==='label')ws='music';/*MERGED_LABEL*/WS=ws;wsLabel();var qa0=document.getElementById('qa');if(qa0)qa0.style.display=(ws==='db'||ws==='cal')?'none':'';var o=document.getElementById('wsp');if(o)o.style.display='none';var m=document.getElementById('wsm');
   if(ws==='music'&&document.getElementById('splash')){setTimeout(function(){enterWS(ws)},150);return Promise.resolve()}
   if(m)m.style.display='none';closeDr();MDR=null;LDR=null;Q='';
-  var n=document.querySelector('nav');n.style.display=ws==='dash'?'none':'';
+  var n=document.querySelector('nav');n.style.display=(ws==='dash'||ws==='cal')?'none':'';
   if(ws==='dash'){view='dash';render();musLoad();repLoad();lblLoad();return load()}
+  if(ws==='cal'){view='calx';render();musLoad();lblLoad();return load()}
   if(ws==='music'){musNav(true);render();return Promise.all([musLoad(),lblLoad()])}
   if(ws==='db'){dbNav();render();dbLoad();return load()}
   musNav(false);render();return load()}
 document.addEventListener('click',function(e){var c=e.target.closest('[data-ws]');if(c){var dd0=document.getElementById('wsdd');if(dd0)dd0.style.display='none';run('setWorkspace',c.dataset.ws).catch(function(){});enterWS(c.dataset.ws);return}
   if(e.target.closest('#wsbtn')){var dd=document.getElementById('wsdd');if(!dd){dd=document.createElement('div');dd.id='wsdd';document.body.appendChild(dd)}
     if(dd.style.display==='block'){dd.style.display='none';return}var r=e.target.closest('#wsbtn').getBoundingClientRect();dd.style.left=r.left+'px';dd.style.top=(r.bottom+6)+'px';
-    dd.innerHTML=['dash','plus','music','db'].map(function(k){return'<button data-ws="'+k+'"'+(k===WS?' class="on"':'')+'>'+WSN[k]+'</button>'}).join('');dd.style.display='block';return}
+    dd.innerHTML=['dash','cal','plus','music','db'].map(function(k){return'<button data-ws="'+k+'"'+(k===WS?' class="on"':'')+'>'+WSN[k]+'</button>'}).join('');dd.style.display='block';return}
   var dd2=document.getElementById('wsdd');if(dd2)dd2.style.display='none';
   if(e.target.closest('[data-wsswitch]')){run('setWorkspace','').catch(function(){});var m=document.getElementById('wsm');if(m)m.style.display='none';showPicker()}});
 /* ---------- Database menu (Plus): Clients come from Network (D.clients); Talent, Brands and Contacts are the TALENT, BRANDS and CONTACTS tabs of the Plus sheet.
@@ -1014,7 +1186,8 @@ function mTaskRow(t,inDr){var d=parseDue(t.due),od=t.status!=='Done'&&d&&d<today
 function musReDr(){if(MDR.k==='p')mProjDr(MDR.a,MDR.p);else mArtDr(MDR.a)}
 function mProjDr(a,p){MDR={k:'p',a:a,p:p};var ts=MUS.tasks.filter(function(t){return t.artist===a&&t.project===p}),dn=ts.filter(function(t){return t.status==='Done'}).length;
   openDr('<div style="color:var(--mute);font-size:12px">'+esc(a)+'</div><h2>'+esc(p)+'</h2><div class="mprog">'+mBar({done:dn,tasks:ts})+'<span class="m">'+dn+' of '+ts.length+' done</span></div>'+
-    '<h3>Tasks</h3>'+ts.map(function(t){return mTaskRow(t,1)}).join('')+'<form class="madd" data-madd="task"><input name="t" placeholder="Add a task…"><button class="b">Add</button></form>')}
+    '<h3>Tasks</h3>'+ts.map(function(t){return mTaskRow(t,1)}).join('')+'<form class="madd" data-madd="task"><input name="t" placeholder="Add a task…"><button class="b">Add</button></form>'+
+    meetBlock(D?(D.meetings||[]).filter(function(m){return same(m.project,a+' \u00b7 '+p)}):[],{k:'mus',a:a,p:p},'data-k="mus" data-a="'+esc(a)+'" data-p="'+esc(p)+'"'))}
 function mArtDr(a){MDR={k:'a',a:a};var ps=mProjects().filter(function(p){return p.artist===a});
   openDr('<div style="color:var(--mute);font-size:12px">Artist</div><h2>'+esc(a)+'</h2><h3>Projects ('+ps.length+')</h3>'+
     (ps.map(function(p){return'<div class="prow mq" data-mp="'+esc(p.artist)+'\u0001'+esc(p.name)+'"><span class="dot '+p.h+'"></span><span><b>'+esc(p.name)+'</b></span><span>'+mBar(p)+' <span class="m">'+p.done+'/'+p.tasks.length+'</span></span></div>'}).join('')||'<div class="m">No projects yet.</div>')+
@@ -1184,7 +1357,7 @@ function showLogin(msg){var o=document.getElementById('login');if(!o){o=document
     '<p class="m" style="margin:-6px 0 18px">Use your INNRVZN Google account. Google asks for permission in your browser once, then you come straight back here.</p>'+
     '<button class="b gbtn" data-signin><b>G</b> Sign in with Google</button><p class="m" id="lgmsg" style="margin-top:14px;min-height:18px">'+esc(msg||'')+'</p></div>';o.style.display='flex'}
 function startApp(){var o=document.getElementById('login');if(o)o.style.display='none';
-  return run('getWorkspace').catch(function(){return'plus'}).then(function(ws){if(ws==='plus'||ws==='music'||ws==='dash'||ws==='label'||ws==='db')return enterWS(ws);showPicker()})}
+  return run('getWorkspace').catch(function(){return'plus'}).then(function(ws){if(ws==='plus'||ws==='music'||ws==='dash'||ws==='label'||ws==='db'||ws==='cal')return enterWS(ws);showPicker()})}
 document.addEventListener('click',function(e){
   if(e.target.closest('[data-signin]')){var b=e.target.closest('[data-signin]');b.disabled=true;document.getElementById('lgmsg').textContent='Finish signing in on the Google page that just opened in your browser…';
     run('signIn').then(function(r){toast('Signed in'+(r.email?' as '+r.email:''));startApp()}).catch(function(err){b.disabled=false;document.getElementById('lgmsg').textContent=String(err&&err.message||err)})}
@@ -1196,6 +1369,6 @@ render();
 run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
 if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
   if(ws==='plus'||ws==='music'||ws==='label'||ws==='db')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
-setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash')load();if(WS==='dash')repLoad()},60000);
+setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash'||WS==='cal')load();if(WS==='dash')repLoad()},60000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script><script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>
