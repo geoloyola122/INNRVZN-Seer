@@ -944,8 +944,8 @@
     splashPlate: function () { return Promise.resolve({ ok: false }); },
     openUrl: function (u) { window.open(u, '_blank', 'noopener'); return Promise.resolve({ ok: true }); },
     log: function () { return Promise.resolve({ ok: true }); },
-    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'cal', 'plus', 'music', 'label', 'db'].indexOf(w) > -1 ? w : ''); },
-    setWorkspace: function (ws) { if (['dash', 'cal', 'plus', 'music', 'label', 'db'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
+    getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'cal', 'plus', 'music', 'label', 'db', 'dev'].indexOf(w) > -1 ? w : ''); },
+    setWorkspace: function (ws) { if (['dash', 'cal', 'plus', 'music', 'label', 'db', 'dev'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
     signOut: function () {
       try { if (token && window.google && google.accounts) google.accounts.oauth2.revoke(token, function () { }); } catch (e) { }
       token = ''; lsSet('ta_signed', ''); try { sessionStorage.clear(); } catch (e) { }
