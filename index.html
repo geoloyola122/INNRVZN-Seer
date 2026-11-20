@@ -200,6 +200,7 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 @media (max-width:700px){nav button:not(.on) span{display:none}nav button{padding:8px 11px}.stab{padding:9px 12px}}
 /* ---- phone layout: tables become cards, nav fits the screen (desktop is untouched) ---- */
 @media (max-width:700px){
+ header{gap:8px;padding:8px 10px}#bd{display:none}header>#who{flex:1 1 110px;min-width:0;max-width:none}header>#qa{flex:1 1 100%;order:9}
  main{padding-left:10px;padding-right:10px}
  nav{max-width:100%;overflow-x:auto;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
  nav button{padding:7px 9px;font-size:13px;flex:none}
@@ -306,6 +307,28 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 .wscard .ic{width:1.7em;height:1.7em;color:var(--acc);margin-bottom:6px;display:block}
 #wsdd button{display:flex;align-items:center;gap:9px;width:100%;text-align:left}#wsdd button .ic{opacity:.85}.wssep{height:1px;background:var(--line);margin:4px 6px}
 .wsbtn .ic{margin-right:3px}
+
+.askov{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,11,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:askin .14s ease both}
+.askov.bye{opacity:0;transition:opacity .12s}
+@keyframes askin{from{opacity:0}to{opacity:1}}
+.askbox{width:min(420px,100%);padding:20px;border-radius:20px;background:linear-gradient(135deg,var(--hi),transparent 50%),var(--glass2);-webkit-backdrop-filter:blur(30px) saturate(1.6);backdrop-filter:blur(30px) saturate(1.6);border:1px solid var(--rim);box-shadow:0 24px 70px rgba(0,0,0,.5),inset 0 1px 0 var(--rim);animation:askup .18s ease both}
+@keyframes askup{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.asktt{font-weight:700;font-size:16px;margin-bottom:6px}.askmsg{color:var(--mute);white-space:pre-wrap;margin-bottom:14px;line-height:1.45}
+.askin{width:100%;background:var(--chip);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 11px;font:inherit;margin-bottom:14px}
+.askin:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 25%,transparent)}
+.askbtns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.askbtns .pri{background:var(--acc);border-color:transparent;color:#fff;font-weight:600}.askbtns .dng{background:var(--red);border-color:transparent;color:#fff;font-weight:600}
+.askch{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:12px}
+
+.skel{display:grid;gap:10px;padding:6px 0;max-width:720px}
+.skel i{display:block;height:46px;border-radius:12px;background:linear-gradient(90deg,var(--chip) 25%,var(--hi) 50%,var(--chip) 75%);background-size:300% 100%;animation:skl 1.3s ease-in-out infinite}
+.skel i:nth-child(2){width:88%}.skel i:nth-child(3){width:72%}.skel i:nth-child(4){width:55%}
+@keyframes skl{from{background-position:100% 0}to{background-position:-100% 0}}
+.errcard{max-width:460px;margin:40px auto;padding:22px;border-radius:18px;border:1px solid var(--line);background:var(--glass2);text-align:center;display:grid;gap:10px;justify-items:center}
+.errtt{font-weight:700;font-size:17px}.errcard .pri{background:var(--acc);border-color:transparent;color:#fff;font-weight:600}
+#acct{width:34px;height:34px;padding:0;border-radius:50%;font-weight:700;font-size:12px;background:var(--acc);color:#fff;border-color:transparent}
+.acctdd{position:fixed;z-index:150;min-width:230px;padding:12px;border-radius:16px;background:var(--glass2);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);border:1px solid var(--rim);box-shadow:0 18px 50px rgba(0,0,0,.45);display:grid;gap:4px}
+.acctdd b{font-size:14px}.acctdd .m{font-size:12px;word-break:break-all}.acctdd button{text-align:left;margin-top:4px}
+@media (prefers-reduced-motion:reduce){.skel i{animation:none}.askov,.askbox{animation:none}}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -313,7 +336,7 @@ html:has(#splash),body:has(#splash){background:var(--bg)!important}
 <div id="splash"><video id="spv" src="splash.webm" muted playsinline></video><div class="skip">Click to skip</div></div>
 <header><img id="hlogo" alt="" style="height:26px;margin-right:-4px"><b>INNRVZN Seer</b><button id="wsbtn" class="b wsbtn" title="Switch workspace">Workspace</button><nav><button data-v="dash" class="on"><svg class="ic" viewBox="0 0 24 24"><use href="#i-dashboard"/></svg><span>Dashboard</span></button><button data-v="tasks"><svg class="ic" viewBox="0 0 24 24"><use href="#i-projects"/></svg><span>Projects</span></button><button data-v="cal"><svg class="ic" viewBox="0 0 24 24"><use href="#i-calendar"/></svg><span>Calendar</span></button><button data-v="more"><svg class="ic" viewBox="0 0 24 24"><use href="#i-more"/></svg><span>More</span></button></nav>
 <form id="qa"><input id="qi" placeholder="Add a task: Review deck #Project @Ashley wed   (Ctrl+K)" title="@owner · #campaign or client · today, tomorrow, mon–sun, nov 14 · Tasks starting with Bump sort last" autocomplete="off"><button class="b">Add</button></form>
-<select id="who"></select><button class="b" id="rf" title="Refresh">↻</button><button class="b" id="th" title="Switch light / dark"></button><select id="bd" title="Window background"><option value="acrylic">Acrylic</option><option value="blur">Glass</option><option value="solid">Solid</option></select></header>
+<select id="who"></select><button class="b" id="rf" title="Refresh">↻</button><button class="b" id="th" title="Switch light / dark"></button><button class="b" id="acct" title="Account" aria-haspopup="true"></button><select id="bd" title="Window background"><option value="acrylic">Acrylic</option><option value="blur">Glass</option><option value="solid">Solid</option></select></header>
 <datalist id="forl"></datalist>
 <main id="v"></main><div id="toast"></div><aside id="dr"></aside>
 <script>
@@ -330,6 +353,20 @@ function run(fn){var a=[].slice.call(arguments,1);var f=window.__api&&window.__a
 function showNoAccess(msg){var o=document.getElementById('noacc');if(!o){o=document.createElement('div');o.id='noacc';document.body.appendChild(o)}
   o.style.cssText='position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,11,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)';
   o.innerHTML='<div class="wsbox" style="max-width:440px;text-align:center"><div class="wst">No access</div><p class="m" style="margin:8px 0 18px">'+esc(msg||'This Google account is not on the Seer team.')+'</p><p class="m" style="margin:0 0 18px">Ask an admin to add your Google email to the Credentials sheet, then try again.</p><button class="b" data-switchacct>Use a different account</button> <button class="b" onclick="location.reload()">Try again</button></div>'}
+/* ---------- Seer dialogs (replace the browser's confirm/prompt) ---------- */
+function askDlg(o){return new Promise(function(res){var d=document.createElement('div');d.className='askov';
+  var btns=o.choices?'<div class="askch">'+o.choices.map(function(c,i){return'<button class="b" data-ch="'+i+'">'+esc(c)+'</button>'}).join('')+'</div><div class="askbtns"><button class="b" data-no>Cancel</button></div>'
+    :'<div class="askbtns"><button class="b" data-no>'+esc(o.no||'Cancel')+'</button><button class="b '+(o.danger?'dng':'pri')+'" data-yes>'+esc(o.yes||'OK')+'</button></div>';
+  d.innerHTML='<div class="askbox" role="dialog" aria-modal="true"><div class="asktt">'+esc(o.title||'')+'</div><div class="askmsg">'+esc(o.msg||'')+'</div>'+(o.input?'<input class="askin" value="'+esc(o.def||'')+'" placeholder="'+esc(o.ph||'')+'" autocomplete="off">':'')+btns+'</div>';
+  var prev=document.activeElement,done=false;function fin(v){if(done)return;done=true;document.removeEventListener('keydown',kd,true);d.classList.add('bye');setTimeout(function(){d.remove();try{if(prev&&prev.focus)prev.focus()}catch(e){}},120);res(v)}
+  function val(){var i=d.querySelector('.askin');return i?i.value:true}
+  function kd(e){if(e.key==='Escape'){e.stopPropagation();e.preventDefault();fin(o.input?null:(o.choices?null:false))}else if(e.key==='Enter'&&!o.choices&&!(e.target&&e.target.closest&&e.target.closest('[data-no]'))){e.stopPropagation();e.preventDefault();fin(val())}else if(e.key==='Tab'){var f=[].slice.call(d.querySelectorAll('input,button'));if(!f.length)return;var i=f.indexOf(document.activeElement);e.preventDefault();f[(i+(e.shiftKey?f.length-1:1))%f.length].focus()}}
+  d.addEventListener('mousedown',function(e){if(e.target===d)fin(o.input?null:(o.choices?null:false))});
+  d.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-no'))fin(o.input?null:(o.choices?null:false));else if(b.hasAttribute('data-yes'))fin(val());else if(b.dataset.ch!==undefined)fin(o.choices[+b.dataset.ch])});
+  document.body.appendChild(d);document.addEventListener('keydown',kd,true);var f=d.querySelector('.askin')||d.querySelector('[data-yes]')||d.querySelector('[data-ch]');if(f){f.focus();if(f.select)f.select()}})}
+function askOk(msg,o){return askDlg(Object.assign({msg:msg,title:'Please confirm'},o||{}))}
+function askText(msg,def,o){return askDlg(Object.assign({msg:msg,def:def||'',input:true,yes:'Add',title:'Enter a value'},o||{})).then(function(v){v=v===null||v===false?'':String(v).trim();return v||null})}
+function askChoice(title,choices){return askDlg({title:title,choices:choices})}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none'},2600)}
 function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -347,7 +384,7 @@ function load(force){document.getElementById('rf').textContent='…';return run(
   w.innerHTML='<option value="">Everyone</option>'+d.people.map(function(p){return'<option'+(p===who?' selected':'')+'>'+esc(p)+'</option>'}).join('');
   document.getElementById('forl').innerHTML=d.forOptions.map(function(f){return'<option value="#'+esc(f)+'">'}).join('');
   render();document.getElementById('rf').textContent='↻'}).catch(function(e){toast(e.message);document.getElementById('rf').textContent='↻';
-  if(!D)document.getElementById('v').innerHTML='<div class="empty">Couldn\'t load the tracker: '+esc(e.message)+'<br><br><button class="b" onclick="load()">Try again</button></div>'})}
+  if(!D)document.getElementById('v').innerHTML='<div class="errcard"><div class="errtt">Couldn\'t load the tracker</div><div class="m">'+esc(/NO_ACCESS/.test(e.message)?'This account does not have access.':(e.message||'Something went wrong.'))+'</div><div class="m">Check your internet connection, then try again.</div><button class="b pri" onclick="load()">Try again</button></div>'})}
 function mine(t){return !who||t.owner.toLowerCase().indexOf(who.toLowerCase())>-1}
 function sortT(a,b){if(a.bump!==b.bump)return a.bump?1:-1;var x=parseDue(a.due),y=parseDue(b.due);return(x?x:9e15)-(y?y:9e15)}
 function taskHtml(t){var d=parseDue(t.due),od=d&&d<today();
@@ -406,7 +443,7 @@ var CUR=null,LKC=null;
 function linkChip(tab,links,k){var d=LKEYS[tab][k],l=(links||{})[k],has=l&&l.url;
   return'<span class="lk'+(has?'':' none')+'">'+(has?'<a href="#" data-url="'+esc(l.url)+'">'+d[1]+' ↗</a>':'<span class="m">'+d[1]+'</span>')+'<button class="ed" title="'+(has?'Replace':'Add')+' link" data-lkedit="'+k+'">'+(has?'✎':'+')+'</button></span>'}
 function linksRow(tab,links,keys){return'<div class="lkrow">'+keys.map(function(k){return linkChip(tab,links,k)}).join('')+'</div><div id="lkform"></div>'}
-function editSplit(tab,row,ess,extra){var bE=document.getElementById('edE'),bA=document.getElementById('edA');if(bE)bE.innerHTML='<div class="empty">Loading…</div>';
+function editSplit(tab,row,ess,extra){var bE=document.getElementById('edE'),bA=document.getElementById('edA');if(bE)bE.innerHTML='<div class="skel" aria-busy="true"><i></i><i></i><i></i><i></i></div>';
   return run('getRecord',tab,row).then(function(r){var sch=r.schema,ki=sch.cols.findIndex(function(c){return c.col===sch.key});
     ED={tab:tab,row:row,key:r.values[ki],values:r.values,schema:sch};setTimeout(addDelBar,0);var idx={};sch.cols.forEach(function(c,i){idx[c.col]=i});
     var one=function(L){var i=idx[L];return i===undefined?'':fieldHtml(sch.cols[i],r.values[i],i)};
@@ -776,12 +813,12 @@ function mtSave(force){var m=MTP.m,g=function(id){var e=document.getElementById(
   if(ent.endTime&&!ent.time)return mtErr('Add a start time before the end time.','mt_s');if(ent.endTime&&tmin(ent.endTime)<=tmin(ent.time))return mtErr('The end time must be after the start time.','mt_e');
   mtErr('');var btn=document.querySelector('#mtf .pri');if(btn)btn.disabled=true;
   run('meetingSave',ent).then(function(){return mtAfter(m?'Meeting updated':'Meeting created: it is on the calendar and in its project')}).catch(function(e){if(btn)btn.disabled=false;var msg=String(e&&e.message||e).replace(/^.*?DUPLICATE:\s*/,'DUPLICATE:');
-    if(/^DUPLICATE:/.test(msg)){if(confirm(msg.replace('DUPLICATE: ','')))return mtSave(true);return}mtErr(msg)})}
+    if(/^DUPLICATE:/.test(msg)){askOk(msg.replace('DUPLICATE: ',''),{yes:'Save anyway',title:'Possible duplicate'}).then(function(ok){if(ok)mtSave(true)});return}mtErr(msg)})}
 document.addEventListener('submit',function(e){if(e.target.id==='mtf'){e.preventDefault();mtSave(false)}});
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   var pp=t.closest('[data-pp]');if(pp){pp.classList.toggle('on');return}
-  if(t.closest('[data-mtcancel]')&&MTP&&MTP.m){var m=MTP.m;if(!confirm('Cancel "'+m.subject+'"? It stays on record as Canceled.'))return;run('updateCell','MEETINGS',m.row,m.subject,'C','Canceled').then(function(){return mtAfter('Meeting canceled')}).catch(function(x){mtErr(x.message)});return}
-  if(t.closest('[data-mtdel]')&&MTP&&MTP.m){var m2=MTP.m;if(!confirm('Delete "'+m2.subject+'" for everyone? This removes the row (it is noted in Task History).'))return;run('deleteRecord','MEETINGS',m2.row,m2.subject).then(function(){return mtAfter('Meeting deleted')}).catch(function(x){mtErr(x.message)});return}
+  if(t.closest('[data-mtcancel]')&&MTP&&MTP.m){var m=MTP.m;askOk('Cancel "'+m.subject+'"? It stays on record as Canceled.',{yes:'Cancel meeting',no:'Keep it',title:'Cancel meeting'}).then(function(ok){if(!ok)return;run('updateCell','MEETINGS',m.row,m.subject,'C','Canceled').then(function(){return mtAfter('Meeting canceled')}).catch(function(x){mtErr(x.message)})});return}
+  if(t.closest('[data-mtdel]')&&MTP&&MTP.m){var m2=MTP.m;askOk('Delete "'+m2.subject+'" for everyone? This removes the row (it is noted in Task History).',{yes:'Delete',danger:1,title:'Delete meeting'}).then(function(ok){if(!ok)return;run('deleteRecord','MEETINGS',m2.row,m2.subject).then(function(){return mtAfter('Meeting deleted')}).catch(function(x){mtErr(x.message)})});return}
   var v=t.closest('[data-cxv]');if(v){CX.view=v.dataset.cxv;render();return}
   var n=t.closest('[data-cxn]');if(n){cxNav(+n.dataset.cxn);return}
   var cg=t.closest('[data-cxgo]');if(cg){CX.d=parseDue(cg.dataset.cxgo);CX.view='day';render();return}
@@ -871,7 +908,7 @@ function renderDash(v){
   var left='<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s tasks":'All tasks')+'</b><span class="m">'+all.length+' open · '+g.Overdue.length+' overdue</span>'+seg+'</div>'+
     (!D||!MUS?'<div class="m" style="padding:4px 2px">Loading '+(!D?'INNRVZN Plus':'INNRVZN Music')+'…</div>':'')+
     (ks.length?ks.map(function(k){return'<h3>'+k+' ('+g[k].length+')</h3>'+g[k].map(row).join('')}).join(''):'<div class="empty">No open tasks.</div>')+'</div>';
-  v.innerHTML=reportBox()+'<div class="dash">'+left+'<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s meetings":'Meetings')+'</b></div>'+(D?calHtml(false):'<div class="empty">Loading…</div>')+'</div></div>'}
+  v.innerHTML=reportBox()+'<div class="dash">'+left+'<div class="pane"><div class="panehd"><b>'+(who?esc(who)+"'s meetings":'Meetings')+'</b></div>'+(D?calHtml(false):'<div class="skel" aria-busy="true"><i></i><i></i><i></i><i></i></div>')+'</div></div>'}
 /* ---------- Report form (Dashboard, Seer-wide: Plus + Label) ---------- */
 var REP=null,RPT={text:'',date:'',filt:'all',sug:[],si:0};
 function repLoad(){return run('reportsData').then(function(d){REP=d.reports||[];if(view==='dash'&&WS==='dash')render()}).catch(function(){if(!REP)REP=[]})}
@@ -929,7 +966,7 @@ function mDashRow(t){var d=parseDue(t.due),od=d&&d<today();
     '<div class="m">'+esc(t.artist)+' · '+esc(t.project)+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-dws]');if(!b)return;UI.dws=b.dataset.dws;render()});
 function setTone(){var p=(view==='tasks'&&UI.pmeProj)||(view==='clients'&&UI.pmeNet),r=document.documentElement;if(p!==(r.getAttribute('data-mode')==='pme')){if(p)r.setAttribute('data-mode','pme');else r.removeAttribute('data-mode');applyBD()}}
-function render(){setTone();var v=document.getElementById('v');if(WS==='cal')return renderCalx(v);if(WS==='dev')return renderDev(v);if(view==='dash')return renderDash(v);if(WS==='db'){if(!D){v.innerHTML='<div class="empty">Loading…</div>';return}return renderDb(v)}if(WS==='music')return view==='more'?renderMore(v):/^l/.test(view)?renderLabel(v):renderMusic(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
+function render(){setTone();var v=document.getElementById('v');if(WS==='cal')return renderCalx(v);if(WS==='dev')return renderDev(v);if(view==='dash')return renderDash(v);if(WS==='db'){if(!D){v.innerHTML='<div class="skel" aria-busy="true"><i></i><i></i><i></i><i></i></div>';return}return renderDb(v)}if(WS==='music')return view==='more'?renderMore(v):/^l/.test(view)?renderLabel(v):renderMusic(v);if(!D){v.innerHTML='<div class="empty">Loading… If this is your first time, finish the Google sign-in in your web browser, then come back here.</div>';return}
   if(view==='clients')renderNet(v);else if(view==='tasks')renderProjects(v);else if(view==='cal')renderCal(v);else if(view==='dev')renderDev(v);else if(view==='more')renderMore(v);else renderDash(v)}
 var BL=null;
 function blHtml(){var out=[],open=0,done=0;BL.split('\n').forEach(function(l,i){var m=l.match(/^- \[( |x)\] (.*)$/i);
@@ -990,9 +1027,9 @@ document.addEventListener('click',function(e){var t=e.target.closest('[data-drv]
   else if(k==='disconnect')drvDo(run('driveDisconnect'));
   else if(k==='set'){var v=(document.getElementById('drvl')||{}).value||'';if(!v.trim())return toast('Paste a folder link first');drvDo(run('driveSetRoot',v),'Main folder saved for everyone.')}
   else if(k==='find')drvDo(run('driveFind','INNRVZN Plus').then(function(l){DRVF=l}));
-  else if(k==='create'){if(DRV&&DRV.root&&!confirm('A main folder is already set. Create a new one and switch to it?'))return;drvDo(run('driveCreateRoot','INNRVZN Plus'),'Created in your My Drive and saved for everyone.')}});
+  else if(k==='create'){var goC=function(){drvDo(run('driveCreateRoot','INNRVZN Plus'),'Created in your My Drive and saved for everyone.')};if(DRV&&DRV.root)askOk('A main folder is already set. Create a new one and switch to it?',{yes:'Create new',title:'New main folder'}).then(function(ok){if(ok)goC()});else goC()}});
 
-function renderDev(v){v.innerHTML='<div class="empty">Loading…</div>';run('getBacklog').then(function(r){BL=r.text;v.innerHTML=blHtml()}).catch(function(e){v.innerHTML='<div class="empty">'+esc(e.message)+'</div>'})}
+function renderDev(v){v.innerHTML='<div class="skel" aria-busy="true"><i></i><i></i><i></i><i></i></div>';run('getBacklog').then(function(r){BL=r.text;v.innerHTML=blHtml()}).catch(function(e){v.innerHTML='<div class="empty">'+esc(e.message)+'</div>'})}
 document.getElementById('v').addEventListener('change',function(e){var c=e.target.closest('[data-bl]');if(!c||BL===null)return;var ls=BL.split('\n'),i=+c.dataset.bl;
   ls[i]=ls[i].replace(/^- \[( |x)\]/i,c.checked?'- [x]':'- [ ]');BL=ls.join('\n');run('saveBacklog',BL).then(function(){document.getElementById('v').innerHTML=blHtml()}).catch(function(er){toast(er.message)})});
 function parseQA(s){var o={task:'',owner:'',forName:'',due:''},words=[];
@@ -1091,6 +1128,15 @@ function paintTh(){document.getElementById('th').textContent=document.documentEl
 document.getElementById('th').onclick=function(){setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')};paintTh();
 var BD='acrylic';try{BD=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}
 function applyBD(){document.documentElement.classList.toggle('clear',BD!=='solid');document.getElementById('bd').value=BD;run('setBackdrop',BD,document.documentElement.getAttribute('data-theme')+(document.documentElement.getAttribute('data-mode')==='pme'?'-pme':'')).catch(function(){})}
+(function(){var b=document.getElementById('acct');function ini(n){n=String(n||'').trim();if(!n)return'?';var w=n.split(/[\s@.]+/).filter(Boolean);return((w[0]||'')[0]+((w[1]||'')[0]||'')).toUpperCase()}
+function close(){var o=document.querySelector('.acctdd');if(o)o.remove()}
+b.textContent=ini(window.__acctName||'');
+run('authStatus').then(function(a){if(a&&a.ok){window.__acctName=a.name||a.email;b.textContent=ini(a.name||a.email);b.title=(a.name||a.email||'Account')}}).catch(function(){});
+b.addEventListener('click',function(e){e.stopPropagation();if(document.querySelector('.acctdd'))return close();
+ run('authStatus').then(function(a){a=a||{};var r=b.getBoundingClientRect(),d=document.createElement('div');d.className='acctdd';d.style.top=(r.bottom+8)+'px';d.style.right=Math.max(8,innerWidth-r.right)+'px';
+ d.innerHTML='<b>'+esc(a.name||(D&&D.me)||'Signed in')+'</b><div class="m">'+esc(a.email||'')+(a.role?' 00b7 '+esc(a.role):'')+'</div><button class="b" data-switchacct>Switch account</button><button class="b" data-signout>Sign out</button>';document.body.appendChild(d)}).catch(function(){})});
+document.addEventListener('click',function(e){if(!e.target.closest('.acctdd'))close();else if(e.target.closest('button'))setTimeout(close,0)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')close()})})();
 document.getElementById('bd').onchange=function(){BD=this.value;try{localStorage.setItem('ta_bd',BD)}catch(e){}applyBD()};applyBD();
 var __sp=false,__vd=false,__go=null;
 var __fd=false;function fadeSplash(){var e=document.getElementById('splash');if(!e||__fd)return;__fd=true;e.classList.add('out');setTimeout(function(){var fin=function(){e.remove();try{applyBD()}catch(x){}};try{run('endSplash').then(fin,fin)}catch(x){fin()}},600)}
@@ -1251,14 +1297,13 @@ function mArtDr(a){MDR={k:'a',a:a};var ps=mProjects().filter(function(p){return 
 function mWhen(w){w=w.toLowerCase();var t=today();if(w==='today')return t;if(w==='tomorrow'){t.setDate(t.getDate()+1);return t}
   var k=['sun','mon','tue','wed','thu','fri','sat'].indexOf(w);if(k>-1){t.setDate(t.getDate()+((k-t.getDay()+7)%7||7));return t}return parseDue(w)}
 function musErr(e){toast(String(e&&e.message||e));musLoad()}
-function mAskProject(a,name){var first=prompt('First task for "'+name+'":','');if(!first)return;run('musicAddTask',a,name,first,'','').then(function(){musLoad().then(function(){mProjDr(a,name)})},musErr)}
+function mAskProject(a,name){askText('First task for "'+name+'":','',{title:'First task'}).then(function(first){if(!first)return;run('musicAddTask',a,name,first,'','').then(function(){musLoad().then(function(){mProjDr(a,name)})},musErr)})}
 document.addEventListener('click',function(e){var x;if((x=e.target.closest('[data-mp]'))&&MUS){var k=x.dataset.mp.split('\u0001');mProjDr(k[0],k[1]);return}if(WS!=='music')return;
   if((x=e.target.closest('[data-mp]'))){var k=x.dataset.mp.split('\u0001');mProjDr(k[0],k[1])}
   else if((x=e.target.closest('[data-mart]')))mArtDr(x.dataset.mart);
-  else if((x=e.target.closest('[data-mnew]'))){if(x.dataset.mnew==='artist'){var n=prompt('Artist name:','');if(n)run('musicAddArtist',n).then(musLoad,musErr)}
-    else{var ra=LBL?LBL.artists:MUS.artists,a=prompt('Artist ('+ra.map(function(a){return a.name}).join(', ')+'):',ra[0]?ra[0].name:'');if(!a)return;
-      var m=ra.filter(function(z){return z.name.toLowerCase()===a.trim().toLowerCase()})[0];if(!m)return toast('Add '+a+' under Artists first');var p=prompt('Project name:','');if(p)mAskProject(m.name,p.trim())}}
-  else if((x=e.target.closest('[data-mdel]'))){var r=x.closest('.mtask');if(confirm('Delete "'+r.dataset.task+'"?'))run('musicDelTask',+r.dataset.row,r.dataset.task).then(musLoad,musErr)}});
+  else if((x=e.target.closest('[data-mnew]'))){if(x.dataset.mnew==='artist'){askText('Artist name:','',{title:'New artist'}).then(function(n){if(n)run('musicAddArtist',n).then(musLoad,musErr)})}
+    else{var ra=LBL?LBL.artists:MUS.artists;askText('Artist ('+ra.map(function(a){return a.name}).join(', ')+'):',ra[0]?ra[0].name:'',{title:'New project'}).then(function(a){if(!a)return;var m=ra.filter(function(z){return z.name.toLowerCase()===a.trim().toLowerCase()})[0];if(!m)return toast('Add '+a+' under Artists first');askText('Project name:','',{title:'New project'}).then(function(p){if(p)mAskProject(m.name,p.trim())})})}}
+  else if((x=e.target.closest('[data-mdel]'))){var r=x.closest('.mtask');var tk=r.dataset.task,rw=+r.dataset.row;askOk('Delete "'+tk+'"?',{yes:'Delete',danger:1,title:'Delete task'}).then(function(ok){if(ok)run('musicDelTask',rw,tk).then(musLoad,musErr)})}});
 document.addEventListener('change',function(e){var f=e.target.dataset&&e.target.dataset.mf,r=e.target.closest('.mtask');if(!f||!r)return;
   var fld=f,val=e.target.value;if(f==='done'){fld='status';val=e.target.checked?'Done':'In progress'}
   run('musicSet',+r.dataset.row,r.dataset.task,fld,val).then(function(){toast('Saved');musLoad()},musErr)},true);
@@ -1367,8 +1412,8 @@ function lArtDr(code){var a=lArt(code);LDR={k:'a',code:code};var sg=LBL.songs.fi
     '<form class="madd" data-ladd="release"><input name="t" placeholder="New release for '+esc(a.name)+'…"><button class="b">Add</button></form>'+
     '<form class="madd" data-ladd="song"><input name="t" placeholder="New song for '+esc(a.name)+'…"><button class="b">Add</button></form>')}
 function lPickArtist(cb){if(LDR&&LDR.k==='a')return cb(lArt(LDR.code));
-  var t=prompt('Artist ('+LBL.artists.map(function(a){return a.name}).join(', ')+'):',LBL.artists[0]?LBL.artists[0].name:'');if(!t)return;t=t.trim().toLowerCase();
-  var a=LBL.artists.filter(function(z){return z.name.toLowerCase()===t||z.code.toLowerCase()===t})[0];if(!a)return toast('Add that artist first (Artists > + Artist)');cb(a)}
+  askText('Artist ('+LBL.artists.map(function(a){return a.name}).join(', ')+'):',LBL.artists[0]?LBL.artists[0].name:'',{title:'Which artist?',yes:'Next'}).then(function(t){if(!t)return;t=t.trim().toLowerCase();
+  var a=LBL.artists.filter(function(z){return z.name.toLowerCase()===t||z.code.toLowerCase()===t})[0];if(!a)return toast('Add that artist first (Artists > + Artist)');cb(a)})}
 function lAddSong(a,name){run('labelAddSong',a.code,name,'').then(function(){toast('Added '+name);lblLoad()},lErr)}
 function lAddRelease(a,name,type){run('labelAddRelease',a.code,name,type||'Single','').then(function(){toast('Added '+name+' with its checklist');lblLoad()},lErr)}
 document.addEventListener('click',function(e){if(WS!=='music')return;var x;
@@ -1378,19 +1423,18 @@ document.addEventListener('click',function(e){if(WS!=='music')return;var x;
   else if((x=e.target.closest('[data-lcheck]'))){toast('Checking playlists… this takes a minute');x.disabled=true;
     run('labelCheckPlaylists').then(function(r){x.disabled=false;toast(r&&r.message?r.message:'Checked '+r.checked+' playlist'+(r.checked===1?'':'s')+': '+r.new+' new, '+r.added+' now added, '+r.removed+' removed'+(r.errors&&r.errors.length?' ('+r.errors.length+' could not be read)':''));lblLoad()},function(e){x.disabled=false;toast(String(e&&e.message||e))})}
   else if((x=e.target.closest('[data-lnew]'))){var k=x.dataset.lnew;
-    if(k==='watch'){var u=prompt('Spotify playlist link to keep an eye on:','');if(u)run('labelAddPlaylist','','',u.trim(),'','','','').then(function(){toast('Playlist added. Use Check playlists to see which of our songs are in it.');lblLoad()},lErr)}
-    else if(k==='artist'){var n=prompt('Artist name:','');if(n)run('labelAddArtist',n).then(function(r){toast('Added '+n.trim()+' ('+r.code+')');lblLoad()},lErr)}
-    else lPickArtist(function(a){if(k==='song'){var s=prompt('Song title for '+a.name+':','');if(s)lAddSong(a,s.trim())}
-      else{var r=prompt('Release name for '+a.name+':','');if(!r)return;var t=(prompt('Type: Single, EP or Album','Single')||'Single').trim();lAddRelease(a,r.trim(),/^ep$/i.test(t)?'EP':/^album$/i.test(t)?'Album':'Single')}})}
+    if(k==='watch'){askText('Spotify playlist link to keep an eye on:','',{title:'Watch a playlist',ph:'https://open.spotify.com/playlist/\u2026'}).then(function(u){if(u)run('labelAddPlaylist','','',u.trim(),'','','','').then(function(){toast('Playlist added. Use Check playlists to see which of our songs are in it.');lblLoad()},lErr)})}
+    else if(k==='artist'){askText('Artist name:','',{title:'New artist'}).then(function(n){if(n)run('labelAddArtist',n).then(function(r){toast('Added '+n.trim()+' ('+r.code+')');lblLoad()},lErr)})}
+    else lPickArtist(function(a){if(k==='song'){askText('Song title for '+a.name+':','',{title:'New song'}).then(function(s){if(s)lAddSong(a,s.trim())})}
+      else{askText('Release name for '+a.name+':','',{title:'New release'}).then(function(r){if(!r)return;askChoice('Type of release',['Single','EP','Album']).then(function(t){if(t)lAddRelease(a,r.trim(),t)})})}})}
   else if((x=e.target.closest('[data-ldel]'))){var tab=x.dataset.ldel,row=+x.dataset.lr,key=x.dataset.lk;
     if(tab==='releases'){var r=LBL.releases.filter(function(z){return z.row===row})[0],as=r?lRelStats(r).as.slice().sort(function(a,b){return b.row-a.row}):[];
-      if(!confirm('Delete "'+key+'" and its '+as.length+' checklist items? Songs stay, but lose this release name.'))return;
-      as.reduce(function(p,a){return p.then(function(){return run('labelDel','assets',a.row,a.item)})},Promise.resolve()).then(function(){return run('labelDel','releases',row,key)}).then(function(){LDR=null;closeDr();lblLoad()},lErr)}
-    else if(confirm('Delete "'+key+'"?'))run('labelDel',tab,row,key).then(function(){LDR=null;closeDr();lblLoad()},lErr)}},true);
+      askOk('Delete "'+key+'" and its '+as.length+' checklist items? Songs stay, but lose this release name.',{yes:'Delete',danger:1,title:'Delete release'}).then(function(ok){if(!ok)return;
+      as.reduce(function(p,a){return p.then(function(){return run('labelDel','assets',a.row,a.item)})},Promise.resolve()).then(function(){return run('labelDel','releases',row,key)}).then(function(){LDR=null;closeDr();lblLoad()},lErr)})}
+    else askOk('Delete "'+key+'"?',{yes:'Delete',danger:1,title:'Delete'}).then(function(ok){if(ok)run('labelDel',tab,row,key).then(function(){LDR=null;closeDr();lblLoad()},lErr)})}},true);
 document.addEventListener('change',function(e){var t=e.target,f=t.dataset&&t.dataset.lf;if(!f||WS!=='music')return;var tab=t.dataset.lt,row=+t.dataset.lr,key=t.dataset.lk,val=t.value;
   if(f==='done'){f='progress';val=t.checked?'Done':'In progress';
-    if(t.checked){var a=LBL.assets.filter(function(z){return z.row===row})[0];if(a&&!String(a.link||'').trim()){var l=prompt('Paste the link to "'+key+'" (leave blank to mark it done without one):','');
-      if(l&&l.trim())return run('labelSet','assets',row,key,'link',l.trim()).then(function(){return run('labelSet','assets',row,key,'progress','Done')}).then(function(){toast('Saved');lblLoad()},lErr)}}}
+    if(t.checked){var a=LBL.assets.filter(function(z){return z.row===row})[0];if(a&&!String(a.link||'').trim()){askText('Paste the link to "'+key+'" (leave blank to mark it done without one):','',{title:'Link for this item',ph:'https://\u2026',yes:'Save'}).then(function(l){if(l&&l.trim())return run('labelSet','assets',row,key,'link',l.trim()).then(function(){return run('labelSet','assets',row,key,'progress','Done')}).then(function(){toast('Saved');lblLoad()},lErr);run('labelSet',tab,row,key,f,val).then(function(){toast('Saved');lblLoad()},lErr)});return}}}
   if(f==='due'||(tab==='releases'&&f==='date'))val=val;
   run('labelSet',tab,row,key,f,val).then(function(){toast('Saved');lblLoad()},lErr)},true);
 document.addEventListener('submit',function(e){var pf=e.target.closest('[data-lpl]');if(pf&&WS==='music'){e.preventDefault();var px=LDR&&LDR.k==='s'?LBL.songs.filter(function(z){return z.row===LDR.row})[0]:null;if(!px||!pf.u.value.trim())return;
@@ -1417,7 +1461,7 @@ function startApp(){var o=document.getElementById('login');if(o)o.style.display=
 document.addEventListener('click',function(e){
   if(e.target.closest('[data-signin]')){var b=e.target.closest('[data-signin]');b.disabled=true;document.getElementById('lgmsg').textContent='Finish signing in on the Google page that just opened in your browser…';
     run('signIn').then(function(r){toast('Signed in'+(r.email?' as '+r.email:''));startApp()}).catch(function(err){b.disabled=false;document.getElementById('lgmsg').textContent=String(err&&err.message||err)})}
-  else if(e.target.closest('[data-signout]')){if(!confirm('Sign out of INNRVZN Seer on this computer?'))return;run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin('Signed out.')})}
+  else if(e.target.closest('[data-signout]')){askOk('Sign out of INNRVZN Seer on this computer?',{yes:'Sign out',title:'Sign out'}).then(function(ok){if(!ok)return;run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin('Signed out.')})})}
   else if(e.target.closest('[data-switchacct]')){run('signOut').then(function(){D=null;MUS=null;closeDr();showLogin();document.querySelector('[data-signin]').click()})}});
 var _renderMore=renderMore;renderMore=function(v){_renderMore(v);run('authStatus').then(function(a){if(!a.ok||view!=='more')return;
   v.insertAdjacentHTML('afterbegin','<div class="card acct"><div><div class="m">Signed in as</div><b>'+esc(a.name||(D&&D.me)||a.email||'Google account')+'</b><div class="m">'+esc(a.email||'')+(a.role?' \u00b7 '+esc(a.role):'')+'</div></div><span style="flex:1"></span><button class="b" data-switchacct>Switch account</button><button class="b delb" data-signout>Sign out</button></div>')})};
