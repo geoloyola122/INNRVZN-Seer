@@ -121,7 +121,36 @@
     var s = p.toString();
     return s ? '?' + s : '';
   }
+  var CRED_ID = CFG.CREDENTIALS_SHEET_ID || '1K8ZtXLIb45AZkAolzjycjY-Uaj1ErXGpCgo2y35BqoU', ACCESS = null, accessP = null;
+  function normEmail_(e) {
+    e = String(e || '').trim().toLowerCase(); var p = e.split('@'); if (p.length < 2) return e;
+    var l = p[0].split('+')[0], d = p[1]; if (d === 'gmail.com' || d === 'googlemail.com') { l = l.replace(/\./g, ''); d = 'gmail.com'; } return l + '@' + d;
+  }
+  function accessFrom_(rows, mail) {
+    var key = normEmail_(mail);
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i] || []; if (!key || normEmail_(r[0]) !== key) continue;
+      if (/^(no|false|off|0|inactive)$/i.test(String(r[3] || '').trim())) return { ok: false, reason: 'This account has been switched off. Ask an admin.' };
+      return { ok: true, name: String(r[1] || '').trim(), role: String(r[2] || '').trim() || 'Member', email: mail };
+    }
+    return { ok: false, reason: 'This Google account (' + (mail || 'unknown') + ') is not on the Seer team.' };
+  }
+  function accessCheck_() {
+    if (CFG.NO_AUTH) return Promise.resolve({ ok: true });
+    if (!accessP) accessP = (async function () {
+      var rows;
+      try { rows = (await apiOn(CRED_ID, 'GET', '/values/' + encodeURIComponent('USERS!A2:E'), { valueRenderOption: 'FORMATTED_VALUE' })).values || []; }
+      catch (e) {
+        accessP = null;
+        if (/403|404|not found|permission|shared with your/i.test(String(e && e.message || e))) { ACCESS = { ok: false, reason: 'This Google account (' + (email || 'unknown') + ') is not on the Seer team.' }; accessP = Promise.resolve(ACCESS); return ACCESS; }
+        throw e;
+      }
+      ACCESS = accessFrom_(rows, email); return ACCESS;
+    })();
+    return accessP;
+  }
   async function apiOn(sid, method, path, query, body, retried) {
+    if (sid !== CRED_ID) { var ac = await accessCheck_(); if (!ac.ok) throw new Error('NO_ACCESS: ' + ac.reason); }
     var t = await ensureToken();
     var headers = { 'Content-Type': 'application/json' };
     if (t) headers.Authorization = 'Bearer ' + t;
@@ -186,6 +215,7 @@
   }
   async function people_() { return (await vals_('LISTS!E2:E')).map(function (r) { return pstr_(r[0]); }).filter(function (x) { return x; }); }
   async function meName_() {
+    if (ACCESS && ACCESS.ok && ACCESS.name) { var pp = await people_(); if (pp.indexOf(ACCESS.name) > -1) return ACCESS.name; }
     var loc = (email || '').toLowerCase().split('@')[0].replace(/[^a-z0-9]/g, ''), p = await people_(), cl = function (s) { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); };
     for (var i = 0; i < p.length; i++) if (cl(p[i]) && loc.indexOf(cl(p[i])) > -1) return p[i];
     for (var j = 0; j < p.length; j++) { var f = cl(String(p[j]).split(/\s+/)[0]); if (f && loc.indexOf(f) > -1) return p[j]; }
@@ -483,7 +513,7 @@
   var REPORTS_ID = CFG.REPORTS_SHEET_ID || '1swif2gvwYU8a91sHUr_Aj2bRNRpVj8rT0QAuU_edcwQ';
   async function connections() {
     var defs = [['INNRVZN Plus', 'Tasks, clients, campaigns, meetings', SHEET_ID], ['INNRVZN Music', 'Music projects and tasks', MUSIC_ID],
-      ['INNRVZN Label', 'Artists, songs, releases, stats, playlists', LABEL_ID], ['INNRVZN Reports', 'Dashboard report form', REPORTS_ID]];
+      ['INNRVZN Label', 'Artists, songs, releases, stats, playlists', LABEL_ID], ['INNRVZN Reports', 'Dashboard report form', REPORTS_ID], ['INNRVZN Credentials', 'Who may use Seer (admins edit)', CRED_ID]];
     var items = await Promise.all(defs.map(async function (d) {
       var row = { name: d[0], what: d[1], url: 'https://docs.google.com/spreadsheets/d/' + d[2] + '/edit' };
       try { var m = await apiOn(d[2], 'GET', '', { fields: 'properties.title' }); row.ok = true; row.title = m.properties.title; }

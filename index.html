@@ -283,6 +283,10 @@ paintLogo();
 var D=null,view='dash',who='';try{who=localStorage.getItem('ta_who')||''}catch(e){}
 var DAYS=['sun','mon','tue','wed','thu','fri','sat'],MON=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 function run(fn){var a=[].slice.call(arguments,1);var f=window.__api&&window.__api[fn];if(!f)return Promise.resolve({ok:true});try{return Promise.resolve(f.apply(null,a))}catch(e){return Promise.reject(e)}}
+(function(){var o=run;run=function(){return o.apply(null,arguments).catch(function(e){var m=String(e&&e.message||e);if(/NO_ACCESS/.test(m))showNoAccess(m.replace(/^.*NO_ACCESS:\s*/,''));throw e})}})();
+function showNoAccess(msg){var o=document.getElementById('noacc');if(!o){o=document.createElement('div');o.id='noacc';document.body.appendChild(o)}
+  o.style.cssText='position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,11,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)';
+  o.innerHTML='<div class="wsbox" style="max-width:440px;text-align:center"><div class="wst">No access</div><p class="m" style="margin:8px 0 18px">'+esc(msg||'This Google account is not on the Seer team.')+'</p><p class="m" style="margin:0 0 18px">Ask an admin to add your Google email to the Credentials sheet, then try again.</p><button class="b" data-switchacct>Use a different account</button> <button class="b" onclick="location.reload()">Try again</button></div>'}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none'},2600)}
 function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
