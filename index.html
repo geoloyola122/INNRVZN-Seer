@@ -944,9 +944,9 @@ function renderMore(v){
   function card(ic,title,sub,id,steps){return'<div class="card dlc"><div class="dlh"><span class="dli">'+ic+'</span><div><b>'+title+'</b><div class="m">'+sub+'</div></div></div>'+
     (id?'<a class="b dlb" href="#" data-url="'+dlUrl(id)+'">Download</a>':'<div class="m">Not uploaded yet.</div>')+'<ol class="dls">'+steps.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ol></div>'}
   v.innerHTML='<div class="sec">Install INNRVZN Seer</div><div class="card dlc setc" id="upc" style="margin-bottom:14px"><div class="dlh"><span class="dli">↻</span><div><b>App version</b><div class="m" id="upv">Checking…</div></div></div><div id="upb"></div></div><div class="dlg">'+
-    card('⊞','Windows','INNRVZN Seer.exe · about 38 MB',INSTALLERS.win,['Download and save it anywhere, e.g. Desktop.','Open it. If Windows warns, choose More info, then Run anyway.','Sign in with Google once and tick the Sheets box.'])+
+    card('⊞','Windows','INNRVZN Seer.exe · about 37 MB',INSTALLERS.win,['Download and save it anywhere, e.g. Desktop.','Open it. If Windows warns, choose More info, then Run anyway.','Sign in with Google once and tick the Sheets box.'])+
     card('⌘','Mac','INNRVZN-Tracker-Mac.zip',INSTALLERS.mac,['Download and unzip it.','Right-click "Install INNRVZN (Mac).command", then Open.','Sign in with Google once and tick the Sheets box.'])+
-    '</div><div class="m" style="margin-top:14px">You need Editor access to the tracker sheet for any version to load.</div>'+
+    '</div><div class="m" style="margin-top:14px">Sign in with your INNRVZN Google account. It must be on the Seer team list, and the sheets must be shared with it. If you see No access, ask an admin to add your email to the Credentials sheet.</div>'+
     '<div class="sec" style="margin-top:26px">Settings</div><div class="card dlc setc" id="drvc"><div class="dlh"><span class="dli">▲</span><div><b>Google Drive</b><div class="m">Project and client folders are created inside one shared folder.</div></div></div><div id="drvb" class="m">Checking…</div></div>'+
     '<div class="card dlc setc" id="conc" style="margin-top:14px"><div class="dlh"><span class="dli">⇄</span><div><b>Connections</b><div class="m">Everything Seer reads from and writes to.</div></div></div><div id="conb" class="m">Checking…</div></div>';
   drvLoad();updLoad(false);conLoad()}
