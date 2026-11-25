@@ -264,6 +264,9 @@ nav button{display:inline-flex;align-items:center;gap:7px}
 .rmt{font-size:12px;color:var(--ok)}.gprev{flex-basis:100%;display:flex;flex-direction:column;gap:8px}.gg{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--chip)}.gi{margin-top:4px;font-size:13px}
 .gt{display:inline-block;min-width:62px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}.gt.u{color:var(--mute)}.gt.t{color:var(--acc)}.gt.mt{color:var(--ok)}.ghint{font-size:12px;color:var(--acc);margin-top:6px;min-height:16px}.gchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.gchips .chip{font-size:12px;padding:2px 10px}
 .gl{display:inline-block;width:16px;font-weight:700;margin-right:2px}.gl.g{color:var(--ok)}.gl.a{color:var(--amber)}.gl.r{color:var(--red)}
+.otag,[data-otag]{cursor:pointer}.otag:hover{color:var(--acc);text-decoration:underline}
+#tagpop{position:fixed;z-index:75;display:none;width:min(440px,92vw);padding:10px 12px;border-radius:14px;background:var(--solid);border:1px solid var(--rim);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.tph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.tpr{padding:6px 0;border-top:1px solid var(--line)}.tpb{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.tpb .chip{font-size:12px;padding:2px 9px}
 .gadd{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;color:var(--amber);font-size:12px}.gerr{color:var(--amber);font-size:12px}
 .rnew{font-size:10px;font-weight:700;color:#fff;background:var(--acc);border-radius:6px;padding:0 5px;margin-left:4px}
 .rbdg{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:var(--acc);border-radius:9px;padding:0 5px;margin-left:6px}
@@ -419,7 +422,7 @@ function mine(t){return !who||t.owner.toLowerCase().indexOf(who.toLowerCase())>-
 function sortT(a,b){if(a.bump!==b.bump)return a.bump?1:-1;var x=parseDue(a.due),y=parseDue(b.due);return(x?x:9e15)-(y?y:9e15)}
 function taskHtml(t){var d=parseDue(t.due),od=d&&d<today();
   return'<div class="t'+(od?' od':'')+(t.deliv?' dlvt':'')+'">'+(t.deliv?'<button class="dlvb" data-dlv="'+t.row+'" data-n="'+esc(t.task)+'" data-f="'+esc(t.forName)+'" title="Submit the deliverable to complete this task">◆</button>':'<input type="checkbox" data-r="'+t.row+'" data-n="'+esc(t.task)+'" title="Complete">')+'<div class="n"><span class="tn" data-task="'+t.row+'" style="cursor:pointer">'+esc(t.task)+'</span>'+
-  '<div class="m">'+(t.deliv?'<span class="dlvtag">Deliverable</span> ':'')+esc(t.forName)+(isPME(t.forName)?' <span class="pmetag">PME</span>':'')+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+(t.dueTime?' '+esc(t.dueTime):'')+'</span>'+(t.notes?' · '+esc(t.notes.slice(0,90)):'')+'</div></div>'+
+  '<div class="m">'+(t.deliv?'<span class="dlvtag">Deliverable</span> ':'')+'<span class="otag" data-otag="'+esc(t.forName)+'">'+esc(t.forName)+'</span>'+(isPME(t.forName)?' <span class="pmetag">PME</span>':'')+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+(t.dueTime?' '+esc(t.dueTime):'')+'</span>'+(t.notes?' · '+esc(t.notes.slice(0,90)):'')+'</div></div>'+
   '<div class="acts"><button data-s="1" data-r="'+t.row+'" data-n="'+esc(t.task)+'">+1d</button> <button data-s="7" data-r="'+t.row+'" data-n="'+esc(t.task)+'">+1w</button></div></div>'}
 var Q='';
 function has(a,b){return a&&b&&String(a).toLowerCase().indexOf(String(b).toLowerCase())>-1}
@@ -947,6 +950,9 @@ function repLoad(){return run('reportsData').then(function(d){REP=d.reports||[];
 function repCands(){var c=[],seen={};function add(n,k,x){n=String(n||'').trim();if(!n)return;var key=k+'|'+n.toLowerCase();if(seen[key])return;seen[key]=1;c.push({n:n,k:k,x:x||''})}
   ((D&&D.clients)||[]).forEach(function(x){add(x.name,'Client')});((D&&D.campaigns)||[]).forEach(function(x){add(x.name,'Campaign',x.code);add(x.code,'Campaign',x.name)});
   ((LBL&&LBL.artists)||[]).forEach(function(a){add(a.name,'Artist',a.code);add(a.code,'Artist',a.name)});((LBL&&LBL.songs)||[]).forEach(function(x){add(x.song,'Song',x.artist)});
+  ((D&&D.ams)||[]).forEach(function(a){add(a.name,'Account Manager',a.known||a.team)});
+  TLABELS.forEach(function(x){add(x,'Label')});
+  if(typeof DB!=='undefined'&&DB){(DB.talent||[]).forEach(function(x){add(x.name,'Talent',x.category)});(DB.brands||[]).forEach(function(x){add(x.org,'Brand',x.type)});(DB.contacts||[]).forEach(function(x){add(x.name,'Contact',x.org)})}
   if(typeof MUS!=='undefined'&&MUS){(MUS.artists||[]).forEach(function(a){add(a.name,'Artist')});(MUS.tasks||[]).forEach(function(t){add(t.project,'Project',t.artist)})}return c}
 function repNorm(t){return String(t||'').replace(/_/g,' ').trim().toLowerCase()}
 function repTok(n){return String(n).replace(/\s+/g,'_')}
@@ -958,7 +964,7 @@ function repParse(text){var cs=repCands(),tags=[],bad=[],ppl=[],badp=[],m,re=/#(
     if(h2){if(ppl.indexOf(h2)<0)ppl.push(h2)}else if(badp.indexOf(m[1])<0)badp.push(m[1])}
   return{tags:tags,bad:bad,people:ppl,badp:badp}}
 function repPrev(){if(gIsGrouped(RPT.text))return gPreview();var _b=repParse(RPT.text||'').bad;return repPrev0()+(_b.length?'<div class="gprev">'+_b.map(function(t){return'<div>'+gAddHtml(t.replace(/_/g,' '))+'</div>'}).join('')+'</div>':'')}
-function repPrev0(){var r=repParse(RPT.text||'');return(r.tags.map(function(t){return'<span class="rc ok">#'+esc(t)+'</span>'}).concat(r.people.map(function(t){return'<span class="rc pp">@'+esc(t)+'</span>'}),r.bad.map(function(t){return'<span class="rc bad" title="Not found: pick one from the list">#'+esc(t)+' ?</span>'}),r.badp.map(function(t){return'<span class="rc bad" title="Not found">@'+esc(t)+' ?</span>'}))).join('')||'<span class="m">Tag with # (artist, song, client, campaign) and @ (person).</span>'}
+function repPrev0(){var r=repParse(RPT.text||'');return(r.tags.map(function(t){return'<span class="rc ok" data-otag="'+esc(t)+'">#'+esc(t)+'</span>'}).concat(r.people.map(function(t){return'<span class="rc pp">@'+esc(t)+'</span>'}),r.bad.map(function(t){return'<span class="rc bad" title="Not found: pick one from the list">#'+esc(t)+' ?</span>'}),r.badp.map(function(t){return'<span class="rc bad" title="Not found">@'+esc(t)+' ?</span>'}))).join('')||'<span class="m">Tag with # (artist, song, client, campaign) and @ (person).</span>'}
 function isoToday(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
 function reportBox(full){
   if(!RPT.date)RPT.date=isoToday();
@@ -995,7 +1001,7 @@ document.addEventListener('click',function(e){var f=e.target.closest&&e.target.c
 document.addEventListener('change',function(e){if(e.target.id==='rptD')RPT.date=e.target.value});
 /* ---------- Reports: shared row (Dashboard feed + Reports page), edit/delete (author only), set a meeting from a report ---------- */
 var MEETRX=/\b(meet(ing)?s?|call|catch[- ]?up|sync|zoom|gmeet|hangout|presentation|pitch)\b/i;
-function repTx(t){return esc(t).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){return a+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-rtag="'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'})}
+function repTx(t){return esc(t).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){return a+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-otag="'+esc(b.slice(1).replace(/_/g,' '))+'" title="Open #'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'})}
 function repRow(r){var me=meName(),mn=r.people.some(function(p){return eqN(p,me)}),inv=repInvolves(r,me),sn=repSeen(r,me),dn=repDone(r,me);
   if(RPT.edit===r.row)return'<div class="rrow ed" data-rrow="'+r.row+'"><textarea id="rptE" rows="3">'+esc(r.text)+'</textarea><div class="ract"><button class="b" data-redsave="'+r.row+'">Save</button><button class="b" data-redcancel>Cancel</button></div></div>';
   var hint=!r.meeting&&MEETRX.test(r.text);
@@ -1065,6 +1071,21 @@ document.addEventListener('click',function(e){var x=e.target.closest&&e.target.c
   if(x.dataset.rtask)return repMakeTask(r);if(x.dataset.rseen)return repMark(r,'seen',!repSeen(r));repMark(r,'done',!repDone(r))});
 /* ---------- Report threads inside drawers (campaign, client, artist, project, song) ---------- */
 var RTH=null;
+function openTag(name){var n=String(name||'').replace(/_/g,' ').trim(),q=n.toLowerCase(),i,pk=TAGK[q];if(!n)return false;
+  if(TLABELS.some(function(l){return eqN(l,n)})){RPG.tag=TLABELS.filter(function(l){return eqN(l,n)})[0];run('setWorkspace','reports').catch(function(){});enterWS('reports');return true}
+  if(pk==='Organization'||pk==='Client'){var c0=((D&&D.clients)||[]).findIndex(function(c){return eqN(c.name,n)});if(c0>-1){cliDr(c0);return true}}
+  if(pk==='Account Manager'){var a0=((D&&D.ams)||[]).filter(function(a){return eqN(a.name,n)})[0];if(a0){amDr(a0.row);repAttach([a0.name]);return true}}
+  if(pk==='Artist'&&typeof LBL!=='undefined'&&LBL){var l0=(LBL.artists||[]).filter(function(a){return eqN(a.name,n)})[0];if(l0){lArtDr(l0.code);return true}}
+  if(pk==='Talent'||pk==='Brand'||pk==='Contact'||(pk==='Organization'&&!((D&&D.clients)||[]).some(function(c){return eqN(c.name,n)}))){toast('#'+n+' is a '+pk+': its details are in Database');return true}
+  var cs=(D&&D.campaigns)||[];for(i=0;i<cs.length;i++)if(eqN(cs[i].name,n)||eqN(cs[i].code,n)){campDr(i);return true}
+  var cl=(D&&D.clients)||[];for(i=0;i<cl.length;i++)if(eqN(cl[i].name,n)){cliDr(i);return true}
+  var am=((D&&D.ams)||[]).filter(function(a){return eqN(a.name,n)})[0];if(am){amDr(am.row);repAttach([am.name]);return true}
+  if(typeof LBL!=='undefined'&&LBL){var la=(LBL.artists||[]).filter(function(a){return eqN(a.name,n)||eqN(a.code,n)})[0];if(la){lArtDr(la.code);return true}
+    var so=(LBL.songs||[]).filter(function(x){return eqN(x.song,n)})[0];if(so){lSongDr(so.row);return true}}
+  if(typeof MUS!=='undefined'&&MUS){var mt=(MUS.tasks||[]).filter(function(t){return eqN(t.project,n)})[0];if(mt){mProjDr(mt.artist,mt.project);return true}
+    if((MUS.artists||[]).some(function(a){return eqN(a.name,n)})){mArtDr((MUS.artists.filter(function(a){return eqN(a.name,n)})[0]).name);return true}}
+  toast('#'+n+' has no page yet');return false}
+document.addEventListener('click',function(e){var x=e.target.closest&&e.target.closest('[data-otag]');if(!x)return;e.preventDefault();e.stopPropagation();openTag(x.dataset.otag)},true);
 function repMatch(r,names){return r.tags.some(function(t){return names.some(function(n){return eqN(t,n)})})}
 function repThread(names){var ns=names.filter(Boolean),list=(REP||[]).filter(function(r){return repMatch(r,ns)});
   return'<div class="rthr"><h3>Reports ('+list.length+')</h3>'+(REP===null?'<div class="m">Loading…</div>':list.map(function(r){var mine=eqN(r.by,meName());
@@ -1094,16 +1115,17 @@ function gWhen(s){var re=/\b(today|tomorrow|mon(?:day)?|tue(?:s|sday)?|wed(?:nes
   return d?{d:d,txt:m[0]}:null}
 function gTime(s){var m=/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i.exec(s);if(!m)return null;var h=+m[1],mi=m[2]||'00';if(h<1||h>12)return null;return{t:h+':'+mi+' '+m[3].toUpperCase(),txt:m[0]}}
 function gPerson(tok){var q=repNorm(tok),pe=(D&&D.people)||[];return pe.filter(function(n){return n.toLowerCase()===q})[0]||(function(){var h=pe.filter(function(n){return n.toLowerCase().indexOf(q)===0||n.toLowerCase().split(/\s+/).some(function(w){return w.indexOf(q)===0})});return h.length===1?h[0]:null})()}
-function gTag(tok){var q=repNorm(tok),cs=repCands();return cs.filter(function(c){return c.n.toLowerCase()===q})[0]||(function(){var h=cs.filter(function(c){return c.n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})()}
-function gAddHtml(name){return'<div class="gadd"><span>#'+esc(name)+' doesn\'t exist yet. Add it as:</span>'+['Campaign','Client','Artist'].map(function(k){return'<button class="b mi" data-gadd="'+k+'" data-gname="'+esc(name)+'">'+k+'</button>'}).join('')+'</div>'}
+function gTag(tok){var q=repNorm(tok),cs=repCands(),ex=cs.filter(function(c){return c.n.toLowerCase()===q}),pk=TAGK[q];return(pk&&ex.filter(function(c){return(KFOLD[c.k]||c.k)===pk||c.k===pk})[0])||ex.filter(function(c){return c.k!=='Brand'&&c.k!=='Contact'})[0]||ex[0]||(function(){var h=cs.filter(function(c){return c.n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})()}
+function gAddHtml(name){return'<div class="gadd"><span>#'+esc(name)+' doesn\'t exist yet.</span><button class="b mi" data-gpop="1">Set it up</button></div>'}
+document.addEventListener('mousedown',function(e){if(e.target.closest&&e.target.closest('[data-gpop]')){e.preventDefault();TAGIGN={};tagPop()}});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-gadd]');if(!b)return;e.preventDefault();var k=b.dataset.gadd,n=b.dataset.gname;
   askOk('Add "'+n+'" as a new '+k+'?',{yes:'Add '+k,title:'New tag'}).then(function(ok){if(!ok)return;b.disabled=true;
-    var p=k==='Campaign'?run('addRecord','CAMPAIGNS',{E:n}):k==='Client'?run('addRecord','CLIENTS & PARTNERSHIPS',{C:n}):run('labelAddArtist',n);
+    var p=tagCreate(k,n);tagPref(n,k);
     return p.then(function(){toast(k+' added: #'+n);return Promise.all([load(),typeof lblLoad==='function'?lblLoad():null])}).then(function(){var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev()})}).catch(function(err){b.disabled=false;toast(err.message||'Could not add')})});
 function gLight(k,tip){return'<span class="gl '+k+'" title="'+esc(tip)+'">'+(k==='g'?'✓':k==='a'?'●':'✕')+'</span>'}
 function gIsGrouped(t){return /(^|\n)\s*#(tasks?|meetings?|updates?)\b/i.test(t||'')||/\n\s*\n\s*#\S/.test(t||'')}
 function gParse(text){var groups=[],g=null,sec='update',errs=[];
-  function open(tag){g={tag:tag,updates:[],tasks:[],meetings:[]};groups.push(g);sec='update'}
+  function open(tag){g={tag:tag,updates:[],tasks:[],meetings:[],labels:[]};groups.push(g);sec='update'}
   function item(line){line=line.trim();if(!line)return;if(!g)open(null);
     var ppl=[],m,re=/@([^\s#@]+)/g;while((m=re.exec(line))){var p=gPerson(m[1]);if(p){if(ppl.indexOf(p)<0)ppl.push(p)}else errs.push('Unknown person @'+m[1])}
     if(sec==='update'){g.updates.push(line);return}
@@ -1116,13 +1138,13 @@ function gParse(text){var groups=[],g=null,sec='update',errs=[];
     if(!line){if(g&&(g.updates.length||g.tasks.length||g.meetings.length))g=null;sec='update';return}
     var h=/^#([^\s#@]+)\s*(.*)$/.exec(line);
     if(h){var k=GHDR[h[1].toLowerCase()];if(k){if(!g)open(null);sec=k;if(h[2])item(h[2]);return}
-      var tg=gTag(h[1]);if(!tg){var nm=h[1].replace(/_/g,' ');tg={n:nm,k:'?',missing:true};errs.push('#'+nm+' does not exist yet')}open(tg);if(h[2])item(h[2]);return}
+      var tg=gTag(h[1]);if(tg&&tg.k==='Label'){if(!g)open(null);if(g.labels.indexOf(tg.n)<0)g.labels.push(tg.n);if(h[2])item(h[2]);return}if(!tg){var nm=h[1].replace(/_/g,' ');tg={n:nm,k:'?',missing:true};errs.push('#'+nm+' does not exist yet')}open(tg);if(h[2])item(h[2]);return}
     item(line)});
   groups=groups.filter(function(x){return x.updates.length||x.tasks.length||x.meetings.length});
   groups.forEach(function(x){if(!x.tag)errs.push('A group has no #project: start it with a project tag')});
   return{groups:groups,errs:errs}}
 function gPreview(){var p=gParse(RPT.text||'');
-  return'<div class="gprev">'+p.groups.map(function(x){return'<div class="gg"><b>'+(x.tag?'#'+esc(x.tag.n):'<span style="color:var(--amber)">No project</span>')+'</b>'+(x.tag&&x.tag.missing?gAddHtml(x.tag.n):'')+
+  return'<div class="gprev">'+p.groups.map(function(x){return'<div class="gg"><b>'+(x.labels&&x.labels.length?x.labels.map(function(l){return'<span class="wtag mus">'+esc(l)+'</span>'}).join(''):'')+(x.tag?(x.tag.missing?'#'+esc(x.tag.n):'<span class="rc ok" data-otag="'+esc(x.tag.n)+'">#'+esc(x.tag.n)+'</span>'):'<span style="color:var(--amber)">No project</span>')+'</b>'+(x.tag&&x.tag.missing?gAddHtml(x.tag.n):'')+
     x.updates.map(function(u){return'<div class="gi">'+gLight(x.tag&&!x.tag.missing?'g':'r',x.tag&&!x.tag.missing?'filed under #'+(x.tag?x.tag.n:''):'needs a project')+'<span class="gt u">Update</span>'+esc(u)+'</div>'}).join('')+
     x.tasks.map(function(t){return'<div class="gi">'+gLight(t.badp?'r':(!t.ownerSet||!t.dueSet)?'a':'g',t.badp?'unknown person':!t.ownerSet?'no owner: goes to you':!t.dueSet?'no date: due today':'ready')+'<span class="gt t">Task</span>'+esc(t.name)+' <span class="m">· '+esc(t.owner||'you')+' · '+fmt(parseDue(t.due))+(t.dueSet?'':' (today)')+'</span></div>'}).join('')+
     x.meetings.map(function(mt){return'<div class="gi">'+gLight(mt.badp||!mt.date?'r':!mt.time?'a':'g',mt.badp?'unknown person':!mt.date?'needs a day':!mt.time?'no time yet':'ready')+'<span class="gt mt">Meeting</span>'+esc(mt.title)+' <span class="m">· '+(mt.date?fmt(parseDue(mt.date)):'no date')+(mt.time?' '+esc(mt.time):'')+(mt.attendees?' · '+esc(mt.attendees):'')+'</span></div>'}).join('')+'</div>'}).join('')+
@@ -1130,7 +1152,7 @@ function gPreview(){var p=gParse(RPT.text||'');
 function gSave(){var p=gParse(RPT.text||'');if(!p.groups.length)return toast('Nothing to post');if(p.errs.length)return toast(p.errs[0]);
   var b=document.getElementById('rptB');if(b)b.disabled=true;var chain=Promise.resolve(),made={r:0,t:0,m:0};
   p.groups.forEach(function(x){var tag=x.tag.n,tok='#'+repTok(tag),camp=x.tag.k==='Campaign'?((D&&D.campaigns)||[]).filter(function(c){return c.name===tag||c.code===tag})[0]:null;
-    if(x.updates.length)chain=chain.then(function(){var tx=tok+'\n'+x.updates.map(function(u){return'• '+u}).join('\n'),rp=repParse(tx);return run('reportAdd',{date:RPT.date||isoToday(),text:tx,tags:[tag].concat(rp.tags.filter(function(t){return t!==tag})),people:rp.people}).then(function(){made.r++;
+    if(x.updates.length)chain=chain.then(function(){var tx=tok+'\n'+x.updates.map(function(u){return'• '+u}).join('\n'),rp=repParse(tx);return run('reportAdd',{date:RPT.date||isoToday(),text:tx+(x.labels.length?'\n'+x.labels.map(function(l){return'#'+l}).join(' '):''),tags:[tag].concat(x.labels,rp.tags.filter(function(t){return t!==tag&&x.labels.indexOf(t)<0})),people:rp.people}).then(function(){made.r++;
       var cl=((D&&D.clients)||[]).filter(function(c){return c.name===tag||(camp&&c.name===camp.client)})[0];if(cl)return run('addLog',{client:cl.name,type:'Report',summary:x.updates.join(' / '),followUp:''}).catch(function(){})})});
     x.tasks.forEach(function(t){chain=chain.then(function(){return run('addTask',{task:t.name,forName:camp?camp.name:tag,owner:t.owner,due:t.due}).then(function(){made.t++})})});
     x.meetings.forEach(function(mt){chain=chain.then(function(){return run('meetingSave',{title:mt.title,date:mt.date,time:mt.time,endTime:'',category:'Meeting',reminder:'None',attendees:mt.attendees,
@@ -1180,9 +1202,57 @@ document.addEventListener('keydown',function(e){if(e.target.id!=='rptT'||e.key!=
 document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;var ta=e.target,v=ta.value,pos=ta.selectionStart,ls=v.lastIndexOf('\n',pos-1)+1;
   if(/^•\s#$/.test(v.slice(ls,pos))){ta.value=v.slice(0,ls)+'#'+v.slice(pos);ta.selectionStart=ta.selectionEnd=ls+1}},true);
 ['keyup','click','focusin'].forEach(function(ev){document.addEventListener(ev,function(e){if(e.target&&e.target.id==='rptT'){gGuide(e.target);if(ev!=='keyup')gPostLabel()}})});
+/* ---------- Tag type pop-up: unknown or ambiguous #tags get a "what is this?" mini window ---------- */
+var TQ={Artist:['our artist, or still in negotiations?','Our artist','In negotiations'],Organization:['are we actively working with them?','Working with them','Not yet'],
+  Project:['confirmed, or still a pitch?','Confirmed','Pitching'],Talent:['are we actively working with them?','Working with them','Not yet'],'Account Manager':['are we actively working with them?','Working with them','Not yet']};
+var TAGSTEP={},TKINDS=['Project','Organization','Account Manager','Artist','Talent'],TLABELS=['Prospect'],TAGK={},TAGIGN={},KFOLD={Campaign:'Project',Project:'Project',Client:'Organization',Brand:'Organization',Contact:'Organization','Account Manager':'Account Manager',Artist:'Artist',Song:'Artist',Talent:'Talent',Label:'Label'};
+try{TAGK=JSON.parse(localStorage.getItem('seer.tagk')||'{}')}catch(e){TAGK={}}
+function tagPrefK(q){var k=TAGK[q];return k}
+function tagPref(n,k){TAGK[String(n).toLowerCase()]=k;try{localStorage.setItem('seer.tagk',JSON.stringify(TAGK))}catch(e){}}
+function tagMatches(tok){var q=repNorm(tok);return repCands().filter(function(c){return c.n.toLowerCase()===q})}
+function tagIssues(text){var out=[],seen={},re=/#([^\s#@]+)(?=[\s]|$)/g,m;
+  while((m=re.exec(text||''))){var tok=m[1],key=repNorm(tok);if(GHDR[tok.toLowerCase()]||seen[key]||TAGIGN[key])continue;seen[key]=1;
+    var ms=tagMatches(tok),kinds=[];ms.forEach(function(c){var fk=KFOLD[c.k]||c.k;if(kinds.indexOf(fk)<0)kinds.push(fk)});
+    if(!ms.length){if(!repCands().some(function(c){return c.n.toLowerCase().indexOf(key)===0}))out.push({n:tok.replace(/_/g,' '),kinds:null})}
+    else if(kinds.length>1&&!TAGK[key])out.push({n:ms[0].n,kinds:kinds})}
+  return out}
+function tagPop(){var ta=document.getElementById('rptT'),box=document.getElementById('tagpop');if(!ta)return;var is=tagIssues(ta.value);
+  if(!is.length){if(box)box.style.display='none';return}
+  if(!box){box=document.createElement('div');box.id='tagpop';document.body.appendChild(box)}
+  var r=ta.getBoundingClientRect();box.style.left=Math.max(8,Math.min(r.left,innerWidth-380))+'px';box.style.top=Math.min(r.bottom+8,innerHeight-60)+'px';
+  box.innerHTML='<div class="tph"><b>What '+(is.length>1?'are these tags':'is this tag')+'?</b><button class="b mi" data-tpclose>✕</button></div>'+is.map(function(x){
+    return'<div class="tpr"><div><span class="rc ok">#'+esc(x.n)+'</span> <span class="m">'+(x.kinds?'matches more than one: which is it?':'is new.')+'</span></div><div class="tpb">'+
+      (x.kinds?x.kinds.map(function(k){return'<button class="chip" data-tpk="'+esc(k)+'" data-tpn="'+esc(x.n)+'" data-tpnew="0">'+esc(k)+'</button>'}).join(''):
+        TAGSTEP[repNorm(x.n)]?(function(k){var q=TQ[k];return'<span class="m">'+esc(k)+': '+esc(q[0])+'</span><button class="chip" data-tpreal="'+esc(x.n)+'" data-tpkind="'+esc(k)+'">'+esc(q[1])+'</button><button class="chip" data-tpprosp="'+esc(x.n)+'" data-tpkind="'+esc(k)+'">'+esc(q[2])+'</button><button class="chip" data-tpback="'+esc(x.n)+'">‹ Back</button>'})(TAGSTEP[repNorm(x.n)]):
+        '<span class="m">What is it?</span>'+TKINDS.map(function(k){return'<button class="chip" data-tpk="'+esc(k)+'" data-tpn="'+esc(x.n)+'" data-tpnew="1">'+esc(k)+'</button>'}).join(''))+
+      '<button class="chip" data-tpign="'+esc(x.n)+'" title="Keep it as plain text">Not a tag</button></div></div>'}).join('');box.style.display='block'}
+function tagCreate(k,n){var ta=document.getElementById('rptT'),pro=/#prospect\b/i.test(ta?ta.value:'');
+  if(k==='Project'||k==='Campaign')return run('addRecord','CAMPAIGNS',{E:n});if(k==='Organization'||k==='Client')return run('addRecord',pro?'BRAND OUTREACH CLIENTS':'CLIENTS & PARTNERSHIPS',{C:n});
+  if(k==='Artist')return run('labelAddArtist',n);if(k==='Account Manager')return run('addRecord','ACCOUNT MANAGERS',{B:n});
+  return run('dbAdd',{Talent:'talent',Brand:'brands',Contact:'contacts'}[k],n)}
+document.addEventListener('mousedown',function(e){var b=e.target.closest&&e.target.closest('[data-tpk],[data-tpign],[data-tpclose],[data-tpreal],[data-tpprosp],[data-tpback]');if(!b)return;e.preventDefault();var box=document.getElementById('tagpop');
+  if(b.dataset.tpback){delete TAGSTEP[repNorm(b.dataset.tpback)];tagPop();return}
+  if(b.dataset.tpreal||b.dataset.tpprosp){var pn=b.dataset.tpreal||b.dataset.tpprosp,pk=b.dataset.tpkind,pro=!!b.dataset.tpprosp;b.disabled=true;tagPref(pn,pk);
+    var job=pk==='Organization'?run('addRecord',pro?'BRAND OUTREACH CLIENTS':'CLIENTS & PARTNERSHIPS',{C:pn}):pk==='Project'?run('addRecord','CAMPAIGNS',pro?{E:pn,G:'Pitching'}:{E:pn}):
+      pk==='Artist'?run('labelAddArtist',pn):pk==='Account Manager'?run('addRecord','ACCOUNT MANAGERS',{B:pn}):run('dbAdd','talent',pn);
+    job.then(function(){var ta2=document.getElementById('rptT');
+      if(pro&&ta2&&!/#prospect\b/i.test(ta2.value)){var re2=new RegExp('(#'+repTok(pn).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=\\s|$)','i');ta2.value=ta2.value.replace(re2,'$1 #Prospect')}
+      delete TAGSTEP[repNorm(pn)];toast('#'+pn+' added: '+pk+(pro?' (prospect)':''));DBP=null;return Promise.all([load(),typeof lblLoad==='function'?lblLoad():null,pk==='Talent'?dbLoad():null])})
+      .then(function(){var ta3=document.getElementById('rptT');if(ta3)ta3.dispatchEvent(new Event('input',{bubbles:true}));tagPop()}).catch(function(err){b.disabled=false;toast(err.message||'Could not add')});return}
+  if(b.dataset.tpnew==='1'){TAGSTEP[repNorm(b.dataset.tpn)]=b.dataset.tpk;tagPop();return}
+
+  if(b.dataset.tpclose!==undefined){var ta0=document.getElementById('rptT');tagIssues(ta0?ta0.value:'').forEach(function(x){TAGIGN[repNorm(x.n)]=1});if(box)box.style.display='none';return}
+  if(b.dataset.tpign){TAGIGN[repNorm(b.dataset.tpign)]=1;var ta1=document.getElementById('rptT');ta1.value=ta1.value.replace(new RegExp('#'+repTok(b.dataset.tpign).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?=\\s|$)','gi'),b.dataset.tpign);ta1.dispatchEvent(new Event('input',{bubbles:true}));return}
+  var k=b.dataset.tpk,n=b.dataset.tpn;tagPref(n,k);
+  if(b.dataset.tpnew!=='1'){toast('#'+n+' = '+k);tagPop();var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev();return}
+  b.disabled=true;tagCreate(k,n).then(function(){toast(k+' added: #'+n);DBP=null;return Promise.all([load(),typeof lblLoad==='function'?lblLoad():null,(k==='Talent'||k==='Brand'||k==='Contact')?dbLoad():null])})
+    .then(function(){tagPop();var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev();gPostLabel()}).catch(function(err){b.disabled=false;toast(err.message||'Could not add')})});
+document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;clearTimeout(tagPop._t);tagPop._t=setTimeout(tagPop,350)});
+document.addEventListener('focusin',function(e){if(e.target.id==='rptT'&&typeof dbLoad==='function'&&!DB)dbLoad()});
+document.addEventListener('focusout',function(e){if(e.target.id==='rptT')setTimeout(function(){var a=document.activeElement,box=document.getElementById('tagpop');if(box&&!(a&&a.id==='rptT'))box.style.display='none'},200)});
 function mDashRow(t){var d=parseDue(t.due),od=d&&d<today();
   return'<div class="t mtask'+(od?' od':'')+'" data-row="'+t.row+'" data-task="'+esc(t.task)+'"><input type="checkbox" data-mf="done" title="Complete"><div class="n"><span class="wtag mus">Music</span><span class="tn" data-mp="'+esc(t.artist)+'\u0001'+esc(t.project)+'" style="cursor:pointer">'+esc(t.task)+'</span>'+
-    '<div class="m">'+esc(t.artist)+' · '+esc(t.project)+' · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
+    '<div class="m"><span class="otag" data-otag="'+esc(t.artist)+'">'+esc(t.artist)+'</span> · <span class="otag" data-otag="'+esc(t.project)+'">'+esc(t.project)+'</span> · '+esc(t.owner||'No owner')+' · '+(od?'<span style="color:var(--red)">':'<span>')+fmt(d)+'</span>'+(t.status!=='Not started'?' · '+esc(t.status):'')+'</div></div></div>'}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-dws]');if(!b)return;UI.dws=b.dataset.dws;render()});
 document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('[data-dgrp]');if(!h)return;var k=h.dataset.dgrp;UI.dcol=UI.dcol||{};var cur=k in UI.dcol?UI.dcol[k]:(k==='Later'||k==='Bumps');UI.dcol[k]=!cur;render()});
 function setTone(){var p=(view==='tasks'&&UI.pmeProj)||(view==='clients'&&UI.pmeNet),r=document.documentElement;if(p!==(r.getAttribute('data-mode')==='pme')){if(p)r.setAttribute('data-mode','pme');else r.removeAttribute('data-mode');applyBD()}}

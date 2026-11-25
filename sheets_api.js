@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.25.1321';   // stamped by release.py
+  var WEB_VERSION = '2026.11.25.1339';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -913,6 +913,13 @@
     if (!a) throw new Error('Unknown artist code ' + code);
     return { a: a, d: d };
   }
+  async function dbAdd(kind, name) {
+    name = String(name || '').trim(); if (!name) throw new Error('Name needed.');
+    var tc = { talent: ['TALENT', 'A'], brands: ['BRANDS', 'C'], contacts: ['CONTACTS', 'C'] }[kind];
+    var row = (await vals_("'" + tc[0] + "'!" + tc[1] + ':' + tc[1])).length + 1;
+    await apiOn(SHEET_ID, 'PUT', '/values/' + encodeURIComponent("'" + tc[0] + "'!" + tc[1] + row), { valueInputOption: 'RAW' }, { values: [[name]] });
+    return { ok: true };
+  }
   async function labelAddArtist(name) {
     name = String(name || '').trim(); if (!name) throw new Error('Name needed.');
     var d = await labelData();
@@ -969,7 +976,7 @@
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
     databaseData: databaseData,
     musicData: musicData, musicSet: musicSet, musicAddTask: musicAddTask, musicAddArtist: musicAddArtist, musicDelTask: musicDelTask,
-    labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, labelAddSong: labelAddSong,
+    labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, dbAdd: dbAdd, labelAddSong: labelAddSong,
     labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
     labelCheckPlaylists: function () { return Promise.reject(new Error('Checking playlists runs in the Seer desktop app (Windows or Mac). Playlists you add here are kept and checked from there.')); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
