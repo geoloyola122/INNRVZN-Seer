@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.20.1607';   // stamped by release.py
+  var WEB_VERSION = '2026.11.25.1223';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -579,12 +579,14 @@
     return { account: email, items: items };
   }
   async function reportsData() {
-    var rows = await sv_(REPORTS_ID, 'REPORTS!A2:F'), out = [];
+    var rows = await sv_(REPORTS_ID, 'REPORTS!A2:J'), out = [], me = String((await meName_()) || '').trim().toLowerCase(), em = String(email || '').toLowerCase();
     rows.forEach(function (r, i) {
-      r = pad_(r, 6);
-      if (pstr_(r[4]).trim()) out.push({ row: i + 2, date: pstr_(r[0]).slice(0, 10), by: pstr_(r[1]),
+      r = pad_(r, 10);
+      if (pstr_(r[4]).trim()) out.push({ row: i + 2, date: pstr_(r[0]).slice(0, 10), by: pstr_(r[1]), added: pstr_(r[5]), meeting: pstr_(r[7]),
+        seen: pstr_(r[8]).split('|').map(function (t) { return t.trim(); }).filter(Boolean), done: pstr_(r[9]).split('|').map(function (t) { return t.trim(); }).filter(Boolean),
         tags: pstr_(r[2]).split('|').map(function (t) { return t.trim(); }).filter(Boolean),
-        people: pstr_(r[3]).split('|').map(function (t) { return t.trim(); }).filter(Boolean), text: pstr_(r[4]) });
+        people: pstr_(r[3]).split('|').map(function (t) { return t.trim(); }).filter(Boolean), text: pstr_(r[4]),
+        mine: !!((pstr_(r[6]).trim() && pstr_(r[6]).trim().toLowerCase() === em) || (me && pstr_(r[1]).trim().toLowerCase() === me)) });
     });
     return { reports: out };
   }
@@ -592,8 +594,41 @@
     var text = String((entry && entry.text) || '').trim();
     if (!text) throw new Error('Write the report first.');
     var who = (await meName_()) || email, day = String(entry.date || dateNow()).slice(0, 10), n = new Date();
-    await sAppend_(REPORTS_ID, 'REPORTS!A:F', [[day, who, (entry.tags || []).join(' | '), (entry.people || []).join(' | '), text,
-      dateNow() + ' ' + ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2)]]);
+    var r = await sAppend_(REPORTS_ID, 'REPORTS!A:G', [[day, who, (entry.tags || []).join(' | '), (entry.people || []).join(' | '), text,
+      dateNow() + ' ' + ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2), email || '']]);
+    var m = /!A(\d+)/.exec(((r && r.updates) || {}).updatedRange || '');
+    return { ok: true, row: m ? +m[1] : null };
+  }
+  async function repRow_(row, expected, own) {
+    var r = pad_((await sv_(REPORTS_ID, 'REPORTS!A' + row + ':H' + row))[0] || [], 8);
+    if (pstr_(r[4]).trim() !== String(expected).trim()) throw new Error('That report changed or moved. Refresh and try again.');
+    if (own) { var me = String((await meName_()) || '').trim().toLowerCase(), em = String(email || '').toLowerCase();
+      if (!((pstr_(r[6]).trim().toLowerCase() === em && em) || (me && pstr_(r[1]).trim().toLowerCase() === me))) throw new Error('Only the person who wrote this report can change or delete it.'); }
+    return r.slice(0, 8).map(pstr_);
+  }
+  async function reportEdit(row, expected, entry) {
+    var text = String((entry && entry.text) || '').trim(); if (!text) throw new Error('The report cannot be empty.');
+    await repRow_(row, expected, true);
+    await sUpdate_(REPORTS_ID, 'REPORTS!C' + row + ':E' + row, [[(entry.tags || []).join(' | '), (entry.people || []).join(' | '), text]]);
+    return { ok: true };
+  }
+  async function reportDelete(row, expected) {
+    var old = await repRow_(row, expected, true), n = new Date();
+    await sAppend_(REPORTS_ID, 'REMOVED!A:J', [old.concat([(await meName_()) || email, dateNow() + ' ' + ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2)])]);
+    await sDelRow_(REPORTS_ID, 'REPORTS', row);
+    return { ok: true };
+  }
+  async function reportMark(row, expected, kind, on) {
+    var col = { seen: 'I', done: 'J' }[kind]; await repRow_(row, expected, false);
+    var me = (await meName_()) || email, cur = pstr_(((await sv_(REPORTS_ID, 'REPORTS!' + col + row))[0] || [''])[0]);
+    var names = cur.split('|').map(function (t) { return t.trim(); }).filter(function (n) { return n && n.toLowerCase() !== me.toLowerCase(); });
+    if (on !== false) names.push(me);
+    await apiOn(REPORTS_ID, 'PUT', '/values/' + encodeURIComponent('REPORTS!' + col + row), { valueInputOption: 'RAW' }, { values: [[names.join(' | ')]] });
+    return { ok: true };
+  }
+  async function reportMeeting(row, expected, label) {
+    await repRow_(row, expected, false);
+    await sUpdate_(REPORTS_ID, 'REPORTS!H' + row, [[String(label).slice(0, 200)]]);
     return { ok: true };
   }
   async function setClientStatus(src, row, expected, status) {
@@ -937,7 +972,7 @@
     labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
     labelCheckPlaylists: function () { return Promise.reject(new Error('Checking playlists runs in the Seer desktop app (Windows or Mac). Playlists you add here are kept and checked from there.')); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
-    addLog: addLog, meetingSave: meetingSave, meetingMove: meetingMove, connections: connections, reportsData: reportsData, reportAdd: reportAdd, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
+    addLog: addLog, meetingSave: meetingSave, meetingMove: meetingMove, connections: connections, reportsData: reportsData, reportAdd: reportAdd, reportEdit: reportEdit, reportDelete: reportDelete, reportMeeting: reportMeeting, reportMark: reportMark, setClientStatus: setClientStatus, setLink: setLink, getBacklog: getBacklog, saveBacklog: saveBacklog,
     setBackdrop: function () { return Promise.resolve({ ok: true, skipped: true }); },
     getBackdrop: function () { return Promise.resolve({ mode: 'solid', theme: 'dark' }); },
     endSplash: function () { return Promise.resolve({ ok: true }); },
