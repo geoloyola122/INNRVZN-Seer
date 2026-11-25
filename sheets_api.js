@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.25.1339';   // stamped by release.py
+  var WEB_VERSION = '2026.11.25.2235';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -913,6 +913,20 @@
     if (!a) throw new Error('Unknown artist code ' + code);
     return { a: a, d: d };
   }
+  async function historyStats() {
+    var rows = await sv_(SHEET_ID, "'TASK HISTORY'!A2:J"), pp = await people_(), out = [];
+    var cl = function (v) { return String(v || '').toLowerCase().replace(/[^a-z0-9]/g, ''); };
+    function canon(x) { x = String(x || '').trim(); var low = x.toLowerCase(); if (low === 'migo') return 'Emilio Constantino';
+      for (var i = 0; i < pp.length; i++) if (pp[i].toLowerCase() === low) return pp[i];
+      var loc = cl(low.split('@')[0]), h = pp.filter(function (p) { return cl(p) && (loc.indexOf(cl(p)) > -1 || loc === cl(p.split(' ')[0])); });
+      if (!h.length) h = pp.filter(function (p) { var f = cl(p.split(' ')[0]); return f && loc.indexOf(f) > -1; });
+      return h.length === 1 ? h[0] : x; }
+    var MON = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
+    rows.forEach(function (r) { r = pad_(r, 10); var m = /([A-Z][a-z]{2}) (\d{1,2}), (\d{4})/.exec(pstr_(r[0])); if (!m || !MON[m[1]]) return;
+      var by = canon(r[1]); if (/^REMOVED|^\(/.test(pstr_(r[1]))) return;
+      out.push({ date: m[3] + '-' + ('0' + MON[m[1]]).slice(-2) + '-' + ('0' + m[2]).slice(-2), by: by, task: pstr_(r[2]), forName: pstr_(r[3]), owner: pstr_(r[5]), deliv: pstr_(r[9]).trim() }); });
+    return { done: out };
+  }
   async function dbAdd(kind, name) {
     name = String(name || '').trim(); if (!name) throw new Error('Name needed.');
     var tc = { talent: ['TALENT', 'A'], brands: ['BRANDS', 'C'], contacts: ['CONTACTS', 'C'] }[kind];
@@ -976,7 +990,7 @@
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
     databaseData: databaseData,
     musicData: musicData, musicSet: musicSet, musicAddTask: musicAddTask, musicAddArtist: musicAddArtist, musicDelTask: musicDelTask,
-    labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, dbAdd: dbAdd, labelAddSong: labelAddSong,
+    labelData: labelData, labelSet: labelSet, labelNextCode: labelNextCode, labelAddArtist: labelAddArtist, dbAdd: dbAdd, historyStats: historyStats, labelAddSong: labelAddSong,
     labelAddRelease: labelAddRelease, labelAddStat: labelAddStat, labelAddPlaylist: labelAddPlaylist, labelDel: labelDel,
     labelCheckPlaylists: function () { return Promise.reject(new Error('Checking playlists runs in the Seer desktop app (Windows or Mac). Playlists you add here are kept and checked from there.')); },
     getSchema: getSchema, nextCode: nextCode, getRecord: getRecord, updateCell: updateCell, deleteRecord: deleteRecord, addRecord: addRecord,
