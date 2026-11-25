@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.25.1223';   // stamped by release.py
+  var WEB_VERSION = '2026.11.25.1321';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -267,7 +267,7 @@
   }
 
   async function getData() {
-    var ranges = ['TASKS!A2:L', 'CAMPAIGNS!A2:U', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
+    var ranges = ['TASKS!A2:M', 'CAMPAIGNS!A2:U', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
       'MEETINGS!A2:O', "'ACCOUNT MANAGERS'!A2:K", "'PME CLIENTS'!A2:P", 'AGENCIES!A2:Y'];
     var q = { ranges: ranges, valueRenderOption: 'UNFORMATTED_VALUE', dateTimeRenderOption: 'SERIAL_NUMBER' };
     var all = await Promise.all([api('GET', '/values:batchGet', q), links_(), readLog_()]);
@@ -317,10 +317,10 @@
     });
     var tasks = [];
     t.forEach(function (r, i) {
-      r = pad_(r, 12);
+      r = pad_(r, 13);
       if (!r[2] || r[0] === true || r[1] === true) return;
       tasks.push({ row: i + 2, task: pstr_(r[2]), forName: pstr_(r[3]), type: pstr_(r[4]), owner: pstr_(r[5]), due: serialToIso_(r[6]),
-        dueTime: timeStr_(r[7]), notes: pstr_(r[8]), bump: /^bump/i.test(pstr_(r[2])), deliv: r[10] === true, delivUrl: pstr_(r[11]).trim() });
+        dueTime: timeStr_(r[7]), notes: pstr_(r[8]), bump: /^bump/i.test(pstr_(r[2])), deliv: r[10] === true, delivUrl: pstr_(r[11]).trim(), added: serialToIso_(r[9]), addedBy: pstr_(r[12]).trim() });
     });
     var camps = [];
     c.forEach(function (r, i) {
@@ -346,10 +346,11 @@
   // ------------------------------------------------------------ task writes
   async function addTask(task) {
     if (!task || !task.task) throw new Error('Task name is required.');
-    var row = (await vals_('TASKS!C:C')).length + 1, added = (function () { var p = nowParts(); return p.mon + ' ' + p.day; })();
+    var row = (await vals_('TASKS!C:C')).length + 1, added = dateNow(), by = (await meName_()) || email;
     await vBatch([
       { range: 'TASKS!A' + row + ':D' + row, values: [[false, false, task.task, task.forName || 'Internal']] },
-      { range: 'TASKS!F' + row + ':J' + row, values: [[task.owner || '', task.due || '', task.dueTime || '', task.notes || '', added]] }], 'USER_ENTERED');
+      { range: 'TASKS!F' + row + ':J' + row, values: [[task.owner || '', task.due || '', task.dueTime || '', task.notes || '', added]] },
+      { range: 'TASKS!M' + row, values: [[by]] }], 'USER_ENTERED');
     return { ok: true, row: row };
   }
   async function completeTask(row, expected, deliverable) {
@@ -358,7 +359,7 @@
     if (!r.length || pstr_(r[2]) !== expected) throw new Error('Rows moved. Refresh and try again.');
     deliverable = String(deliverable || pstr_(r[11]) || '').trim();
     if (r[10] === true && !deliverable) throw new Error('This task is deliverable-sensitive: submit the deliverable to complete it.');
-    var who = (await meName_() || email || 'APP').toUpperCase(), due = serialToIso_(r[6]);
+    var who = (await meName_() || email || 'APP'), due = serialToIso_(r[6]);
     if (/^\d{4}-\d\d-\d\d/.test(due)) due = dueFmt(due);
     await vAppend('TASK HISTORY!A:J', [[stampNow(), who, r[2], r[3], 'TASKS', r[5], due, timeStr_(r[7]), '', deliverable]], 'RAW');
     await sBatch([{ deleteDimension: { range: { sheetId: await sheetId_('TASKS'), dimension: 'ROWS', startIndex: row - 1, endIndex: row } } }]);
@@ -451,7 +452,7 @@
     await check_("'" + tab + "'", row, sch.key, expected);
     var v = await vals_("'" + tab + "'!A" + row + ':J' + row);
     v = v.length ? pad_(v[0], 10) : pad_([], 10);
-    var who = (await meName_() || email || 'APP').toUpperCase(), stamp = stampNow(), entry;
+    var who = (await meName_() || email || 'APP'), stamp = stampNow(), entry;
     if (tab === 'TASKS') {
       var due = serialToIso_(v[6]);
       if (/^\d{4}-\d\d-\d\d/.test(due)) due = dueFmt(due);
