@@ -416,7 +416,7 @@ function parseDue(s){ // accepts yyyy-MM-dd or "Sat, Nov 14"
   var m=s.toLowerCase().match(/([a-z]{3})[a-z]*\s+(\d{1,2})/);if(!m||MON.indexOf(m[1])<0)return null;
   var d=new Date(today().getFullYear(),MON.indexOf(m[1]),+m[2]);if(d<today()-200*864e5)d.setFullYear(d.getFullYear()+1);return d}
 function fmt(d){return d?d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}):'No date'}
-function load(force){document.getElementById('rf').textContent='…';return run('getData').then(function(d){D=d;classify(D);
+var DSIG='';function load(force){document.getElementById('rf').textContent='…';return run('getData').then(function(d){var sig=JSON.stringify(d);if(!force&&D&&sig===DSIG){document.getElementById('rf').textContent='↻';return}DSIG=sig;D=d;classify(D);RCC=null;
   var em=String(d.email||'').toLowerCase(),lastEm='';try{lastEm=localStorage.getItem('ta_who_acct')||''}catch(e){}
   if(em&&lastEm!==em){who=d.me||'';try{localStorage.setItem('ta_who',who);localStorage.setItem('ta_who_acct',em)}catch(e){}}
   if(who&&d.people.indexOf(who)<0){var wl=who.toLowerCase(),hit=d.people.filter(function(p){return p.toLowerCase().split(' ')[0]===wl})[0];who=hit||'';try{localStorage.setItem('ta_who',who)}catch(e){}}
@@ -963,8 +963,9 @@ document.addEventListener('click',function(e){var x=e.target.closest&&e.target.c
   var line=(h.forName?'#'+repTok(h.forName)+'\n':'')+'• Done: '+h.task;ta.value=(ta.value.trim()?ta.value.replace(/\s*$/,'')+'\n\n':'')+line;ta.focus();ta.selectionStart=ta.selectionEnd=ta.value.length;ta.dispatchEvent(new Event('input',{bubbles:true}));x.remove()});
 /* ---------- Report form (Dashboard, Seer-wide: Plus + Label) ---------- */
 var REP=null,RPT={text:'',date:'',filt:'all',sug:[],si:0};
-function repLoad(){return run('reportsData').then(function(d){REP=d.reports||[];repBadge();if(RTH)histLoad(true);repThreadRefresh();if((view==='dash'&&WS==='dash')||WS==='reports'){var ae=document.activeElement;if(!(ae&&/^(rptT|rptE|rtT)$/.test(ae.id)))render()}}).catch(function(){if(!REP)REP=[]})}
-function repCands(){var c=[],seen={};function add(n,k,x){n=String(n||'').trim();if(!n)return;var key=k+'|'+n.toLowerCase();if(seen[key])return;seen[key]=1;c.push({n:n,k:k,x:x||''})}
+var RSIG='';function repLoad(){return run('reportsData').then(function(d){var sig=JSON.stringify(d.reports||[]);if(REP&&sig===RSIG)return;RSIG=sig;REP=d.reports||[];repBadge();if(RTH)histLoad(true);repThreadRefresh();if((view==='dash'&&WS==='dash')||WS==='reports'){var ae=document.activeElement;if(!(ae&&/^(rptT|rptE|rtT)$/.test(ae.id)))render()}}).catch(function(){if(!REP)REP=[]})}
+var RCC=null,RCT=0;function repCands(){if(RCC&&Date.now()-RCT<5000)return RCC;RCT=Date.now();return RCC=repCands0()}
+function repCands0(){var c=[],seen={};function add(n,k,x){n=String(n||'').trim();if(!n)return;var key=k+'|'+n.toLowerCase();if(seen[key])return;seen[key]=1;c.push({n:n,k:k,x:x||''})}
   ((D&&D.clients)||[]).forEach(function(x){add(x.name,'Client')});((D&&D.campaigns)||[]).forEach(function(x){add(x.name,'Campaign',x.code);add(x.code,'Campaign',x.name)});
   ((LBL&&LBL.artists)||[]).forEach(function(a){add(a.name,'Artist',a.code);add(a.code,'Artist',a.name)});((LBL&&LBL.songs)||[]).forEach(function(x){add(x.song,'Song',x.artist)});
   ((D&&D.ams)||[]).forEach(function(a){add(a.name,'Account Manager',a.known||a.team)});
@@ -1008,7 +1009,7 @@ function repSave(){if(gIsGrouped(RPT.text))return gSave();if(RPT.text.trim()&&!r
     var cl=((D&&D.clients)||[]).filter(function(c){return r.tags.indexOf(c.name)>-1}),p=Promise.resolve();
     cl.forEach(function(c){p=p.then(function(){return run('addLog',{client:c.name,type:'Report',summary:text,followUp:''})})});return p}).then(function(){
     RPT.text='';toast('Report saved');return Promise.all([repLoad(),load()]).then(function(){var w=RPT.wm;RPT.wm=false;if(w&&RPT.newRow)repMeet(repFind(RPT.newRow));else render()})}).catch(function(e){b.disabled=false;toast(e.message||'Could not save')})}
-document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;RPT.text=e.target.value;document.getElementById('rptP').innerHTML=repPrev();repSugShow(e.target);gGuide(e.target);gPostLabel()});
+var _rpf=0;document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;var ta=e.target;RPT.text=ta.value;repSugShow(ta);if(_rpf)return;_rpf=requestAnimationFrame(function(){_rpf=0;var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev();gGuide(ta);gPostLabel()})});
 document.addEventListener('keydown',function(e){if(e.target.id!=='rptT')return;var box=document.getElementById('rptS');
   if(RPT.sug.length&&box.style.display==='block'){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();RPT.si=(RPT.si+(e.key==='ArrowDown'?1:RPT.sug.length-1))%RPT.sug.length;[].forEach.call(box.children,function(c,i){c.classList.toggle('on',i===RPT.si)});return}
     if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();return repPick(RPT.si)}if(e.key==='Escape'){RPT.sug=[];box.style.display='none';return}}
@@ -1098,7 +1099,7 @@ function repBadge(){var n=repUnread().length,b=document.getElementById('wsbtn');
   fresh.forEach(function(r){var msg=r.by+(r.people.some(function(p){return eqN(p,meName())})?' mentioned you':' reported on your project')+': '+r.text.replace(/[#@]([^\s#@]+)/g,function(_,a){return a.replace(/_/g,' ')}).slice(0,120);
     toast(msg);try{if(window.Notification&&Notification.permission==='granted')new Notification('INNRVZN Seer',{body:msg})}catch(e){}})}
 try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission()}catch(e){}
-setInterval(function(){if(document.activeElement&&/^rpt|^rtT/.test(document.activeElement.id||''))return;repLoad()},60000);
+setInterval(function(){if(document.hidden)return;if(document.activeElement&&/^rpt|^rtT/.test(document.activeElement.id||''))return;repLoad()},60000);
 function repMark(r,kind,on){return run('reportMark',r.row,r.text,kind,on).then(repLoad).catch(function(e){toast(e.message||'Could not update')})}
 function repMakeTask(r){var i=document.getElementById('qi'),p=r.people.filter(function(x){return!eqN(x,meName())})[0]||r.people[0]||'',t=r.tags[0]||'';
   var tx=r.text.replace(/[#@][^\s#@]+/g,'').replace(/\s+/g,' ').trim().slice(0,90);
@@ -1262,7 +1263,7 @@ document.addEventListener('keydown',function(e){if(e.target.id!=='rptT'||e.key!=
   if(proj||upd){e.preventDefault();var ins='\n• ';ta.value=v.slice(0,pos)+ins+v.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=pos+ins.length;ta.dispatchEvent(new Event('input',{bubbles:true}))}});
 document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;var ta=e.target,v=ta.value,pos=ta.selectionStart,ls=v.lastIndexOf('\n',pos-1)+1;
   if(/^•\s#$/.test(v.slice(ls,pos))){ta.value=v.slice(0,ls)+'#'+v.slice(pos);ta.selectionStart=ta.selectionEnd=ls+1}},true);
-['keyup','click','focusin'].forEach(function(ev){document.addEventListener(ev,function(e){if(e.target&&e.target.id==='rptT'){gGuide(e.target);if(ev!=='keyup')gPostLabel()}})});
+['keyup','click','focusin'].forEach(function(ev){document.addEventListener(ev,function(e){if(e.target&&e.target.id==='rptT'){if(ev==='keyup'&&!/^(Arrow|Home|End|Page)/.test(e.key||''))return;gGuide(e.target);if(ev!=='keyup')gPostLabel()}})});
 /* ---------- Tag type pop-up: unknown or ambiguous #tags get a "what is this?" mini window ---------- */
 var TQ={Artist:['our artist, or still in negotiations?','Our artist','In negotiations'],Organization:['are we actively working with them?','Working with them','Not yet'],
   Project:['confirmed, or still a pitch?','Confirmed','Pitching'],Talent:['are we actively working with them?','Working with them','Not yet'],'Account Manager':['are we actively working with them?','Working with them','Not yet']};
@@ -1528,7 +1529,7 @@ var __fd=false;function fadeSplash(){var e=document.getElementById('splash');if(
 function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 (function(){var v=document.getElementById('spv'),e=document.getElementById('splash');if(!e)return;
   if(!v||!v.getAttribute('src')){__vd=true;return}
-  v.playbackRate=1.6;v.addEventListener('ended',videoDone);v.addEventListener('error',videoDone);setInterval(function(){if(v.currentTime>=6)videoDone()},40);
+  v.playbackRate=1.6;v.addEventListener('ended',videoDone);v.addEventListener('error',videoDone);var _vw=setInterval(function(){if(__vd||v.currentTime>=6){clearInterval(_vw);videoDone()}},100);
   e.addEventListener('click',function(){__vd=true;__sp=true;fadeSplash()});document.addEventListener('keydown',function(){__vd=true;__sp=true;fadeSplash()},{once:true});
   var started=false;var plated=false;function plate(){if(plated)return;plated=true;try{var rc=v.getBoundingClientRect(),k=window.devicePixelRatio||1;run('splashPlate',rc.left*k,rc.top*k,rc.width*k).catch(function(){})}catch(e){}}
   window.__splashGo=function(){if(started)return;started=true;var pr=v.play&&v.play();if(pr&&pr.catch)pr.catch(videoDone)};setTimeout(window.__splashGo,12000);setTimeout(videoDone,30000)})();
@@ -1859,6 +1860,6 @@ render();
 run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
 if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
   if(ws==='plus'||ws==='music'||ws==='label'||ws==='db')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
-setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(WS==='plus'||WS==='dash'||WS==='cal')load();if(WS==='dash')repLoad()},60000);
+setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(document.hidden)return;var ae=document.activeElement;if(ae&&/^(rptT|rptE|rtT)$/.test(ae.id||''))return;if(WS==='plus'||WS==='dash'||WS==='cal')load()},60000);
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script><script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>
