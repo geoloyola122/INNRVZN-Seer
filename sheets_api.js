@@ -50,7 +50,7 @@
   function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
   function lsSet(k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) { } }
   // remember the session across reloads / app restarts: reuse the saved token until it expires, and the account for re-sign-in
-  (function () { var t = lsGet('ta_tok'), x = +lsGet('ta_exp') || 0; if (t && Date.now() < x) { token = t; tokenExp = x; } email = lsGet('ta_email'); })();
+  (function () { var t = lsGet('ta_tok'), x = +lsGet('ta_exp') || 0; if (t && Date.now() < x) { token = t; tokenExp = x; } var p = null; try { p = JSON.parse(lsGet('seer.profile') || 'null'); } catch (e) { } email = (p && p.email) || ''; })();
 
   function signinUI(show, msg) {
     var el = document.getElementById('signin');
@@ -69,50 +69,30 @@
       })();
     });
   }
-  function requestToken(prompt) {
-    return waitGIS().then(function () {
-      if (!CFG.CLIENT_ID || /^YOUR_/.test(CFG.CLIENT_ID)) throw new Error('Google sign-in is not set up yet (config.js has no CLIENT_ID).');
-      if (!tc) tc = google.accounts.oauth2.initTokenClient({ client_id: CFG.CLIENT_ID, scope: SCOPE, hint: lsGet('ta_email') || undefined, callback: function () { } });
-      return new Promise(function (res, rej) {
-        tc.callback = function (r) {
-          if (r.error) return rej(new Error(r.error_description || r.error));
-          token = r.access_token; tokenExp = Date.now() + ((r.expires_in || 3600) - 90) * 1000;
-          fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + token } })
-            .then(function (x) { return x.json(); }).then(function (u) { email = (u && u.email) || email || ''; }).catch(function () { })
-            .then(function () { lsSet('ta_tok', token); lsSet('ta_exp', String(tokenExp)); lsSet('ta_email', email); res(token); });
-        };
-        tc.error_callback = function (e) { rej(new Error((e && (e.message || e.type)) || 'Sign-in was cancelled')); };
-        tc.requestAccessToken({ prompt: prompt });
-      });
-    });
+  // ------------------------------------------------------------ Profiles instead of Google sign-in.
+  // The Seer Apps Script (runs as SEER.innrvzn@gmail.com) lists the team and hands out a short-lived Seer key.
+  var RELAY = 'https://script.google.com/macros/s/AKfycbwy5PgwEXgDL7z5Jb2uKE7-isc-8ly-Y7UK5ydcAdd4LSLKOMD98Zoo8Y03nHhVQQuGEw/exec',
+    RELAY_KEY = 'fUE0mi0P-xuwofPZyZVtqDqwYB9RaF9s';
+  function relay(action, extra) {
+    var body = Object.assign({ key: RELAY_KEY, action: action }, extra || {});
+    return fetch(RELAY, { method: 'POST', body: JSON.stringify(body) }).then(function (r) { return r.json(); })
+      .then(function (o) { if (!o || !o.ok) throw new Error((o && o.error) || 'Seer server refused the request'); return o; });
   }
+  function profile() { try { return JSON.parse(lsGet('seer.profile') || 'null'); } catch (e) { return null; } }
   function ensureToken() {
     if (CFG.NO_AUTH) return Promise.resolve('');
+    var pr = profile();
+    if (!pr || !pr.email) return Promise.reject(new Error('SIGNIN_REQUIRED: Pick your profile.'));
+    email = pr.email;
     if (token && Date.now() < tokenExp) return Promise.resolve(token);
     if (pending) return pending;
-    pending = (async function () {
-      try {
-        if (lsGet('ta_signed')) {            // came back after a refresh or an hour: try silently first
-          try { await requestToken(''); signinUI(false); return token; } catch (e) { }
-        }
-        signinUI(true, lsGet('ta_signed') ? 'Tap Sign in to continue' + (lsGet('ta_email') ? ' as ' + lsGet('ta_email') : '') + '. No password needed.' : '');
-        await new Promise(function (res) { waiters.push(res); });
-        return token;
-      } finally { pending = null; }
-    })();
+    pending = relay('token').then(function (o) {
+      token = o.token; tokenExp = Date.now() + ((o.expiresIn || 3000) - 60) * 1000;
+      lsSet('ta_tok', token); lsSet('ta_exp', String(tokenExp)); return token;
+    }).finally(function () { pending = null; });
     return pending;
   }
-  // the sign-in button (needs a real click, so browsers allow the Google popup)
-  window.__signin = function () {
-    var b = document.getElementById('signin-btn');
-    if (b) b.disabled = true;
-    requestToken(lsGet('ta_signed') ? '' : 'select_account').then(function () {
-      lsSet('ta_signed', '1'); signinUI(false);
-      var w = waiters; waiters = []; w.forEach(function (f) { f(); });
-    }).catch(function (e) {
-      signinUI(true, e.message || 'Sign-in failed. Try again.');
-    }).then(function () { if (b) b.disabled = false; });
-  };
+  window.__signin = function () { };
 
   // ------------------------------------------------------------ REST helpers
   function qs(o) {
@@ -988,7 +968,11 @@
     getData: getData, addTask: addTask, completeTask: completeTask, snoozeTask: snoozeTask, setCampaignStatus: setCampaignStatus,
     driveStatus: driveStatus, driveConnect: driveStatus, driveDisconnect: driveStatus, driveFind: driveFind, driveSetRoot: driveSetRoot,
     driveCreateRoot: driveCreateRoot, createFolder: ensureFolder_, submitDeliverable: submitDeliverable, uploadDeliverableData: uploadDeliverableData,
-    authStatus: async function () { var a = await accessCheck_(); return { ok: !!a.ok, email: email, name: a.name || '', role: a.role || '' }; },
+    authStatus: async function () { var pr = profile(); if (!pr || !pr.email) return { ok: false, email: '' };
+      try { var a = await accessCheck_(); return { ok: !!a.ok, email: email, name: a.name || pr.name || '', role: a.role || '' }; } catch (e) { return { ok: false, email: '', error: String(e && e.message || e) }; } },
+    profiles: function () { return relay('users').then(function (o) { var seen = {}; return (o.users || []).filter(function (u) { var k = String(u.name || '').trim().toLowerCase(); if (!k || seen[k]) return false; seen[k] = 1; return true; }); }); },
+    signIn: function (em) { return A.profiles().then(function (ps) { var p = ps.filter(function (u) { return String(u.email).toLowerCase() === String(em || '').toLowerCase(); })[0];
+      if (!p) throw new Error('Pick a profile.'); lsSet('seer.profile', JSON.stringify(p)); email = p.email; ACCESS = null; accessP = null; token = ''; tokenExp = 0; return { ok: true, email: p.email, name: p.name }; }); },
     appVersion: function () { return Promise.resolve({ version: WEB_VERSION, web: true }); },
     checkUpdate: function () { return Promise.resolve({ newer: false }); },
     databaseData: databaseData,
@@ -1007,9 +991,7 @@
     getWorkspace: function () { var w = lsGet('ta_ws'); return Promise.resolve(['dash', 'cal', 'plus', 'music', 'label', 'db', 'dev', 'more'].indexOf(w) > -1 ? w : ''); },
     setWorkspace: function (ws) { if (['dash', 'cal', 'plus', 'music', 'label', 'db', 'dev', 'more'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
     signOut: function () {
-      try { if (token && window.google && google.accounts) google.accounts.oauth2.revoke(token, function () { }); } catch (e) { }
-      token = ''; tokenExp = 0; lsSet('ta_signed', ''); lsSet('ta_tok', ''); lsSet('ta_exp', ''); lsSet('ta_email', ''); try { sessionStorage.clear(); } catch (e) { }
-      setTimeout(function () { location.reload(); }, 150);
+      lsSet('seer.profile', ''); lsSet('ta_tok', ''); lsSet('ta_exp', ''); token = ''; tokenExp = 0; email = ''; ACCESS = null; accessP = null;
       return Promise.resolve({ ok: true });
     }
   };
