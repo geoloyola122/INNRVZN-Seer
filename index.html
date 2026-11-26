@@ -1552,7 +1552,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('.acctdd'))cl
 document.addEventListener('keydown',function(e){if(e.key==='Escape')close()})})();
 document.getElementById('bd').onchange=function(){BD=this.value;try{localStorage.setItem('ta_bd',BD)}catch(e){}applyBD()};applyBD();
 var __sp=false,__vd=false,__go=null;
-var __fd=false;function fadeSplash(){var e=document.getElementById('splash');if(!e||__fd)return;__fd=true;e.classList.add('out');setTimeout(function(){var fin=function(){e.remove();try{applyBD()}catch(x){}};try{run('endSplash').then(fin,fin)}catch(x){fin()}},600)}
+var __fd=false;function fadeSplash(){var e=document.getElementById('splash');if(!e||__fd)return;__fd=true;e.classList.add('out');setTimeout(function(){var fin=function(){e.remove();try{applyBD()}catch(x){}var q=window.__afterSplash||[];window.__afterSplash=[];q.forEach(function(f){try{f()}catch(x){}})};try{run('endSplash').then(fin,fin)}catch(x){fin()}},600)}
 function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 (function(){var v=document.getElementById('spv'),e=document.getElementById('splash');if(!e)return;
   if(!v||!v.getAttribute('src')){__vd=true;return}
@@ -1869,7 +1869,7 @@ document.getElementById('qa').addEventListener('submit',function(e){if(WS!=='mus
   i.value='';lAddSong(a,s)},true);
 (function(){var nv=document.querySelector('nav'),old=nv.onclick;nv.onclick=function(e){old.call(this,e);if(WS==='music'&&view!=='more')document.getElementById('qi').placeholder=(view==='lart'?'Add a song: Feel Like #Matt Habit':'Add a task: Shoot BTS #Feel Like Roll-out @Ashley dec 5')+'   (Ctrl+K)'}})();
 /* ---------- sign-in screen (desktop). Google's own consent page must open in the browser: Google blocks it inside app windows. ---------- */
-function showLogin(msg){var o=document.getElementById('login');if(!o){o=document.createElement('div');o.id='login';document.body.appendChild(o)}
+function showLogin(msg){if(document.getElementById('splash')){(window.__afterSplash=window.__afterSplash||[]).push(function(){showLogin(msg)});return}var o=document.getElementById('login');if(!o){o=document.createElement('div');o.id='login';document.body.appendChild(o)}
   o.innerHTML='<div class="pkwrap"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="pkt">Who\'s working?</div><div id="pkgrid" class="pkgrid"><div class="m">Loading profiles…</div></div><p class="m" id="lgmsg" style="margin-top:18px;min-height:18px">'+esc(msg||'')+'</p></div>';o.style.display='flex';
   run('profiles').then(function(ps){var g=document.getElementById('pkgrid');if(!g)return;var cols=['#6d5dfc','#e8590c','#0ca678','#d6336c','#1c7ed6','#f08c00','#7048e8','#2b8a3e','#c2255c'];
     g.innerHTML=(ps||[]).map(function(p,i){var w=String(p.name).split(/\s+/).filter(Boolean),ini=((w[0]||'?')[0]+((w[1]||'')[0]||'')).toUpperCase();
