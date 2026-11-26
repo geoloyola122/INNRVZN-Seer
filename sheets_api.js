@@ -49,6 +49,8 @@
   var token = '', tokenExp = 0, email = '', tc = null, pending = null, waiters = [];
   function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
   function lsSet(k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) { } }
+  // remember the session across reloads / app restarts: reuse the saved token until it expires, and the account for re-sign-in
+  (function () { var t = lsGet('ta_tok'), x = +lsGet('ta_exp') || 0; if (t && Date.now() < x) { token = t; tokenExp = x; } email = lsGet('ta_email'); })();
 
   function signinUI(show, msg) {
     var el = document.getElementById('signin');
@@ -70,14 +72,14 @@
   function requestToken(prompt) {
     return waitGIS().then(function () {
       if (!CFG.CLIENT_ID || /^YOUR_/.test(CFG.CLIENT_ID)) throw new Error('Google sign-in is not set up yet (config.js has no CLIENT_ID).');
-      if (!tc) tc = google.accounts.oauth2.initTokenClient({ client_id: CFG.CLIENT_ID, scope: SCOPE, callback: function () { } });
+      if (!tc) tc = google.accounts.oauth2.initTokenClient({ client_id: CFG.CLIENT_ID, scope: SCOPE, hint: lsGet('ta_email') || undefined, callback: function () { } });
       return new Promise(function (res, rej) {
         tc.callback = function (r) {
           if (r.error) return rej(new Error(r.error_description || r.error));
           token = r.access_token; tokenExp = Date.now() + ((r.expires_in || 3600) - 90) * 1000;
           fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + token } })
-            .then(function (x) { return x.json(); }).then(function (u) { email = (u && u.email) || ''; }).catch(function () { })
-            .then(function () { res(token); });
+            .then(function (x) { return x.json(); }).then(function (u) { email = (u && u.email) || email || ''; }).catch(function () { })
+            .then(function () { lsSet('ta_tok', token); lsSet('ta_exp', String(tokenExp)); lsSet('ta_email', email); res(token); });
         };
         tc.error_callback = function (e) { rej(new Error((e && (e.message || e.type)) || 'Sign-in was cancelled')); };
         tc.requestAccessToken({ prompt: prompt });
@@ -93,7 +95,7 @@
         if (lsGet('ta_signed')) {            // came back after a refresh or an hour: try silently first
           try { await requestToken(''); signinUI(false); return token; } catch (e) { }
         }
-        signinUI(true, lsGet('ta_signed') ? 'Your session ended. Sign in again to continue.' : '');
+        signinUI(true, lsGet('ta_signed') ? 'Tap Sign in to continue' + (lsGet('ta_email') ? ' as ' + lsGet('ta_email') : '') + '. No password needed.' : '');
         await new Promise(function (res) { waiters.push(res); });
         return token;
       } finally { pending = null; }
@@ -1006,7 +1008,7 @@
     setWorkspace: function (ws) { if (['dash', 'cal', 'plus', 'music', 'label', 'db', 'dev', 'more'].indexOf(ws) === -1) return Promise.reject(new Error('Unknown workspace')); lsSet('ta_ws', ws); return Promise.resolve({ ok: true }); },
     signOut: function () {
       try { if (token && window.google && google.accounts) google.accounts.oauth2.revoke(token, function () { }); } catch (e) { }
-      token = ''; lsSet('ta_signed', ''); try { sessionStorage.clear(); } catch (e) { }
+      token = ''; tokenExp = 0; lsSet('ta_signed', ''); lsSet('ta_tok', ''); lsSet('ta_exp', ''); lsSet('ta_email', ''); try { sessionStorage.clear(); } catch (e) { }
       setTimeout(function () { location.reload(); }, 150);
       return Promise.resolve({ ok: true });
     }
