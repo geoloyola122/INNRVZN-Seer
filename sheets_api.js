@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.25.2235';   // stamped by release.py
+  var WEB_VERSION = '2026.11.26.0849';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -580,10 +580,10 @@
     return { account: email, items: items };
   }
   async function reportsData() {
-    var rows = await sv_(REPORTS_ID, 'REPORTS!A2:J'), out = [], me = String((await meName_()) || '').trim().toLowerCase(), em = String(email || '').toLowerCase();
+    var rows = await sv_(REPORTS_ID, 'REPORTS!A2:K'), out = [], me = String((await meName_()) || '').trim().toLowerCase(), em = String(email || '').toLowerCase();
     rows.forEach(function (r, i) {
-      r = pad_(r, 10);
-      if (pstr_(r[4]).trim()) out.push({ row: i + 2, date: pstr_(r[0]).slice(0, 10), by: pstr_(r[1]), added: pstr_(r[5]), meeting: pstr_(r[7]),
+      r = pad_(r, 11);
+      if (pstr_(r[4]).trim()) out.push({ rid: pstr_(r[10]).trim(), row: i + 2, date: pstr_(r[0]).slice(0, 10), by: pstr_(r[1]), added: pstr_(r[5]), meeting: pstr_(r[7]),
         seen: pstr_(r[8]).split('|').map(function (t) { return t.trim(); }).filter(Boolean), done: pstr_(r[9]).split('|').map(function (t) { return t.trim(); }).filter(Boolean),
         tags: pstr_(r[2]).split('|').map(function (t) { return t.trim(); }).filter(Boolean),
         people: pstr_(r[3]).split('|').map(function (t) { return t.trim(); }).filter(Boolean), text: pstr_(r[4]),
@@ -598,6 +598,7 @@
     var r = await sAppend_(REPORTS_ID, 'REPORTS!A:G', [[day, who, (entry.tags || []).join(' | '), (entry.people || []).join(' | '), text,
       dateNow() + ' ' + ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2), email || '']]);
     var m = /!A(\d+)/.exec(((r && r.updates) || {}).updatedRange || '');
+    if (m && entry.rid) await apiOn(REPORTS_ID, 'PUT', '/values/' + encodeURIComponent('REPORTS!K' + m[1]), { valueInputOption: 'RAW' }, { values: [[String(entry.rid)]] });
     return { ok: true, row: m ? +m[1] : null };
   }
   async function repRow_(row, expected, own) {
