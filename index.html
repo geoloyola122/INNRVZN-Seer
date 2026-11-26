@@ -271,7 +271,7 @@ i.medot,.dots i.me{background:#3b82f6!important}i.medot{display:inline-block;wid
 .gadd{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;color:var(--amber);font-size:12px}.gerr{color:var(--amber);font-size:12px}
 .rnew{font-size:10px;font-weight:700;color:#fff;background:var(--acc);border-radius:6px;padding:0 5px;margin-left:4px}
 .rbdg{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:var(--acc);border-radius:9px;padding:0 5px;margin-left:6px}
-#rptT{min-height:42px;height:42px;transition:height .15s}#rptPane:focus-within #rptT,#rptT:not(:placeholder-shown){height:180px}
+#rptT{min-height:180px;height:180px}
 .dgrp{cursor:pointer;user-select:none}.dgrp:hover{color:var(--acc)}
 .rthr{margin-top:18px;border-top:1px solid var(--line);padding-top:6px}.rdone{font-size:12.5px;padding:5px 10px;margin:4px 0;border-left:2px solid var(--ok);color:var(--text)}.rdone i{font-style:normal;font-weight:600}
 .rmeet{font-size:12.5px;padding:5px 10px;margin:4px 0;border-left:2px solid var(--acc)}.rrp{margin-left:6px;font-size:11px;padding:0 6px}
@@ -375,7 +375,7 @@ i.medot,.dots i.me{background:#3b82f6!important}i.medot{display:inline-block;wid
  #mobbar button svg{width:22px;height:22px}#mobbar button.on{color:var(--acc);background:var(--chip)}
  #mobbar button i{position:absolute;top:2px;left:calc(50% + 8px);min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--red,#e5484d);color:#fff;font-size:10px;font-style:normal;line-height:16px}
  body.mob .rpage .rfil{flex-wrap:wrap}body.mob .rpage .rfil select,body.mob .rpage .rfil input[type=date]{flex:1 1 45%;min-width:0}
- body.mob #rptT:not(:placeholder-shown),body.mob #rptPane:focus-within #rptT{height:150px}
+ body.mob #rptT{min-height:160px;height:160px}
  body.mob #calpop{width:calc(100vw - 24px)!important;left:12px!important}
  body.mob .dash{grid-template-columns:1fr}}
 .rfmore{display:contents}.rpgfb{display:none}
@@ -1058,7 +1058,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
     ta.value=v.slice(0,pos)+(pos&&!/\s$/.test(v.slice(0,pos))?' ':'')+ins+' '+v.slice(pos);RPT.text=ta.value;ta.dispatchEvent(new Event('input',{bubbles:true}));toast('Uploaded to '+tag+': '+fs.length+' file'+(fs.length===1?'':'s'))})
    .catch(function(err){toast(err.message||'Upload failed')}).finally(function(){RPT.up=Math.max(0,RPT.up-1);b.disabled=false})});
 var RKC={t:0,m:{}};function repKindOf(n){if(Date.now()-RKC.t>3000){RKC.m={};repCands().forEach(function(c){var k=repNorm(c.n);if(!RKC.m[k])RKC.m[k]=c.k});RKC.t=Date.now()}return RKC.m[repNorm(n)]||''}
-function repTx(t){return repFiles(esc(t)).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){var k=b[0]==='#'?repKindOf(b.slice(1).replace(/_/g,' ')):'';return a+(k?'<span class="rck"><small>'+esc(k==='Account Manager'?'AM':k)+'</small>':'')+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-otag="'+esc(b.slice(1).replace(/_/g,' '))+'" title="Open #'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'+(k?'</span>':'')})}
+function repTx(t){return repFiles(esc(t)).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){var k=b[0]==='#'?repKindOf(b.slice(1).replace(/_/g,' ')):'';if(k==='Label')k='';return a+(k?'<span class="rck"><small>'+esc(k==='Account Manager'?'AM':k)+'</small>':'')+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-otag="'+esc(b.slice(1).replace(/_/g,' '))+'" title="Open #'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'+(k?'</span>':'')})}
 function repRow(r){var me=meName(),mn=r.people.some(function(p){return eqN(p,me)}),inv=repInvolves(r,me),sn=repSeen(r,me),dn=repDone(r,me);
   if(RPT.edit===r.row)return'<div class="rrow ed" data-rrow="'+r.row+'"><textarea id="rptE" rows="3">'+esc(r.text)+'</textarea><div class="ract"><button class="b" data-redsave="'+r.row+'">Save</button><button class="b" data-redcancel>Cancel</button></div></div>';
   var hint=!r.meeting&&MEETRX.test(r.text);
@@ -1914,7 +1914,8 @@ document.addEventListener('click',function(e){var x=e.target.closest&&e.target.c
 /* ---------- Phone: three tabs only (Reporting, Tasks, Calendar). Desktop untouched. ---------- */
 var MOBQ=MOBQ||window.matchMedia('(max-width:720px)'),MTAB=MTAB||'report';try{MTAB=localStorage.getItem('seer.mtab')||MTAB}catch(e){}
 function noR(x){return String(x||'').replace(/\s*\[R:[^\]]*\]/g,'').trim()}
-function isMob(){if(!MOBQ)MOBQ=window.matchMedia('(max-width:720px)');return MOBQ.matches}
+function isMob(){if(window.pywebview||location.protocol==='file:')return false; // desktop app never uses the phone layout (its splash window is narrow)
+  if(!MOBQ)MOBQ=window.matchMedia('(max-width:720px)');return MOBQ.matches}
 function mobBar(){var b=document.getElementById('mobbar');if(!isMob()){if(b)b.remove();document.body.classList.remove('mob');return}
   document.body.classList.add('mob');if(!b){b=document.createElement('nav');b.id='mobbar';document.body.appendChild(b)}
   var n=(typeof repUnread==='function'&&REP)?repUnread().length:0;
