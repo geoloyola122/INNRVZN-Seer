@@ -1022,13 +1022,13 @@ function reportBox(full){
     (function(){var ds=doneSug();return ds.length?'<div class="gchips dsugs" style="margin:0 0 8px"><span class="m">Finished this week:</span>'+ds.map(function(h,i){return'<button class="chip" data-dsug="'+i+'">✓ '+esc(h.task)+(h.forName?' · '+esc(h.forName):'')+'</button>'}).join('')+'</div>':''})()+'<div style="position:relative"><textarea id="rptT" rows="3" placeholder="What happened? One line per item.&#10;#Sony&#10;approved the deck&#10;#Task&#10;send rate card @Ashley fri&#10;#Meeting&#10;call with brand team thu 3pm @Geo&#10;CC: @Ashley (email a copy)&#10;(blank line, then the next #project)   Ctrl+Enter to post">'+esc(RPT.text)+'</textarea><div id="rptS" class="rsug"></div></div><div id="rptH" class="ghint"></div><div id="rptC" class="gchips"></div>'+
     '<div class="bar" style="margin:8px 0 0;align-items:center"><div id="rptP" style="flex:1;display:flex;gap:6px;flex-wrap:wrap;min-width:200px">'+repPrev()+'</div><input type="date" id="rptD" value="'+esc(RPT.date)+'" style="min-width:0;width:auto"><button class="b" data-rattach title="Attach a file (or drop / paste it into the text)">📎</button><button class="b" id="rptB" style="background:var(--acc);color:#fff;border-color:transparent">Save report</button></div>'+
     (full?'</div>':'<div class="panehd" style="margin-top:14px"><b style="font-size:13px">Recent reports</b>'+seg+'<button class="b mi" data-ws="reports">All reports →</button></div><div id="rptF">'+feed+'</div></div>')}
-function repSugShow(ta){var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.exec(ta.value.slice(0,pos)),box=document.getElementById('rptS');
+function repSugShow(ta){RPT.ta=ta;var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.exec(ta.value.slice(0,pos)),box=document.getElementById(ta.id==='rptE'?'rptES':'rptS');if(!box)return;
   if(!m){RPT.sug=[];box.style.display='none';return}
   var ch=m[0][0],q=repNorm(m[0].slice(1)),src=ch==='#'?repCands():((D&&D.people)||[]).map(function(n){return{n:n,k:'Person',x:''}});
   RPT.sug=src.filter(function(c){return!q||c.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,8);RPT.si=0;RPT.at=pos-m[0].length;RPT.ch=ch;
   box.innerHTML=RPT.sug.map(function(c,i){return'<div class="ri'+(i===0?' on':'')+'" data-ri="'+i+'"><span>'+esc(c.n)+'</span><span class="m">'+c.k+(c.x?' · '+esc(c.x):'')+'</span></div>'}).join('');box.style.display=RPT.sug.length?'block':'none'}
-function repPick(i){var c=RPT.sug[i],ta=document.getElementById('rptT');if(!c||!ta)return;var pos=ta.selectionStart,ins=RPT.ch+repTok(c.n)+' ';
-  ta.value=ta.value.slice(0,RPT.at)+ins+ta.value.slice(pos);ta.focus();ta.selectionStart=ta.selectionEnd=RPT.at+ins.length;RPT.text=ta.value;RPT.sug=[];document.getElementById('rptS').style.display='none';document.getElementById('rptP').innerHTML=repPrev()}
+function repPick(i){var c=RPT.sug[i],ta=RPT.ta&&document.body.contains(RPT.ta)?RPT.ta:document.getElementById('rptT');if(!c||!ta)return;var pos=ta.selectionStart,ins=RPT.ch+repTok(c.n)+' ';
+  ta.value=ta.value.slice(0,RPT.at)+ins+ta.value.slice(pos);ta.focus();ta.selectionStart=ta.selectionEnd=RPT.at+ins.length;RPT.sug=[];if(ta.id==='rptT')RPT.text=ta.value;var bx=document.getElementById(ta.id==='rptE'?'rptES':'rptS');if(bx)bx.style.display='none';var pp=document.getElementById('rptP');if(pp&&ta.id==='rptT')pp.innerHTML=repPrev()}
 function repSave(){if(RPT.up)return toast('Wait for the file upload to finish, then post');if(gIsGrouped(RPT.text))return gSave();if(RPT.text.trim()&&!repParse(RPT.text).tags.length)return toast('Add a #project or #client so this update is filed (type # to pick one)');var r=repParse(RPT.text||'');if(!RPT.text.trim())return toast('Write the report first');
   if(r.bad.length||r.badp.length)return toast('Fix the tags marked ? (pick one from the list, or remove the # or @)');
   var b=document.getElementById('rptB');b.disabled=true;var text=RPT.text.trim();
@@ -1037,10 +1037,11 @@ function repSave(){if(RPT.up)return toast('Wait for the file upload to finish, t
     cl.forEach(function(c){p=p.then(function(){return run('addLog',{client:c.name,type:'Report',summary:text,followUp:''})})});return p}).then(function(){
     RPT.text='';toast('Report saved');return Promise.all([repLoad(),load()]).then(function(){var w=RPT.wm;RPT.wm=false;if(w&&RPT.newRow)repMeet(repFind(RPT.newRow));else render()})}).catch(function(e){b.disabled=false;toast(e.message||'Could not save')})}
 var _rpf=0;document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;var ta=e.target;RPT.text=ta.value;repSugShow(ta);if(_rpf)return;_rpf=requestAnimationFrame(function(){_rpf=0;var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev();gGuide(ta);gPostLabel()})});
-document.addEventListener('keydown',function(e){if(e.target.id!=='rptT')return;var box=document.getElementById('rptS');
+document.addEventListener('keydown',function(e){if(e.target.id!=='rptT'&&e.target.id!=='rptE')return;var box=document.getElementById(e.target.id==='rptE'?'rptES':'rptS');if(!box)return;
   if(RPT.sug.length&&box.style.display==='block'){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();RPT.si=(RPT.si+(e.key==='ArrowDown'?1:RPT.sug.length-1))%RPT.sug.length;[].forEach.call(box.children,function(c,i){c.classList.toggle('on',i===RPT.si)});return}
     if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();return repPick(RPT.si)}if(e.key==='Escape'){RPT.sug=[];box.style.display='none';return}}
-  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();repSave()}});
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(e.target.id==='rptE'){var sb=document.querySelector('[data-redsave]');if(sb)sb.click()}else repSave()}});
+document.addEventListener('input',function(e){if(e.target.id==='rptE')repSugShow(e.target)});
 document.addEventListener('mousedown',function(e){var r=e.target.closest&&e.target.closest('[data-ri]');if(r){e.preventDefault();repPick(+r.dataset.ri)}});
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('[data-rpf]');if(f){RPT.filt=f.dataset.rpf;return render()}if(e.target.id==='rptB')repSave();if(e.target.id==='rptBM'){RPT.wm=true;repSave()}});
 document.addEventListener('change',function(e){if(e.target.id==='rptD')RPT.date=e.target.value});
@@ -1068,7 +1069,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 var RKC={t:0,m:{}};function repKindOf(n){if(Date.now()-RKC.t>3000){RKC.m={};repCands().forEach(function(c){var k=repNorm(c.n);if(!RKC.m[k])RKC.m[k]=c.k});RKC.t=Date.now()}return RKC.m[repNorm(n)]||''}
 function repTx(t){return repFiles(esc(t)).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){var k=b[0]==='#'?repKindOf(b.slice(1).replace(/_/g,' ')):'';if(k==='Label')k='';return a+(k?'<span class="rck"><small>'+esc(k==='Account Manager'?'AM':k)+'</small>':'')+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-otag="'+esc(b.slice(1).replace(/_/g,' '))+'" title="Open #'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'+(k?'</span>':'')})}
 function repRow(r){var me=meName(),mn=r.people.some(function(p){return eqN(p,me)}),inv=repInvolves(r,me),sn=repSeen(r,me),dn=repDone(r,me);
-  if(RPT.edit===r.row)return'<div class="rrow ed" data-rrow="'+r.row+'"><textarea id="rptE" rows="3">'+esc(r.text)+'</textarea><div class="ract"><button class="b" data-redsave="'+r.row+'">Save</button><button class="b" data-redcancel>Cancel</button></div></div>';
+  if(RPT.edit===r.row)return'<div class="rrow ed" data-rrow="'+r.row+'"><div style="position:relative"><textarea id="rptE" rows="8" style="width:100%;box-sizing:border-box;min-height:180px">'+esc(r.text)+'</textarea><div id="rptES" class="rsug"></div></div><div class="ract"><button class="b" data-redsave="'+r.row+'">Save</button><button class="b" data-redcancel>Cancel</button></div></div>';
   var hint=!r.meeting&&MEETRX.test(r.text);
   return'<div class="rrow'+(inv&&!sn&&!dn?' mn':'')+'" data-rrow="'+r.row+'"><div class="rhd"><span class="m"><b class="rby">'+esc(r.by||'')+'</b> '+esc(r.date)+(mn?' · <b style="color:var(--acc)">mentions you</b>':inv?' · <b style="color:var(--acc)">your project</b>':'')+(inv&&!sn&&!dn?' <span class="rnew">New</span>':'')+'</span><span class="ract">'+
     '<button class="b mi" data-redit="'+r.row+'" title="Edit">Edit</button>'+(r.mine?'<button class="b mi delb" data-rdel="'+r.row+'" title="Delete">Delete</button>':'')+'</span></div>'+
@@ -1089,8 +1090,8 @@ document.addEventListener('click',function(e){var x=e.target.closest&&e.target.c
   if(x.dataset.redit){RPT.edit=r.row;render();var ta=document.getElementById('rptE');if(ta)ta.focus();return}
   if(x.dataset.rmeet)return repMeet(r);
   if(x.dataset.redsave){var tx=document.getElementById('rptE').value.trim(),p=repParse(tx);if(!tx)return toast('The report cannot be empty');
-    if(p.bad.length||p.badp.length)return toast('Fix the tags marked ? first');x.disabled=true;
-    return run('reportEdit',r.row,r.text,{text:tx,tags:p.tags,people:p.people}).then(function(){RPT.edit=null;toast('Report updated');var q=Promise.resolve();((D&&D.clients)||[]).filter(function(c){return p.tags.indexOf(c.name)>-1}).forEach(function(c){q=q.then(function(){return run('addLog',{client:c.name,type:'Report (edited)',summary:tx,followUp:''}).catch(function(){})})});return q.then(repLoad)}).then(render,function(err){x.disabled=false;toast(err.message||'Could not save')})}
+    var tg=p.tags.slice();p.bad.forEach(function(b){var n=b.replace(/_/g,' ');if(!GHDR[b.toLowerCase()]&&!/^(status|cc)$/i.test(b)&&tg.indexOf(n)<0)tg.push(n)});x.disabled=true;
+    return run('reportEdit',r.row,r.text,{text:tx,tags:tg,people:p.people}).then(function(){RPT.edit=null;toast('Report updated');var q=Promise.resolve();((D&&D.clients)||[]).filter(function(c){return p.tags.indexOf(c.name)>-1}).forEach(function(c){q=q.then(function(){return run('addLog',{client:c.name,type:'Report (edited)',summary:tx,followUp:''}).catch(function(){})})});return q.then(repLoad)}).then(render,function(err){x.disabled=false;toast(err.message||'Could not save')})}
   if(x.dataset.rdel)return repDeleteFlow(r)});
 function repDeleteFlow(r){var mk=r.rid?'[R:'+r.rid+']':null,lt=mk?((D&&D.tasks)||[]).filter(function(t){return String(t.notes||'').indexOf(mk)>-1}):[],lm=mk?((D&&D.meetings)||[]).filter(function(m){return String(m.agenda||'').indexOf(mk)>-1}):[];
   var n=lt.length+lm.length,ask=n?askDlg({title:'Delete report',msg:'This report created '+(lt.length?lt.length+' task'+(lt.length>1?'s':''):'')+(lt.length&&lm.length?' and ':'')+(lm.length?lm.length+' meeting'+(lm.length>1?'s':''):'')+'. Delete them too?',choices:['Delete report, tasks and meetings','Delete report only']})
@@ -1290,12 +1291,12 @@ document.addEventListener('mousedown',function(e){var x=e.target.closest&&e.targ
   else if(ch.rep){var bl=/^#(task|meeting)/i.test(ch.ins)?'':'• ';ta.value=v.slice(0,ls)+ch.ins+'\n'+bl+v.slice(le);var np=ls+ch.ins.length+1+bl.length;ta.selectionStart=ta.selectionEnd=np}
   else{ta.value=v.slice(0,le).replace(/\s+$/,'')+ch.ins+v.slice(le);var np2=le+ch.ins.length;ta.selectionStart=ta.selectionEnd=np2}
   ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}))});
-document.addEventListener('keydown',function(e){if(e.target.id!=='rptT'||e.key!=='Enter'||e.ctrlKey||e.metaKey||e.shiftKey||e.defaultPrevented)return;
+document.addEventListener('keydown',function(e){if((e.target.id!=='rptT'&&e.target.id!=='rptE')||e.key!=='Enter'||e.ctrlKey||e.metaKey||e.shiftKey||e.defaultPrevented)return;
   var ta=e.target,v=ta.value,pos=ta.selectionStart,ls=v.lastIndexOf('\n',pos-1)+1,line=v.slice(ls,pos),c=gCtx(ta),t=line.trim();
   if(/^•\s*$/.test(t)){e.preventDefault();ta.value=v.slice(0,ls)+v.slice(pos);ta.selectionStart=ta.selectionEnd=ls;ta.dispatchEvent(new Event('input',{bubbles:true}));return}
   var isHdr=/^#([^\s#@]+)\s*$/.exec(t),proj=isHdr&&!GHDR[isHdr[1].toLowerCase()],upd=/^•/.test(t)||(c.sec==='update'&&c.hasTag&&t&&!/^#/.test(t));
   if(proj||upd){e.preventDefault();var ins='\n• ';ta.value=v.slice(0,pos)+ins+v.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=pos+ins.length;ta.dispatchEvent(new Event('input',{bubbles:true}))}});
-document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;var ta=e.target,v=ta.value,pos=ta.selectionStart,ls=v.lastIndexOf('\n',pos-1)+1;
+document.addEventListener('input',function(e){if(e.target.id!=='rptT'&&e.target.id!=='rptE')return;var ta=e.target,v=ta.value,pos=ta.selectionStart,ls=v.lastIndexOf('\n',pos-1)+1;
   if(/^•\s#$/.test(v.slice(ls,pos))){ta.value=v.slice(0,ls)+'#'+v.slice(pos);ta.selectionStart=ta.selectionEnd=ls+1}},true);
 ['keyup','click','focusin'].forEach(function(ev){document.addEventListener(ev,function(e){if(e.target&&e.target.id==='rptT'){if(ev==='keyup'&&!/^(Arrow|Home|End|Page)/.test(e.key||''))return;gGuide(e.target);if(ev!=='keyup')gPostLabel()}})});
 /* ---------- Tag type pop-up: unknown or ambiguous #tags get a "what is this?" mini window ---------- */
