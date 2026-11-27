@@ -1162,6 +1162,17 @@ function rptHLsync(ta){var h=document.getElementById('rptHL');if(!h||!ta)return;
 document.addEventListener('input',function(e){if(e.target.id==='rptT')rptHLsync(e.target)});document.addEventListener('scroll',function(e){if(e.target.id==='rptT'){var h=document.getElementById('rptHL');if(h)h.scrollTop=e.target.scrollTop}},true);
 function rptGrow(ta){ta=ta||document.getElementById('rptT');if(!ta)return;ta.style.height='';ta.style.height=Math.max(ta.offsetHeight,ta.scrollHeight+2)+'px'}
 function rptWithCC(){var cc=String(RPT.cc||'').trim();if(cc&&!/(^|\n)\s*cc\s*:/i.test(RPT.text||''))RPT.text=String(RPT.text||'').replace(/\s+$/,'')+'\nCC: '+cc;RPT.cc=''}
+/* Tag lines hold only tags: typing plain text after "#Project " or "#Task " moves it to a new line below (updates get a bullet). */
+document.addEventListener('beforeinput',function(e){var ta=e.target;if((ta.id!=='rptT'&&ta.id!=='rptE')||e.inputType!=='insertText'||!e.data||e.data===' '||e.data[0]==='#')return;
+  var ps=ta.selectionStart;if(ta.selectionEnd!==ps)return;var v=ta.value,ls=v.lastIndexOf('\n',ps-1)+1,le=v.indexOf('\n',ps);if(le<0)le=v.length;if(v.slice(ps,le).trim())return;
+  var line=v.slice(ls,ps);if(!/^\s*(#[^\s#@]+\s+)+$/.test(line))return;
+  var first=/^\s*#([^\s#@]+)/.exec(line)[1].toLowerCase(),sec=GHDR[first],bul=sec?'':'• ',ins=line.replace(/\s+$/,'')+'\n'+bul+e.data;
+  e.preventDefault();taSet(ta,v.slice(0,ls)+ins+v.slice(ps),ls+ins.length);ta.dispatchEvent(new Event('input',{bubbles:true}))});
+/* #Task / #Deliverable / #Meeting / #Update always sit on their own line: finishing one mid-line moves it below. */
+document.addEventListener('beforeinput',function(e){var ta=e.target;if((ta.id!=='rptT'&&ta.id!=='rptE')||e.inputType!=='insertText'||(e.data!==' '&&e.data!=='\n'))return;
+  var ps=ta.selectionStart;if(ta.selectionEnd!==ps)return;var v=ta.value,ls=v.lastIndexOf('\n',ps-1)+1,m=/(^|\s)#([^\s#@]+)$/.exec(v.slice(ls,ps));if(!m||!GHDR[m[2].toLowerCase()])return;
+  var tokAt=ps-m[2].length-1,before=v.slice(ls,tokAt).replace(/\s+$/,'');if(!before.replace(/^[•\-*]\s*/,'').trim())return;
+  e.preventDefault();var ins=before+'\n#'+m[2]+(e.data==='\n'?'\n':' ');taSet(ta,v.slice(0,ls)+ins+v.slice(ps),ls+ins.length);ta.dispatchEvent(new Event('input',{bubbles:true}))});
 /* Space inside a #tag becomes _ while it still matches a known name (two spaces = real space). beforeinput works with phone keyboards too. */
 document.addEventListener('beforeinput',function(e){var ta=e.target;if((ta.id!=='rptT'&&ta.id!=='rptE')||e.inputType!=='insertText'||e.data!==' ')return;
   var ps=ta.selectionStart;if(ta.selectionEnd!==ps)return;var bm=/#([^\s#@]+)$/.exec(ta.value.slice(0,ps));if(!bm)return;
