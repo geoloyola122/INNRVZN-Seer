@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.28.0659';   // stamped by release.py
+  var WEB_VERSION = '2026.11.28.0721';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
