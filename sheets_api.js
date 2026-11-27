@@ -249,7 +249,7 @@
   }
 
   async function getData() {
-    var ranges = ['TASKS!A2:M', 'CAMPAIGNS!A2:U', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
+    var ranges = ['TASKS!A2:M', 'CAMPAIGNS!A2:AS', 'LISTS!A2:E', "'CLIENTS & PARTNERSHIPS'!A2:R", "'BRAND OUTREACH CLIENTS'!A2:P",
       'MEETINGS!A2:O', "'ACCOUNT MANAGERS'!A2:K", "'PME CLIENTS'!A2:P", 'AGENCIES!A2:Y'];
     var q = { ranges: ranges, valueRenderOption: 'UNFORMATTED_VALUE', dateTimeRenderOption: 'SERIAL_NUMBER' };
     var all = await Promise.all([api('GET', '/values:batchGet', q), links_(), readLog_()]);
@@ -306,9 +306,10 @@
     });
     var camps = [];
     c.forEach(function (r, i) {
-      r = pad_(r, 21);
+      r = pad_(r, 45);
       if (!r[4]) return;
       camps.push({ row: i + 2, line: pstr_(r[1]), priority: pstr_(r[2]), code: pstr_(r[3]), name: pstr_(r[4]), lead: pstr_(r[5]),
+        type: pstr_(r[42]).trim(), parent: pstr_(r[43]).trim(), payment: pstr_(r[44]).trim(),
         status: pstr_(r[6]) || 'No status', client: pstr_(r[8]), clipping: pstr_(r[9]), am: pstr_(r[20]), start: serialToIso_(r[17]),
         end: serialToIso_(r[18]), flag: r[0] === true, links: lk['CAMPAIGNS|' + (i + 2)] || {}, notes: pstr_(r[13]), next: pstr_(r[14]) });
     });
@@ -964,7 +965,27 @@
   }
   async function labelDel(tab, row, expected) { await lCheck_(tab, row, expected); await sDelRow_(LABEL_ID, LABEL_TABS[tab][0], row); return { ok: true }; }
 
+  async function subprojectAdd(parent, name) {
+    parent = String(parent || '').trim(); name = String(name || '').trim().replace(/_/g, ' ');
+    if (!parent || !name) throw new Error('Project and sub-project name are required.');
+    var camps = (await getData()).campaigns || [], lc = function (x) { return String(x || '').toLowerCase(); };
+    var par = camps.filter(function (c) { return lc(c.name) === lc(parent) && !c.parent; })[0];
+    if (!par) throw new Error('Unknown project: ' + parent);
+    var old = camps.filter(function (c) { return lc(c.name) === lc(name) && lc(c.parent) === lc(parent); })[0];
+    if (old) return { ok: true, exists: true, name: old.name, row: old.row };
+    var r = await addRecord('CAMPAIGNS', { E: name, G: 'Doing', I: par.client || '', F: par.lead || '', U: par.am || '' });
+    await sUpdate_(SHEET_ID, 'CAMPAIGNS!AQ' + r.row + ':AR' + r.row, [['Sub-project', par.name]]);
+    return { ok: true, name: name, row: r.row, code: r.code || '' };
+  }
+  async function projectSet(name, field, value) {
+    var col = { status: 'G', payment: 'AS', type: 'AQ' }[field]; if (!col) throw new Error('Unknown field.');
+    var c = ((await getData()).campaigns || []).filter(function (x) { return String(x.name).toLowerCase() === String(name || '').trim().toLowerCase(); })[0];
+    if (!c) throw new Error('Unknown project: ' + name);
+    await sUpdate_(SHEET_ID, 'CAMPAIGNS!' + col + c.row, [[String(value)]]);
+    return { ok: true };
+  }
   var A = {
+    subprojectAdd: subprojectAdd, projectSet: projectSet,
     getData: getData, addTask: addTask, completeTask: completeTask, snoozeTask: snoozeTask, setCampaignStatus: setCampaignStatus,
     driveStatus: driveStatus, driveConnect: driveStatus, driveDisconnect: driveStatus, driveFind: driveFind, driveSetRoot: driveSetRoot,
     driveCreateRoot: driveCreateRoot, createFolder: ensureFolder_, submitDeliverable: submitDeliverable, uploadDeliverableData: uploadDeliverableData,

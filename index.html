@@ -996,7 +996,7 @@ var REP=null,RPT={text:'',date:'',filt:'all',sug:[],si:0};
 var RSIG='';function repLoad(){return run('reportsData').then(function(d){var sig=JSON.stringify(d.reports||[]);if(REP&&sig===RSIG)return;RSIG=sig;REP=d.reports||[];repBadge();if(RTH)histLoad(true);repThreadRefresh();if((view==='dash'&&WS==='dash')||WS==='reports'){var ae=document.activeElement;if(!(ae&&/^(rptT|rptE|rtT)$/.test(ae.id)))render()}}).catch(function(){if(!REP)REP=[]})}
 var RCC=null,RCT=0;function repCands(){if(RCC&&Date.now()-RCT<5000)return RCC;RCT=Date.now();return RCC=repCands0()}
 function repCands0(){var c=[],seen={};function add(n,k,x){n=String(n||'').trim();if(!n)return;var key=k+'|'+n.toLowerCase();if(seen[key])return;seen[key]=1;c.push({n:n,k:k,x:x||''})}
-  ((D&&D.clients)||[]).forEach(function(x){add(x.name,'Client')});((D&&D.campaigns)||[]).forEach(function(x){add(x.name,'Campaign',x.code);add(x.code,'Campaign',x.name)});
+  ((D&&D.clients)||[]).forEach(function(x){add(x.name,'Client')});((D&&D.campaigns)||[]).forEach(function(x){if(x.parent){add(x.name,'Sub-project',x.parent);return}add(x.name,'Campaign',x.code);add(x.code,'Campaign',x.name)});
   ((LBL&&LBL.artists)||[]).forEach(function(a){add(a.name,'Artist',a.code);add(a.code,'Artist',a.name)});((LBL&&LBL.songs)||[]).forEach(function(x){add(x.song,'Song',x.artist)});
   ((D&&D.ams)||[]).forEach(function(a){add(a.name,'Account Manager',a.known||a.team)});
   TLABELS.forEach(function(x){add(x,'Label')});
@@ -1005,7 +1005,7 @@ function repCands0(){var c=[],seen={};function add(n,k,x){n=String(n||'').trim()
 function repNorm(t){return String(t||'').replace(/_/g,' ').trim().toLowerCase()}
 function repTok(n){return String(n).replace(/\s+/g,'_')}
 function repParse(text){var cs=repCands(),tags=[],bad=[],ppl=[],badp=[],m,re=/#([^\s#@]+)/g;
-  while((m=re.exec(text))){var q=repNorm(m[1]),hit=cs.filter(function(c){return c.n.toLowerCase()===q})[0]||(function(){var h=cs.filter(function(c){return c.n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})();
+  while((m=re.exec(text))){if(gMod(m[1]))continue;var q=repNorm(m[1]),hit=cs.filter(function(c){return c.n.toLowerCase()===q})[0]||(function(){var h=cs.filter(function(c){return c.n.toLowerCase().indexOf(q)===0});return h.length===1?h[0]:null})();
     if(hit){if(tags.indexOf(hit.n)<0)tags.push(hit.n)}else if(bad.indexOf(m[1])<0)bad.push(m[1])}
   var pe=((D&&D.people)||[]),re2=/@([^\s#@]+)/g;
   while((m=re2.exec(text))){var q2=repNorm(m[1]),h2=pe.filter(function(n){return n.toLowerCase()===q2})[0]||(function(){var h=pe.filter(function(n){return n.toLowerCase().indexOf(q2)===0});return h.length===1?h[0]:null})();
@@ -1027,10 +1027,17 @@ function reportBox(full){
     (full?'</div>':'<div class="panehd" style="margin-top:14px"><b style="font-size:13px">Recent reports</b>'+seg+'<button class="b mi" data-ws="reports">All reports →</button></div><div id="rptF">'+feed+'</div></div>')}
 function repSugShow(ta){RPT.ta=ta;var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.exec(ta.value.slice(0,pos)),box=document.getElementById(ta.id==='rptE'?'rptES':'rptS');if(!box)return;
   if(!m){RPT.sug=[];box.style.display='none';return}
-  var ch=m[0][0],q=repNorm(m[0].slice(1)),src=ch==='#'?repCands():((D&&D.people)||[]).map(function(n){return{n:n,k:'Person',x:''}});
-  RPT.sug=src.filter(function(c){return!q||c.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,8);RPT.si=0;RPT.at=pos-m[0].length;RPT.ch=ch;
-  box.innerHTML=RPT.sug.map(function(c,i){return'<div class="ri'+(i===0?' on':'')+'" data-ri="'+i+'"><span>'+esc(c.n)+'</span><span class="m">'+c.k+(c.x?' · '+esc(c.x):'')+'</span></div>'}).join('');box.style.display=RPT.sug.length?'block':'none'}
-function repPick(i){var c=RPT.sug[i],ta=RPT.ta&&document.body.contains(RPT.ta)?RPT.ta:document.getElementById('rptT');if(!c||!ta)return;var pos=ta.selectionStart,ins=RPT.ch+repTok(c.n)+' ';
+  var ch=m[0][0],q=repNorm(m[0].slice(1)),src=ch==='#'?repCands():((D&&D.people)||[]).map(function(n){return{n:n,k:'Person',x:''}}),
+    pm=ch==='#'&&/#([^\s#@]+)\s+(?:#[^\s#@]+\s+)*$/.exec(ta.value.slice(0,pos-m[0].length)),par=pm&&projOf(pm[1]);RPT.par=par||null;
+  if(par){var subs=subsOf(par.name),low=pm[0].toLowerCase(),sc=subs.filter(function(c){return low.indexOf('#'+repTok(c.name).toLowerCase())>-1})[0];
+    src=(sc?[]:subs.map(function(c){return{n:c.name,k:'Sub-project',x:c.status||''}})).concat(nextStat(sc||par,!!sc).map(function(t){return{n:gMod(t).v,k:'Status',x:sc?sc.name:par.name}}),
+      [{n:'Paid',k:'Payment',x:''},{n:'Unpaid',k:'Payment',x:''}]);
+    if(q&&!sc&&!subs.some(function(c){return repNorm(c.name)===q})&&!gMod(q))src.push({n:m[0].slice(1).replace(/_/g,' '),k:'+ New sub-project',x:'under '+par.name,nw:1})}
+  RPT.sug=src.filter(function(c){return c.nw||!q||c.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,9);RPT.si=0;RPT.at=pos-m[0].length;RPT.ch=ch;
+  box.innerHTML=RPT.sug.map(function(c,i){return'<div class="ri'+(i===0?' on':'')+'" data-ri="'+i+'"><span>'+esc(c.n)+'</span><span class="m">'+esc(kDisp(c.k))+(c.x?' · '+esc(c.x):'')+'</span></div>'}).join('');box.style.display=RPT.sug.length?'block':'none'}
+function repPick(i){var c=RPT.sug[i],ta=RPT.ta&&document.body.contains(RPT.ta)?RPT.ta:document.getElementById('rptT');if(!c||!ta)return;
+  if(c.nw&&RPT.par){var par=RPT.par,nm=c.n;RPT.sug=[];return askOk('Add "'+nm+'" as a sub-project of '+par.name+'?',{yes:'Add sub-project',title:'New sub-project'}).then(function(ok){if(!ok)return;
+    return run('subprojectAdd',par.name,nm).then(function(){toast('Sub-project added: '+nm);return load()}).then(function(){RCC=null;RPT.sug=[{n:nm,k:'Sub-project'}];repPick(0)})}).catch(function(e){toast(e.message||'Could not add')})}var pos=ta.selectionStart,ins=RPT.ch+repTok(c.n)+' ';
   ta.value=ta.value.slice(0,RPT.at)+ins+ta.value.slice(pos);ta.focus();ta.selectionStart=ta.selectionEnd=RPT.at+ins.length;RPT.sug=[];if(ta.id==='rptT')RPT.text=ta.value;var bx=document.getElementById(ta.id==='rptE'?'rptES':'rptS');if(bx)bx.style.display='none';var pp=document.getElementById('rptP');if(pp&&ta.id==='rptT')pp.innerHTML=repPrev()}
 function repSave(){if(RPT.up)return toast('Wait for the file upload to finish, then post');if(gIsGrouped(RPT.text))return gSave();if(RPT.text.trim()&&!repParse(RPT.text).tags.length)return toast('Add a #project or #client so this update is filed (type # to pick one)');var r=repParse(RPT.text||'');if(!RPT.text.trim())return toast('Write the report first');
   if(r.bad.length||r.badp.length)return toast('Fix the tags marked ? (pick one from the list, or remove the # or @)');
@@ -1198,6 +1205,12 @@ document.addEventListener('keydown',function(e){if(e.target.id==='rtT'&&e.key===
   wrap('lSongDr',function(row){var x=LBL&&LBL.songs.filter(function(z){return z.row===+row})[0];return[x&&x.song]})})();
 var _closeDr=closeDr;closeDr=function(){RTH=null;return _closeDr.apply(this,arguments)};
 /* ---------- Grouped reports: #Project starts a group, #Task / #Meeting / #Update start sub-sections, one line = one item ---------- */
+var PSTAT={active:'Active',paused:'Paused',done:'Done',lost:'Lost',pitching:'Pitching'},SSTAT={doing:'Doing',review:'Review',approved:'Approved'},PPAY={paid:'Paid',unpaid:'Unpaid'};
+function gMod(t){t=String(t||'').toLowerCase();return PSTAT[t]?{f:'status',v:PSTAT[t]}:SSTAT[t]?{f:'status',v:SSTAT[t],sub:1}:PPAY[t]?{f:'payment',v:PPAY[t]}:null}
+function kDisp(k){return k==='Campaign'?'PROJECT':k==='Sub-project'?'SUB-PROJECT':k==='Label'?'':k}
+function subsOf(n){n=repNorm(n);return((D&&D.campaigns)||[]).filter(function(c){return c.parent&&repNorm(c.parent)===n})}
+function projOf(tok){var q=repNorm(tok);return((D&&D.campaigns)||[]).filter(function(c){return!c.parent&&(repNorm(c.name)===q||repNorm(c.code)===q)})[0]}
+function nextStat(c,sub){var cur=String(c&&c.status||'').toLowerCase(),o=['doing','review','approved'],i=o.indexOf(cur);return sub?(i<0?['review']:[o[Math.min(i+1,2)]]):(cur==='active'?['done','paused','lost']:['active'])}
 var GHDR={task:'task',tasks:'task',meeting:'meeting',meetings:'meeting',update:'update',updates:'update'};
 function gIso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
 function gWhen(s){var re=/\b(today|tomorrow|mon(?:day)?|tue(?:s|sday)?|wed(?:nesday)?|thu(?:rs|rsday)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? ?\d{1,2}|\d{1,2}\/\d{1,2})\b/i,m=re.exec(s);if(!m)return null;
@@ -1213,7 +1226,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
     var p=tagCreate(k,n);tagPref(n,k);
     return p.then(function(){toast(k+' added: #'+n);return Promise.all([load(),typeof lblLoad==='function'?lblLoad():null])}).then(function(){var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev()})}).catch(function(err){b.disabled=false;toast(err.message||'Could not add')})});
 function gLight(k,tip){return'<span class="gl '+k+'" title="'+esc(tip)+'">'+(k==='g'?'✓':k==='a'?'●':'✕')+'</span>'}
-function gIsGrouped(t){return /(^|\n)\s*#(tasks?|meetings?|updates?)\b/i.test(t||'')||/\n\s*\n\s*#\S/.test(t||'')}
+function gIsGrouped(t){return /(^|\n)\s*#(tasks?|meetings?|updates?)\b/i.test(t||'')||/(^|\n)\s*#[^\s#@]+\s+#[^\s#@]+/.test(t||'')||/\n\s*\n\s*#\S/.test(t||'')}
 function gParse(text){var groups=[],g=null,sec='update',errs=[];
   function open(tag){g={tag:tag,updates:[],tasks:[],meetings:[],labels:[]};groups.push(g);sec='update'}
   function item(line){line=line.trim();if(!line)return;if(!g)open(null);
@@ -1228,13 +1241,16 @@ function gParse(text){var groups=[],g=null,sec='update',errs=[];
     if(!line){if(g&&(g.updates.length||g.tasks.length||g.meetings.length))g=null;sec='update';return}
     var h=/^#([^\s#@]+)\s*(.*)$/.exec(line);
     if(h){var k=GHDR[h[1].toLowerCase()];if(k){if(!g)open(null);sec=k;if(h[2])item(h[2]);return}
-      var tg=gTag(h[1]);if(tg&&tg.k==='Label'){if(!g)open(null);if(g.labels.indexOf(tg.n)<0)g.labels.push(tg.n);if(h[2])item(h[2]);return}if(!tg){var nm=h[1].replace(/_/g,' ');tg={n:nm,k:'?',missing:true};errs.push('#'+nm+' does not exist yet')}open(tg);if(h[2])item(h[2]);return}
+      var tg=gTag(h[1]);if(tg&&tg.k==='Label'){if(!g)open(null);if(g.labels.indexOf(tg.n)<0)g.labels.push(tg.n);if(h[2])item(h[2]);return}if(!tg){var nm=h[1].replace(/_/g,' ');tg={n:nm,k:'?',missing:true};errs.push('#'+nm+' does not exist yet')}open(tg);var rest=h[2],mm;while((mm=/^#([^\s#@]+)\s*/.exec(rest))){var md=gMod(mm[1]),sb=tg.k==='Campaign'&&subsOf(tg.n).filter(function(c){return repNorm(c.name)===repNorm(mm[1])})[0];
+        if(md){if(md.f==='payment')g.pay=md.v;else g.status=md.v}else if(sb)g.sub=sb;else break;rest=rest.slice(mm[0].length)}
+      if(g.status&&SSTAT[g.status.toLowerCase()]&&!g.sub)errs.push('#'+g.status+' is for sub-projects: add one after #'+tg.n);
+      if(rest)item(rest);return}
     item(line)});
-  groups=groups.filter(function(x){return x.updates.length||x.tasks.length||x.meetings.length});
+  groups=groups.filter(function(x){return x.updates.length||x.tasks.length||x.meetings.length||x.status||x.pay});
   groups.forEach(function(x){if(!x.tag)errs.push('A group has no #project: start it with a project tag')});
   return{groups:groups,errs:errs}}
 function gPreview(){var p=gParse(RPT.text||'');
-  return'<div class="gprev">'+p.groups.map(function(x){return'<div class="gg"><b>'+(x.labels&&x.labels.length?x.labels.map(function(l){return'<span class="wtag mus">'+esc(l)+'</span>'}).join(''):'')+(x.tag?(x.tag.missing?'#'+esc(x.tag.n):'<span class="rc ok" data-otag="'+esc(x.tag.n)+'">#'+esc(x.tag.n)+'</span>'):'<span style="color:var(--amber)">No project</span>')+'</b>'+(x.tag&&x.tag.missing?gAddHtml(x.tag.n):'')+
+  return'<div class="gprev">'+p.groups.map(function(x){return'<div class="gg"><b>'+(x.labels&&x.labels.length?x.labels.map(function(l){return'<span class="wtag mus">'+esc(l)+'</span>'}).join(''):'')+(x.tag?(x.tag.missing?'#'+esc(x.tag.n):'<span class="rc ok" data-otag="'+esc(x.tag.n)+'">#'+esc(x.tag.n)+'</span><span class="m"> '+esc(kDisp(x.tag.k))+'</span>'+(x.sub?' › <span class="rc ok">#'+esc(x.sub.name)+'</span><span class="m"> SUB-PROJECT</span>':'')):'<span style="color:var(--amber)">No project</span>')+(x.status?' <span class="wtag">→ '+esc(x.status)+'</span>':'')+(x.pay?' <span class="wtag">'+esc(x.pay)+'</span>':'')+'</b>'+(x.tag&&x.tag.missing?gAddHtml(x.tag.n):'')+
     x.updates.map(function(u){return'<div class="gi">'+gLight(x.tag&&!x.tag.missing?'g':'r',x.tag&&!x.tag.missing?'filed under #'+(x.tag?x.tag.n:''):'needs a project')+'<span class="gt u">Update</span>'+esc(u)+'</div>'}).join('')+
     x.tasks.map(function(t){return'<div class="gi">'+gLight(t.badp?'r':(!t.ownerSet||!t.dueSet)?'a':'g',t.badp?'unknown person':!t.ownerSet?'no owner: goes to you':!t.dueSet?'no date: due today':'ready')+'<span class="gt t">Task</span>'+esc(t.name)+' <span class="m">· '+esc(t.owner||'you')+' · '+fmt(parseDue(t.due))+(t.dueSet?'':' (today)')+'</span></div>'}).join('')+
     x.meetings.map(function(mt){return'<div class="gi">'+gLight(mt.badp||!mt.date?'r':!mt.time?'a':'g',mt.badp?'unknown person':!mt.date?'needs a day':!mt.time?'no time yet':'ready')+'<span class="gt mt">Meeting</span>'+esc(mt.title)+' <span class="m">· '+(mt.date?fmt(parseDue(mt.date)):'no date')+(mt.time?' '+esc(mt.time):'')+(mt.attendees?' · '+esc(mt.attendees):'')+'</span></div>'}).join('')+'</div>'}).join('')+
@@ -1243,15 +1259,16 @@ function gSave(){var p=gParse(RPT.text||'');if(!p.groups.length)return toast('No
   var b=document.getElementById('rptB');if(b)b.disabled=true;var chain=Promise.resolve(),made={r:0,t:0,m:0},rid='R'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
     at=function(v){return String(v||'').split(/\s*,\s*/).filter(Boolean).map(function(p){return'@'+repTok(p)}).join(' ')},parts=[],tags=[],logs=[];
   p.groups.forEach(function(x){var tag=x.tag.n,tok='#'+repTok(tag),camp=x.tag.k==='Campaign'?((D&&D.campaigns)||[]).filter(function(c){return c.name===tag||c.code===tag})[0]:null;x._camp=camp;
-    var tx=tok+(x.labels.length?' '+x.labels.map(function(l){return'#'+repTok(l)}).join(' '):'')+(x.updates.length?'\n'+x.updates.map(function(u){return'• '+u}).join('\n'):'')+
+    var tx=tok+(x.sub?' #'+repTok(x.sub.name):'')+(x.status?' #'+x.status:'')+(x.pay?' #'+x.pay:'')+(x.labels.length?' '+x.labels.map(function(l){return'#'+repTok(l)}).join(' '):'')+(x.updates.length?'\n'+x.updates.map(function(u){return'• '+u}).join('\n'):'')+
       (x.tasks.length?'\nTasks:\n'+x.tasks.map(function(t){return'☐ '+t.name+' · '+at(t.owner)+' · due '+fmt(parseDue(t.due))}).join('\n'):'')+
       (x.meetings.length?'\nMeetings:\n'+x.meetings.map(function(m){return'📅 '+m.title+' · '+fmt(parseDue(m.date))+(m.time?' '+m.time:'')+(m.attendees?' · '+at(m.attendees):'')}).join('\n'):'');
-    parts.push(tx);[tag].concat(x.labels).forEach(function(t){if(tags.indexOf(t)<0)tags.push(t)});
+    parts.push(tx);[tag].concat(x.sub?[x.sub.name]:[],x.labels).forEach(function(t){if(tags.indexOf(t)<0)tags.push(t)});
     var cl=((D&&D.clients)||[]).filter(function(c){return c.name===tag||(camp&&c.name===camp.client)})[0];if(cl)logs.push({client:cl.name,type:'Report',summary:tx.replace(tok,'').trim(),followUp:''})});
   var full=parts.join('\n\n'),rp=repParse(full);rp.tags.forEach(function(t){if(tags.indexOf(t)<0)tags.push(t)});
   chain=chain.then(function(){return run('reportAdd',{rid:rid,date:RPT.date||isoToday(),text:full,tags:tags,people:rp.people}).then(function(){made.r++})});
   logs.forEach(function(l){chain=chain.then(function(){return run('addLog',l).catch(function(){})})});
-  p.groups.forEach(function(x){var tag=x.tag.n,camp=x._camp;
+  p.groups.forEach(function(x){var tag=x.tag.n,camp=x.sub||x._camp;
+    if(x.status||x.pay)chain=chain.then(function(){var tgt=(x.sub||x._camp||{}).name||tag,q=Promise.resolve();if(x.status)q=q.then(function(){return run('projectSet',tgt,'status',x.status)});if(x.pay)q=q.then(function(){return run('projectSet',tgt,'payment',x.pay)});return q});
     x.tasks.forEach(function(t){chain=chain.then(function(){return run('addTask',{task:t.name,forName:camp?camp.name:tag,owner:t.owner,due:t.due,notes:'From report · '+(RPT.date||isoToday())+' · '+(meName()||'')+' [R:'+rid+']'}).then(function(){made.t++})})});
     x.meetings.forEach(function(mt){chain=chain.then(function(){return run('meetingSave',{title:mt.title,date:mt.date,time:mt.time,endTime:'',category:'Meeting',reminder:'None',attendees:mt.attendees,
       project:camp?camp.name:'',client:camp?camp.client:(x.tag.k==='Client'?tag:''),place:'',agenda:'From report · '+(RPT.date||isoToday())+' · '+(meName()||'')+' [R:'+rid+']',force:true}).then(function(){made.m++})})})});
