@@ -43,7 +43,7 @@ main{padding:12px 16px}h3{font-size:12px;letter-spacing:.1em;color:var(--mute);m
 .fld [disabled]{opacity:.55}.sec{font-size:11px;letter-spacing:.1em;color:var(--acc);margin-top:8px;text-transform:uppercase}.newb{margin-left:auto}
 .load{height:6px;background:#232833;border-radius:3px;overflow:hidden;margin-top:6px}.load i{display:block;height:100%;background:var(--acc)}
 #splash{position:fixed;inset:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity .6s;perspective:1100px}
-#splash.out{opacity:0;pointer-events:none}#splash{cursor:pointer}#splash video{width:420px;height:420px;max-width:100vmin;max-height:100vmin;object-fit:contain;opacity:.86}#splash .skip{display:none}html:has(#splash),body:has(#splash){background:transparent!important}body:has(#splash) header,body:has(#splash) main,body:has(#splash) #dr{visibility:hidden}body:has(#splash)::before{display:none!important}html:has(#splash),body:has(#splash){overflow:hidden!important}
+#splash.out{opacity:0;pointer-events:none}#splash{cursor:pointer}#splash .splstill{width:min(260px,60vw);height:auto}#splash video{width:420px;height:420px;max-width:100vmin;max-height:100vmin;object-fit:contain;opacity:.86}#splash .skip{display:none}html:has(#splash),body:has(#splash){background:transparent!important}body:has(#splash) header,body:has(#splash) main,body:has(#splash) #dr{visibility:hidden}body:has(#splash)::before{display:none!important}html:has(#splash),body:has(#splash){overflow:hidden!important}
 #splash .stage{width:96px;height:146px;position:relative;transform-style:preserve-3d;animation:spin 4.5s cubic-bezier(.4,.05,.3,1) 1 both}
 #splash .stage img.glass{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;filter:saturate(1.1) drop-shadow(0 0 10px rgba(160,130,255,.35))}
 #splash .shine{position:absolute;inset:0;transform:translateZ(13.5px);-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.75) 48%,transparent 60%);background-size:300% 100%;animation:shine 4.5s ease-in-out 1 both;mix-blend-mode:screen}
@@ -1567,10 +1567,11 @@ var __fd=false;function fadeSplash(){var e=document.getElementById('splash');if(
 function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 (function(){var v=document.getElementById('spv'),e=document.getElementById('splash');if(!e)return;
   if(!v||!v.getAttribute('src')){__vd=true;return}
-  v.playbackRate=1.6;v.addEventListener('ended',videoDone);v.addEventListener('error',videoDone);var _vw=setInterval(function(){if(__vd||v.currentTime>=6){clearInterval(_vw);videoDone()}},100);
+  var stilled=false;function still(){if(stilled||__vd)return;stilled=true;try{v.style.display='none';var im=document.createElement('img');im.src=logoSrc('w');im.alt='INNRVZN';im.className='splstill';e.insertBefore(im,v)}catch(x){}setTimeout(videoDone,1500)}
+  v.playbackRate=1.6;v.addEventListener('ended',videoDone);v.addEventListener('error',still);if(!(v.canPlayType&&v.canPlayType('video/webm')))setTimeout(still,0);var _vw=setInterval(function(){if(__vd||v.currentTime>=6){clearInterval(_vw);videoDone()}},100);
   e.addEventListener('click',function(){__vd=true;__sp=true;fadeSplash()});document.addEventListener('keydown',function(){__vd=true;__sp=true;fadeSplash()},{once:true});
   var started=false;var plated=false;function plate(){if(plated)return;plated=true;try{var rc=v.getBoundingClientRect(),k=window.devicePixelRatio||1;run('splashPlate',rc.left*k,rc.top*k,rc.width*k).catch(function(){})}catch(e){}}
-  window.__splashGo=function(){if(started)return;started=true;var pr=v.play&&v.play();if(pr&&pr.catch)pr.catch(videoDone)};setTimeout(window.__splashGo,12000);setTimeout(videoDone,30000)})();
+  window.__splashGo=function(){if(started)return;started=true;var pr=v.play&&v.play();if(pr&&pr.catch)pr.catch(still)};setTimeout(window.__splashGo,12000);setTimeout(videoDone,30000)})();
 function hideSplash(){if(__sp)return;__sp=true;if(__vd)fadeSplash();else __go=fadeSplash}
 /* Workspaces: INNRVZN Plus = this tracker sheet. INNRVZN Music = placeholder until its sheet exists.
    The choice is remembered (Python side, workspace.json); the header button switches. */
@@ -1974,4 +1975,4 @@ function drTabShow(k){DRTAB=k;var d=document.getElementById('dr');if(!d)return;d
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-drt]');if(b)drTabShow(b.dataset.drt)});
 setTimeout(function(){var m=document.getElementById('bootmsg');if(m)m.textContent='Still loading… check your connection'},6000);setTimeout(bootDone,20000);
 </script>
-<script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>
+<script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=2)go();else if(v){v.addEventListener("loadeddata",go,{once:true});setTimeout(go,700)}})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>
