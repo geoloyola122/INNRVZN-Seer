@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>INNRVZN Seer</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0a0b12"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Seer">
 <style>
 :root{--bg:#0a0b12;--panel:rgba(255,255,255,.06);--line:rgba(255,255,255,.11);--text:#eceef6;--mute:#9ba1b6;--acc:#ff6a45;--red:#ff5a5f;--amber:#f7b13a;--ok:#3fd49a;
@@ -271,7 +271,8 @@ i.medot,.dots i.me{background:#3b82f6!important}i.medot{display:inline-block;wid
 .gadd{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;color:var(--amber);font-size:12px}.gerr{color:var(--amber);font-size:12px}
 .rnew{font-size:10px;font-weight:700;color:#fff;background:var(--acc);border-radius:6px;padding:0 5px;margin-left:4px}
 .rbdg{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:var(--acc);border-radius:9px;padding:0 5px;margin-left:6px}
-#rptT{min-height:180px;height:180px}
+#rptT{min-height:180px;height:180px;resize:none;overflow:hidden}
+.rcc{position:relative;display:flex;align-items:center;gap:8px;margin-top:6px;background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:6px 10px}.rcc b{font-size:11px;letter-spacing:.08em;color:var(--mut,#888)}.rcc input{flex:1;min-width:0;background:none;border:0;color:var(--text);font:inherit;outline:none}.rcc .rsug{top:100%;left:0;right:0}
 .dgrp{cursor:pointer;user-select:none}.dgrp:hover{color:var(--acc)}
 .rthr{margin-top:18px;border-top:1px solid var(--line);padding-top:6px}.rdone{font-size:12.5px;padding:5px 10px;margin:4px 0;border-left:2px solid var(--ok);color:var(--text)}.rdone i{font-style:normal;font-weight:600}
 .rmeet{font-size:12.5px;padding:5px 10px;margin:4px 0;border-left:2px solid var(--acc)}.rrp{margin-left:6px;font-size:11px;padding:0 6px}
@@ -375,7 +376,7 @@ i.medot,.dots i.me{background:#3b82f6!important}i.medot{display:inline-block;wid
  #mobbar button svg{width:22px;height:22px}#mobbar button.on{color:var(--acc);background:var(--chip)}
  #mobbar button i{position:absolute;top:2px;left:calc(50% + 8px);min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--red,#e5484d);color:#fff;font-size:10px;font-style:normal;line-height:16px}
  body.mob .rpage .rfil{flex-wrap:wrap}body.mob .rpage .rfil select,body.mob .rpage .rfil input[type=date]{flex:1 1 45%;min-width:0}
- body.mob #rptT{min-height:160px;height:160px}
+ body.mob #rptT{min-height:160px}
  body.mob #calpop{width:calc(100vw - 24px)!important;left:12px!important}
  body.mob .dash{grid-template-columns:1fr}}
 .rfmore{display:contents}.rpgfb{display:none}
@@ -396,6 +397,7 @@ body:has(#splash) #boot{display:none!important}#boot{position:fixed;inset:0;z-in
 .pk:hover .pkav,.pk.on .pkav,.pk:focus-visible .pkav{transform:none!important}
 header,#qs,#dr,#toast,.rsug,.askbox,.acctdd,#wsdd,#calpop,#tagpop,#gsearch .gsbox,#busy .bpill,#mobbar,.ghint,.gchips .chip,#login{background:var(--solid)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 #gsq{background:var(--solid)!important}.askov,#gsearch{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+@media (max-width:820px){input,textarea,select{font-size:16px!important}}html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -1022,10 +1024,10 @@ function reportBox(full){
   var seg='<span class="seg">'+[['all','All'],['me','For me'+(repUnread().length?' ('+repUnread().length+')':'')],['mine','My reports']].map(function(x){return'<button class="chip'+(f===x[0]?' on':'')+'" data-rpf="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</span>';
   var feed=REP===null?'<div class="m">Loading reports…</div>':(list.slice(0,4).map(repRow).join('')||'<div class="empty">No reports yet. Write the first one above.</div>');
   return'<div class="pane" id="rptPane"><div class="panehd"><b>Report</b><span class="m">Seer-wide: artists, songs, clients and people</span></div>'+weekStrip()+
-    (function(){var ds=doneSug();return ds.length?'<div class="gchips dsugs" style="margin:0 0 8px"><span class="m">Finished this week:</span>'+ds.map(function(h,i){return'<button class="chip" data-dsug="'+i+'">✓ '+esc(h.task)+(h.forName?' · '+esc(h.forName):'')+'</button>'}).join('')+'</div>':''})()+'<div style="position:relative"><textarea id="rptT" rows="3" placeholder="What happened? One line per item.&#10;#Sony&#10;approved the deck&#10;#Task&#10;send rate card @Ashley fri&#10;#Meeting&#10;call with brand team thu 3pm @Geo&#10;CC: @Ashley (email a copy)&#10;(blank line, then the next #project)   Ctrl+Enter to post">'+esc(RPT.text)+'</textarea><div id="rptS" class="rsug"></div></div><div id="rptH" class="ghint"></div><div id="rptC" class="gchips"></div>'+
+    (function(){var ds=doneSug();return ds.length?'<div class="gchips dsugs" style="margin:0 0 8px"><span class="m">Finished this week:</span>'+ds.map(function(h,i){return'<button class="chip" data-dsug="'+i+'">✓ '+esc(h.task)+(h.forName?' · '+esc(h.forName):'')+'</button>'}).join('')+'</div>':''})()+'<div style="position:relative"><textarea id="rptT" rows="3" placeholder="What happened? One line per item.&#10;#Sony&#10;approved the deck&#10;#Task&#10;send rate card @Ashley fri&#10;#Meeting&#10;call with brand team thu 3pm @Geo&#10;(blank line, then the next #project)   Ctrl+Enter to post">'+esc(RPT.text)+'</textarea><div id="rptS" class="rsug"></div></div><div class="rcc"><b>CC</b><input id="rptCC" placeholder="@name, @name (gets an email copy)" autocomplete="off" value="'+esc(RPT.cc||'')+'"><div id="rptCCS" class="rsug"></div></div><div id="rptH" class="ghint"></div><div id="rptC" class="gchips"></div>'+
     '<div class="bar" style="margin:8px 0 0;align-items:center"><div id="rptP" style="flex:1;display:flex;gap:6px;flex-wrap:wrap;min-width:200px">'+repPrev()+'</div><input type="date" id="rptD" value="'+esc(RPT.date)+'" style="min-width:0;width:auto"><button class="b" data-rattach title="Attach a file (or drop / paste it into the text)">📎</button><button class="b" id="rptB" style="background:var(--acc);color:#fff;border-color:transparent">Save report</button></div>'+
     (full?'</div>':'<div class="panehd" style="margin-top:14px"><b style="font-size:13px">Recent reports</b>'+seg+'<button class="b mi" data-ws="reports">All reports →</button></div><div id="rptF">'+feed+'</div></div>')}
-function repSugShow(ta){RPT.ta=ta;var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.exec(ta.value.slice(0,pos)),box=document.getElementById(ta.id==='rptE'?'rptES':'rptS');if(!box)return;
+function repSugShow(ta){RPT.ta=ta;var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.exec(ta.value.slice(0,pos)),box=document.getElementById(ta.id==='rptE'?'rptES':ta.id==='rptCC'?'rptCCS':'rptS');if(!box)return;
   if(!m){RPT.sug=[];box.style.display='none';return}
   var ch=m[0][0],q=repNorm(m[0].slice(1)),src=ch==='#'?repCands():((D&&D.people)||[]).map(function(n){return{n:n,k:'Person',x:''}}),
     pm=ch==='#'&&/#([^\s#@]+)\s+(?:#[^\s#@]+\s+)*$/.exec(ta.value.slice(0,pos-m[0].length)),par=pm&&projOf(pm[1]);RPT.par=par||null;
@@ -1038,8 +1040,8 @@ function repSugShow(ta){RPT.ta=ta;var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.ex
 function repPick(i){var c=RPT.sug[i],ta=RPT.ta&&document.body.contains(RPT.ta)?RPT.ta:document.getElementById('rptT');if(!c||!ta)return;
   if(c.nw&&RPT.par){var par=RPT.par,nm=c.n;RPT.sug=[];return askOk('Add "'+nm+'" as a sub-project of '+par.name+'?',{yes:'Add sub-project',title:'New sub-project'}).then(function(ok){if(!ok)return;
     return run('subprojectAdd',par.name,nm).then(function(){toast('Sub-project added: '+nm);return load()}).then(function(){RCC=null;RPT.sug=[{n:nm,k:'Sub-project'}];repPick(0)})}).catch(function(e){toast(e.message||'Could not add')})}var pos=ta.selectionStart,ins=RPT.ch+repTok(c.n)+' ';
-  ta.value=ta.value.slice(0,RPT.at)+ins+ta.value.slice(pos);ta.focus();ta.selectionStart=ta.selectionEnd=RPT.at+ins.length;RPT.sug=[];if(ta.id==='rptT')RPT.text=ta.value;var bx=document.getElementById(ta.id==='rptE'?'rptES':'rptS');if(bx)bx.style.display='none';var pp=document.getElementById('rptP');if(pp&&ta.id==='rptT')pp.innerHTML=repPrev()}
-function repSave(){if(RPT.up)return toast('Wait for the file upload to finish, then post');if(gIsGrouped(RPT.text))return gSave();if(RPT.text.trim()&&!repParse(RPT.text).tags.length)return toast('Add a #project or #client so this update is filed (type # to pick one)');var r=repParse(RPT.text||'');if(!RPT.text.trim())return toast('Write the report first');
+  ta.value=ta.value.slice(0,RPT.at)+ins+ta.value.slice(pos);ta.focus();ta.selectionStart=ta.selectionEnd=RPT.at+ins.length;RPT.sug=[];if(ta.id==='rptT')RPT.text=ta.value;if(ta.id==='rptCC')RPT.cc=ta.value;var bx=document.getElementById(ta.id==='rptE'?'rptES':ta.id==='rptCC'?'rptCCS':'rptS');if(bx)bx.style.display='none';var pp=document.getElementById('rptP');if(pp&&ta.id==='rptT')pp.innerHTML=repPrev()}
+function repSave(){if(RPT.up)return toast('Wait for the file upload to finish, then post');if(String(RPT.text||'').trim())rptWithCC();if(gIsGrouped(RPT.text))return gSave();if(RPT.text.trim()&&!repParse(RPT.text).tags.length)return toast('Add a #project or #client so this update is filed (type # to pick one)');var r=repParse(RPT.text||'');if(!RPT.text.trim())return toast('Write the report first');
   if(r.bad.length||r.badp.length)return toast('Fix the tags marked ? (pick one from the list, or remove the # or @)');
   var b=document.getElementById('rptB');b.disabled=true;var text=RPT.text.trim();
   run('reportAdd',{date:RPT.date,text:text,tags:r.tags,people:r.people}).then(function(res){RPT.newRow=res&&res.row;
@@ -1047,11 +1049,19 @@ function repSave(){if(RPT.up)return toast('Wait for the file upload to finish, t
     cl.forEach(function(c){p=p.then(function(){return run('addLog',{client:c.name,type:'Report',summary:text,followUp:''})})});return p}).then(function(){
     RPT.text='';toast('Report saved');return Promise.all([repLoad(),load()]).then(function(){var w=RPT.wm;RPT.wm=false;if(w&&RPT.newRow)repMeet(repFind(RPT.newRow));else render()})}).catch(function(e){b.disabled=false;toast(e.message||'Could not save')})}
 var _rpf=0;document.addEventListener('input',function(e){if(e.target.id!=='rptT')return;var ta=e.target;RPT.text=ta.value;repSugShow(ta);if(_rpf)return;_rpf=requestAnimationFrame(function(){_rpf=0;var pp=document.getElementById('rptP');if(pp)pp.innerHTML=repPrev();gGuide(ta);gPostLabel()})});
-document.addEventListener('keydown',function(e){if(e.target.id!=='rptT'&&e.target.id!=='rptE')return;var box=document.getElementById(e.target.id==='rptE'?'rptES':'rptS');if(!box)return;
+document.addEventListener('keydown',function(e){if(e.target.id!=='rptT'&&e.target.id!=='rptE'&&e.target.id!=='rptCC')return;var box=document.getElementById(e.target.id==='rptE'?'rptES':e.target.id==='rptCC'?'rptCCS':'rptS');if(!box)return;
   if(RPT.sug.length&&box.style.display==='block'){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();RPT.si=(RPT.si+(e.key==='ArrowDown'?1:RPT.sug.length-1))%RPT.sug.length;[].forEach.call(box.children,function(c,i){c.classList.toggle('on',i===RPT.si)});return}
     if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();return repPick(RPT.si)}if(e.key==='Escape'){RPT.sug=[];box.style.display='none';return}}
   if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(e.target.id==='rptE'){var sb=document.querySelector('[data-redsave]');if(sb)sb.click()}else repSave()}});
-document.addEventListener('input',function(e){if(e.target.id==='rptE')repSugShow(e.target)});
+document.addEventListener('input',function(e){if(e.target.id==='rptE')repSugShow(e.target);if(e.target.id==='rptCC'){RPT.cc=e.target.value;repSugShow(e.target)}if(e.target.id==='rptT')rptGrow(e.target)});
+function rptGrow(ta){ta=ta||document.getElementById('rptT');if(!ta)return;ta.style.height='';ta.style.height=Math.max(ta.offsetHeight,ta.scrollHeight+2)+'px'}
+function rptWithCC(){var cc=String(RPT.cc||'').trim();if(cc&&!/(^|\n)\s*cc\s*:/i.test(RPT.text||''))RPT.text=String(RPT.text||'').replace(/\s+$/,'')+'\nCC: '+cc;RPT.cc=''}
+/* Space inside a #tag becomes _ while it still matches a known name (two spaces = real space). beforeinput works with phone keyboards too. */
+document.addEventListener('beforeinput',function(e){var ta=e.target;if((ta.id!=='rptT'&&ta.id!=='rptE')||e.inputType!=='insertText'||e.data!==' ')return;
+  var ps=ta.selectionStart;if(ta.selectionEnd!==ps)return;var bm=/#([^\s#@]+)$/.exec(ta.value.slice(0,ps));if(!bm)return;
+  if(/_$/.test(bm[1])){e.preventDefault();ta.setRangeText(' ',ps-1,ps,'end')}
+  else if(repCands().some(function(c){return c.n.toLowerCase().indexOf(repNorm(bm[1])+' ')===0})){e.preventDefault();ta.setRangeText('_',ps,ps,'end')}else return;
+  ta.dispatchEvent(new Event('input',{bubbles:true}))});
 document.addEventListener('mousedown',function(e){var r=e.target.closest&&e.target.closest('[data-ri]');if(r){e.preventDefault();repPick(+r.dataset.ri)}});
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('[data-rpf]');if(f){RPT.filt=f.dataset.rpf;return render()}if(e.target.id==='rptB')repSave();if(e.target.id==='rptBM'){RPT.wm=true;repSave()}});
 document.addEventListener('change',function(e){if(e.target.id==='rptD')RPT.date=e.target.value});
