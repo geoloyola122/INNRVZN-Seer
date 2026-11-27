@@ -592,7 +592,7 @@
   }
   async function reportEdit(row, expected, entry) {
     var text = String((entry && entry.text) || '').trim(); if (!text) throw new Error('The report cannot be empty.');
-    await repRow_(row, expected, true);
+    await repRow_(row, expected, false);   // anyone may edit; delete stays with the author
     await sUpdate_(REPORTS_ID, 'REPORTS!C' + row + ':E' + row, [[(entry.tags || []).join(' | '), (entry.people || []).join(' | '), text]]);
     return { ok: true };
   }
