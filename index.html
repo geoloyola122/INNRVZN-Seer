@@ -387,6 +387,7 @@ i.medot,.dots i.me{background:#3b82f6!important}i.medot{display:inline-block;wid
  body.mob .rpage>.sum{margin:6px 2px}
  body.mob #mobbar button span{display:inline!important}body.mob #mobbar button{padding:6px 0!important}body.mob .ract .b,body.mob .rft .b{padding:4px 10px;font-size:12px}body.mob .rhd .ract{gap:4px}}
 body:has(#login[style*="flex"]) #mobbar{display:none!important}#login{overflow:auto}#login .pkwrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px;max-width:760px}#login .pkt{font-size:28px;font-weight:700;margin:14px 0 26px}.pkgrid{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}.pk{background:none;border:0;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;width:112px;padding:0;font:inherit}.pkav{width:96px;height:96px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#fff;border:3px solid transparent;transition:transform .12s,border-color .12s}.pk:hover .pkav,.pk:focus-visible .pkav,.pk.on .pkav{border-color:#fff;transform:scale(1.05)}.pkn{font-size:14px;color:var(--mute,#9aa0aa)}.pk:hover .pkn,.pk.on .pkn{color:var(--text)}.pk:disabled{cursor:default;opacity:.6}.pk.on{opacity:1}@media (max-width:520px){.pk{width:86px}.pkav{width:76px;height:76px;font-size:26px}.pkgrid{gap:16px}}
+.drtabs{display:flex;gap:4px;margin:12px 0 10px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}.drtabs::-webkit-scrollbar{display:none}.drtabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mute,#8a8f98);font:inherit;font-size:13px;font-weight:600;padding:8px 10px;cursor:pointer;white-space:nowrap}.drtabs button.on{color:var(--text);border-bottom-color:var(--acc)}.drpane>h3:first-child,.drpane>.mhead:first-child{margin-top:4px}
 /* ---- calm mode: no motion except loading; top layers are solid ---- */
 *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 #busy.on .bbar{animation:bslide 1s linear infinite!important}#busy.w .bspin{animation:bspin .7s linear infinite!important}.skel i{animation:skl 1.3s ease-in-out infinite!important}
@@ -1067,7 +1068,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
     ta.value=v.slice(0,pos)+(pos&&!/\s$/.test(v.slice(0,pos))?' ':'')+ins+' '+v.slice(pos);RPT.text=ta.value;ta.dispatchEvent(new Event('input',{bubbles:true}));toast('Uploaded to '+tag+': '+fs.length+' file'+(fs.length===1?'':'s'))})
    .catch(function(err){toast(err.message||'Upload failed')}).finally(function(){RPT.up=Math.max(0,RPT.up-1);b.disabled=false})});
 var RKC={t:0,m:{}};function repKindOf(n){if(Date.now()-RKC.t>3000){RKC.m={};repCands().forEach(function(c){var k=repNorm(c.n);if(!RKC.m[k])RKC.m[k]=c.k});RKC.t=Date.now()}return RKC.m[repNorm(n)]||''}
-function repTx(t){return repFiles(esc(t)).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){var k=b[0]==='#'?repKindOf(b.slice(1).replace(/_/g,' ')):'';if(k==='Label')k='';return a+(k?'<span class="rck"><small>'+esc(k==='Account Manager'?'AM':k)+'</small>':'')+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-otag="'+esc(b.slice(1).replace(/_/g,' '))+'" title="Open #'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'+(k?'</span>':'')})}
+function repTx(t){return repFiles(esc(t)).replace(/(^|\s)([#@][^\s#@]+)/g,function(_,a,b){var k=b[0]==='#'?repKindOf(b.slice(1).replace(/_/g,' ')):'';if(k==='Label')k='';return a+(k?'<span class="rck"><small>'+esc(k==='Account Manager'?'AM':k==='Campaign'?'Project':k)+'</small>':'')+'<span class="rc '+(b[0]==='#'?'ok':'pp')+'"'+(b[0]==='#'?' data-otag="'+esc(b.slice(1).replace(/_/g,' '))+'" title="Open #'+esc(b.slice(1).replace(/_/g,' '))+'"':'')+'>'+b.replace(/_/g,' ')+'</span>'+(k?'</span>':'')})}
 function repRow(r){var me=meName(),mn=r.people.some(function(p){return eqN(p,me)}),inv=repInvolves(r,me),sn=repSeen(r,me),dn=repDone(r,me);
   if(RPT.edit===r.row)return'<div class="rrow ed" data-rrow="'+r.row+'"><div style="position:relative"><textarea id="rptE" rows="8" style="width:100%;box-sizing:border-box;min-height:180px">'+esc(r.text)+'</textarea><div id="rptES" class="rsug"></div></div><div class="ract"><button class="b" data-redsave="'+r.row+'">Save</button><button class="b" data-redcancel>Cancel</button></div></div>';
   var hint=!r.meeting&&MEETRX.test(r.text);
@@ -1178,7 +1179,7 @@ function repThread(names){var ns=names.filter(Boolean),hit=function(v){return ns
     (mdone.length?'<div class="rdone m">✓ '+mdone.length+' Music task'+(mdone.length>1?'s':'')+' done</div>':'')+
     '<div class="rtcomp"><textarea id="rtT" rows="2" placeholder="Post an update to '+esc(ns[0])+'…  (@ to mention)"></textarea><button class="b" id="rtB">Post</button></div></div>'}
 var RTHOPEN=true;
-function repAttach(names){RTH=names.filter(Boolean);histLoad();var d=document.getElementById('dr');if(!d||!RTH.length)return;var old=d.querySelector('.rthr');if(old)old.remove();RTHOPEN=!d.querySelector('.t,.mtask');setTimeout(tagSumPlace,0);d.insertAdjacentHTML('beforeend',repThread(RTH))}
+function repAttach(names){RTH=names.filter(Boolean);histLoad();var d=document.getElementById('dr');if(!d||!RTH.length)return;var old=d.querySelector('.rthr');if(old)old.remove();RTHOPEN=!d.querySelector('.t,.mtask');setTimeout(tagSumPlace,0);d.insertAdjacentHTML('beforeend',repThread(RTH));setTimeout(drTabs,0)}
 function repThreadRefresh(){var d=document.getElementById('dr'),el=d&&d.querySelector('.rthr');if(!el||!RTH)return;tagSumPlace();var ta=document.getElementById('rtT'),keep=ta?ta.value:'';el.outerHTML=repThread(RTH);var t2=document.getElementById('rtT');if(t2)t2.value=keep}
 document.addEventListener('click',function(e){if(e.target.id!=='rtB'||!RTH)return;var ta=document.getElementById('rtT'),tx=ta.value.trim();if(!tx)return;
   var cands=repCands(),hit=cands.filter(function(c){return RTH.some(function(n){return eqN(c.n,n)})})[0],tag=hit?hit.n:RTH[0];
@@ -1358,7 +1359,7 @@ function tagSummary(ns){var hit=function(v){return ns.some(function(n){return eq
     '<div><span class="m">Last update</span><b>'+(last?esc(last.by)+' · '+esc(fmt(parseDue(last.date))):'None yet')+'</b>'+(last?'<span class="m tsx">'+esc(last.text.replace(/[#@]([^\s#@]+)/g,function(_,a){return a.replace(/_/g,' ')}).replace(/\s+/g,' ').slice(0,90))+'</span>':'')+'</div>'+
     '<div><span class="m">Open tasks</span><b>'+open.length+(od?' <span style="color:var(--red)">· '+od+' late</span>':'')+'</b>'+(nd?'<span class="m tsx">Next: '+esc(nd.t.task)+' · '+esc(fmt(nd.d))+'</span>':'')+'</div>'+
     '<div><span class="m">Next meeting</span><b>'+(up?esc(fmt(parseDue(up.date)))+(up.time?' '+esc(up.time):''):'None set')+'</b>'+(up?'<span class="m tsx">'+esc(up.subject||'')+'</span>':'')+'</div></div>'}
-function tagSumPlace(){var d=document.getElementById('dr');if(!d||!RTH)return;var old=d.querySelector('.tsum');if(old)old.remove();var h=d.querySelector('h2');if(h)h.insertAdjacentHTML('afterend',tagSummary(RTH))}
+function tagSumPlace(){var d=document.getElementById('dr');if(!d||!RTH)return;var old=d.querySelector('.tsum');if(old)old.remove();var bar=d.querySelector('.drtabs'),h=d.querySelector('h2');if(bar)bar.insertAdjacentHTML('beforebegin',tagSummary(RTH));else if(h)h.insertAdjacentHTML('afterend',tagSummary(RTH))}
 /* task alerts: someone else gave me a task */
 var TFRESH={};
 function taskAlerts(){var me=meName();if(!me||!D)return;var key='seer.seenTasks',seen=null;try{seen=JSON.parse(localStorage.getItem(key)||'null')}catch(e){}
@@ -1879,10 +1880,13 @@ document.getElementById('qa').addEventListener('submit',function(e){if(WS!=='mus
 /* ---------- sign-in screen (desktop). Google's own consent page must open in the browser: Google blocks it inside app windows. ---------- */
 function showLogin(msg){if(document.getElementById('splash')){(window.__afterSplash=window.__afterSplash||[]).push(function(){showLogin(msg)});return}var o=document.getElementById('login');if(!o){o=document.createElement('div');o.id='login';document.body.appendChild(o)}
   o.innerHTML='<div class="pkwrap"><img class="wslogo" data-lg="w" src="'+logoSrc('w')+'" alt=""><div class="pkt">Who\'s working?</div><div id="pkgrid" class="pkgrid"><div class="m">Loading profiles…</div></div><p class="m" id="lgmsg" style="margin-top:18px;min-height:18px">'+esc(msg||'')+'</p></div>';o.style.display='flex';
-  run('profiles').then(function(ps){var g=document.getElementById('pkgrid');if(!g)return;var cols=['#6d5dfc','#e8590c','#0ca678','#d6336c','#1c7ed6','#f08c00','#7048e8','#2b8a3e','#c2255c'];
-    g.innerHTML=(ps||[]).map(function(p,i){var w=String(p.name).split(/\s+/).filter(Boolean),ini=((w[0]||'?')[0]+((w[1]||'')[0]||'')).toUpperCase();
-      return'<button class="pk" data-pick="'+esc(p.email)+'"><span class="pkav" style="background:'+cols[i%cols.length]+'">'+esc(ini)+'</span><span class="pkn">'+esc(p.name)+'</span></button>'}).join('')||'<div class="m">No profiles found.</div>'})
-   .catch(function(err){var m=document.getElementById('lgmsg');if(m)m.textContent='Could not load profiles: '+(err&&err.message||err)})}
+  var draw=function(ps){var g=document.getElementById('pkgrid');if(!g||!ps||!ps.length)return;var cols=['#6d5dfc','#e8590c','#0ca678','#d6336c','#1c7ed6','#f08c00','#7048e8','#2b8a3e','#c2255c'];
+    g.innerHTML=ps.map(function(p,i){var w=String(p.name).split(/\s+/).filter(Boolean),ini=((w[0]||'?')[0]+((w[1]||'')[0]||'')).toUpperCase();
+      return'<button class="pk" data-pick="'+esc(p.email)+'"><span class="pkav" style="background:'+cols[i%cols.length]+'">'+esc(ini)+'</span><span class="pkn">'+esc(p.name)+'</span></button>'}).join('')};
+  var cached=null;try{cached=JSON.parse(localStorage.getItem('seer.profiles')||'null')}catch(e){}draw(cached);   // instant from the last visit
+  profFetch().then(function(ps){if(JSON.stringify(ps)!==JSON.stringify(cached))draw(ps);if(!ps||!ps.length){var g=document.getElementById('pkgrid');if(g&&!cached)g.innerHTML='<div class="m">No profiles found.</div>'}})
+   .catch(function(err){if(cached)return;var m=document.getElementById('lgmsg');if(m)m.textContent='Could not load profiles: '+(err&&err.message||err)})}
+var PROFP=null;function profFetch(){if(!PROFP)PROFP=run('profiles').then(function(ps){try{localStorage.setItem('seer.profiles',JSON.stringify(ps||[]))}catch(e){}return ps},function(e){PROFP=null;throw e});return PROFP}
 function startApp(){var o=document.getElementById('login');if(o)o.style.display='none';
   /* every launch lands on the person's own Dashboard (the Dashboard follows the signed-in user); other workspaces via the menu */
   return enterWS('dash')}
@@ -1893,7 +1897,7 @@ document.addEventListener('click',function(e){
 var _renderMore=renderMore;renderMore=function(v){_renderMore(v);run('authStatus').then(function(a){if(!a.ok||view!=='more'||!v.isConnected)return;
   v.insertAdjacentHTML('afterbegin','<div class="card acct"><div><div class="m">Using Seer as</div><b>'+esc(a.name||(D&&D.me)||a.email||'Profile')+'</b><div class="m">'+esc(a.email||'')+(a.role?' \u00b7 '+esc(a.role):'')+'</div></div><span style="flex:1"></span><button class="b" data-switchacct>Switch profile</button></div>')})};
 render();
-run('authStatus').then(function(a){if(a&&a.ok===false){showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
+run('authStatus').then(function(a){if(a&&a.ok===false){profFetch().catch(function(){});showLogin();return}return startApp()},function(){return startApp()}).then(hideSplash,hideSplash);
 if(0)run('getWorkspace').catch(function(){return'plus'}).then(function(ws){
   if(ws==='plus'||ws==='music'||ws==='label'||ws==='db')return enterWS(ws);showPicker()}).then(hideSplash,hideSplash);
 setTimeout(hideSplash,20000);setTimeout(function(){if(window.pywebview)updLoad(true)},9000);setInterval(function(){if(document.hidden)return;var ae=document.activeElement;if(ae&&/^(rptT|rptE|rtT)$/.test(ae.id||''))return;if(WS==='plus'||WS==='dash'||WS==='cal')load()},60000);
@@ -1939,5 +1943,31 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   if(MTAB==='report')WS='reports';else{WS='dash';view='dash'}render();window.scrollTo(0,0)});
 (function(){var f=function(){mobBar();render()};if(MOBQ.addEventListener)MOBQ.addEventListener('change',f);else MOBQ.addListener(f);setTimeout(mobBar,0)})();
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-rpgf]')){RPG.fo=!RPG.fo;var f=document.querySelector('.rfil');if(f)f.classList.toggle('open',RPG.fo)}});
+/* ---------- Project / client / artist windows: name + summary on top, the rest in tabs ---------- */
+var DRTAB='thread';
+function drTabs(){var d=document.getElementById('dr');if(!d||d.querySelector('.drtabs')||!d.querySelector('.rthr'))return;var h2=d.querySelector('h2');if(!h2)return;
+  var P={head:[],thread:[],tasks:[],meetings:[],files:[],details:[],drop:[]},sec=null,kids=[].slice.call(d.children),after=false;
+  kids.forEach(function(el){if(el===h2){after=true;return}if(!after||el.classList.contains('tsum')||el.classList.contains('drx'))return;
+    if(el.classList.contains('rthr')){P.thread.push(el);return}
+    var hd=el.tagName==='H3'?el:(el.querySelector&&el.firstElementChild&&el.firstElementChild.tagName==='H3'?el.firstElementChild:null);
+    if(hd){var t=hd.textContent.toLowerCase();sec=/task/.test(t)?'tasks':/meeting/.test(t)?'meetings':/latest update|log activity|activity|timeline|history/.test(t)?'drop':'details'}
+    else if(el.classList.contains('fldrow')){P.files.push(el);return}
+    else if(el.id==='edE'||el.matches('details.allf,.drhead')){P.details.push(el);return}
+    else if(!sec){if(el.matches('.m,.lnk,.cbadges,.badges')){P.head.push(el);return}sec='details'}
+    P[sec].push(el)});
+  P.drop.forEach(function(el){el.remove()});
+  var nT=d.querySelectorAll('.rthr').length?'':'',tc=P.tasks.reduce(function(n,el){return n+(el.matches&&el.matches('.t')?1:el.querySelectorAll?el.querySelectorAll('.t').length:0)},0),
+    mc=P.meetings.reduce(function(n,el){return n+(el.querySelectorAll?el.querySelectorAll('.mrow').length:0)},0);
+  var tabs=[['thread','Thread'],['tasks','Tasks'+(tc?' '+tc:'')],['meetings','Meetings'+(mc?' '+mc:'')],['files','Files'],['details','Details']];
+  var bar=document.createElement('div');bar.className='drtabs';bar.innerHTML=tabs.map(function(t){return'<button data-drt="'+t[0]+'">'+t[1]+'</button>'}).join('');
+  var hx=h2;P.head.forEach(function(el){hx.insertAdjacentElement('afterend',el);hx=el});var anchor=d.querySelector('.tsum')||hx;anchor.insertAdjacentElement('afterend',bar);var last=bar;
+  tabs.forEach(function(t){var pane=document.createElement('div');pane.className='drpane';pane.dataset.drp=t[0];P[t[0]].forEach(function(el){pane.appendChild(el)});
+    if(t[0]==='files'){var tags=(RTH||[]),fs=[];(REP||[]).forEach(function(r){if(!repMatch(r,tags))return;r.text.replace(/\[📎 ([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,function(_,n,u){fs.push('<div class="t"><span class="rfile" data-url="'+esc(u)+'"><i>📄</i>'+esc(n)+'</span><span class="m"> · '+esc(r.by)+' · '+esc(r.date)+'</span></div>')})});
+      pane.insertAdjacentHTML('beforeend','<h3>Files from reports</h3>'+(fs.reverse().join('')||'<div class="empty">No files attached in reports yet.</div>'))}
+    last.insertAdjacentElement('afterend',pane);last=pane});
+  [].slice.call(d.querySelectorAll(':scope > .m')).reverse().forEach(function(el){h2.insertAdjacentElement('afterend',el)});
+  drTabShow(DRTAB)}
+function drTabShow(k){DRTAB=k;var d=document.getElementById('dr');if(!d)return;d.querySelectorAll('[data-drt]').forEach(function(b){b.classList.toggle('on',b.dataset.drt===k)});d.querySelectorAll('.drpane').forEach(function(p){p.style.display=p.dataset.drp===k?'':'none'})}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-drt]');if(b)drTabShow(b.dataset.drt)});
 </script>
 <script>(function(){var v=document.getElementById("spv");function go(){window.__splashGo&&window.__splashGo()}if(v&&v.readyState>=3)go();else if(v)v.addEventListener("canplaythrough",go,{once:true})})();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>
