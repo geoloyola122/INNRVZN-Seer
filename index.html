@@ -1566,9 +1566,10 @@ var __sp=false,__vd=false,__go=null;
 var __fd=false;function fadeSplash(){var e=document.getElementById('splash');if(!e||__fd)return;__fd=true;e.classList.add('out');setTimeout(function(){var fin=function(){e.remove();try{applyBD()}catch(x){}var q=window.__afterSplash||[];window.__afterSplash=[];q.forEach(function(f){try{f()}catch(x){}})};try{run('endSplash').then(fin,fin)}catch(x){fin()}},600)}
 function videoDone(){if(__vd)return;__vd=true;if(__go)__go()}
 (function(){var v=document.getElementById('spv'),e=document.getElementById('splash');if(!e)return;
+  if(!window.pywebview&&location.protocol!=='file:'&&window.matchMedia('(max-width:720px)').matches){__vd=true;__sp=true;try{v&&v.removeAttribute('src')}catch(x){}e.remove();return}   // phones: no splash, straight to the app
   if(!v||!v.getAttribute('src')){__vd=true;return}
   var stilled=false;function still(){if(stilled||__vd)return;stilled=true;try{v.style.display='none';var im=document.createElement('img');im.src=logoSrc('w');im.alt='INNRVZN';im.className='splstill';e.insertBefore(im,v)}catch(x){}setTimeout(videoDone,1500)}
-  v.playbackRate=1.6;v.addEventListener('ended',videoDone);v.addEventListener('error',still);if(!(v.canPlayType&&v.canPlayType('video/webm')))setTimeout(still,0);var _vw=setInterval(function(){if(__vd||v.currentTime>=6){clearInterval(_vw);videoDone()}},100);
+  v.playbackRate=1.6;v.addEventListener('ended',videoDone);v.addEventListener('error',still);if(!(v.canPlayType&&v.canPlayType('video/webm'))){setTimeout(still,0)}var _vw=setInterval(function(){if(__vd||v.currentTime>=6){clearInterval(_vw);videoDone()}},100);
   e.addEventListener('click',function(){__vd=true;__sp=true;fadeSplash()});document.addEventListener('keydown',function(){__vd=true;__sp=true;fadeSplash()},{once:true});
   var started=false;var plated=false;function plate(){if(plated)return;plated=true;try{var rc=v.getBoundingClientRect(),k=window.devicePixelRatio||1;run('splashPlate',rc.left*k,rc.top*k,rc.width*k).catch(function(){})}catch(e){}}
   window.__splashGo=function(){if(started)return;started=true;var pr=v.play&&v.play();if(pr&&pr.catch)pr.catch(still)};setTimeout(window.__splashGo,12000);setTimeout(videoDone,30000)})();
