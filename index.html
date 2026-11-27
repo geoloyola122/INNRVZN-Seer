@@ -401,6 +401,12 @@ body:has(#splash) #boot{display:none!important}#boot{position:fixed;inset:0;z-in
 header,#qs,#dr,#toast,.rsug,.askbox,.acctdd,#wsdd,#calpop,#tagpop,#gsearch .gsbox,#busy .bpill,#mobbar,.ghint,.gchips .chip,#login{background:var(--solid)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 #gsq{background:var(--solid)!important}.askov,#gsearch{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 @media (max-width:820px){input,textarea,select{font-size:16px!important}}html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+
+/* pop-up window instead of a side drawer */
+#drbg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:19;display:none}#drbg.on{display:block}
+#dr{top:50%!important;left:50%!important;right:auto!important;bottom:auto!important;width:min(600px,94vw)!important;max-height:86vh;border:1px solid var(--line)!important;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.45)!important;transform:translate(-50%,-50%)!important;visibility:hidden;transition:none!important}
+#dr.on{visibility:visible}
+#dr::after,#dr::before{display:none!important}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -500,8 +506,9 @@ document.addEventListener('change',function(e){var el=e.target;if(!el.classList|
 function same(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase()}
 function linkedTasks(n){return D.tasks.filter(function(t){return same(t.forName,n)}).sort(sortT)}
 function dl(o){return'<dl>'+Object.keys(o).filter(function(k){return o[k]}).map(function(k){return'<dt>'+k+'</dt><dd>'+esc(o[k])+'</dd>'}).join('')+'</dl>'}
-function openDr(h){var d=document.getElementById('dr');d.innerHTML='<button class="x" onclick="closeDr()">×</button>'+h;d.classList.add('on')}
-function closeDr(){document.getElementById('dr').classList.remove('on')}
+function openDr(h){var d=document.getElementById('dr');d.innerHTML='<button class="x" onclick="closeDr()">×</button>'+h;d.classList.add('on');d.scrollTop=0;var bg=document.getElementById('drbg');if(!bg){bg=document.createElement('div');bg.id='drbg';bg.onmousedown=function(e){if(e.target===bg)closeDr()};d.parentNode.insertBefore(bg,d)}bg.classList.add('on')}
+function closeDr(){document.getElementById('dr').classList.remove('on');var bg=document.getElementById('drbg');if(bg)bg.classList.remove('on')}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('dr').classList.contains('on')&&!document.querySelector('.rsug[style*="block"]')&&!document.querySelector('.ask,#tagpop'))closeDr()});
 function tasksBlock(n){var ts=linkedTasks(n);return'<h3>Open tasks ('+ts.length+')</h3>'+(ts.length?ts.map(taskHtml).join(''):'<div class="empty">None</div>')}
 function trimNote(s,n){s=String(s||'');if(s.length<=n)return{a:s,b:''};var i=s.lastIndexOf(' ',n);if(i<n*.6)i=n;return{a:s.slice(0,i),b:s.slice(i)}}
 function briefHtml(pairs,notes){var kv=pairs.filter(function(p){return p[0]&&p[1]}).map(function(p){return'<dt>'+p[0]+'</dt><dd>'+p[1]+'</dd>'}).join(''),n=trimNote(notes,320);
@@ -884,7 +891,7 @@ function cxPanel(o){o=o||{};var m=o.m||null,t=cxTimes(),proj=m?m.project:(o.proj
   (m?'<label>Status<select id="mt_st">'+['To Set','To Bump','Confirmed','Canceled'].map(function(x){return'<option'+(x===m.status?' selected':'')+'>'+x+'</option>'}).join('')+'</select></label>':'<div></div>')+'</div>'+
   '<div class="mterr" id="mterr"></div><div class="acts"><button class="b pri" type="submit">'+(m?'Save changes':'Create meeting')+'</button>'+(m&&!cxCanc(m)?'<button type="button" class="b" data-mtcancel>Cancel meeting</button>':'')+(m?'<button type="button" class="b dng" data-mtdel>Delete</button>':'')+'</div></form>');
   setTimeout(function(){var i=document.getElementById('mt_t');if(i&&!m)i.focus()},50)}
-function mtErr(msg,id){var e=document.getElementById('mterr');if(e)e.textContent=msg||'';[].forEach.call(document.querySelectorAll('#mtf .bad'),function(x){x.classList.remove('bad')});if(id){var f=document.getElementById(id);if(f)f.classList.add('bad')}}
+function mtErr(msg,id){var e=document.getElementById('mterr');if(e)e.textContent=msg||'';if(msg)toast(msg);[].forEach.call(document.querySelectorAll('#mtf .bad'),function(x){x.classList.remove('bad')});if(id){var f=document.getElementById(id);if(f)f.classList.add('bad')}}
 function mtAfter(msg){toast(msg);var b=MTP&&MTP.back;MTP=null;return load().then(function(){if(b&&b.k==='camp')campDr(b.i);else if(b&&b.k==='mus')mProjDr(b.a,b.p);else{closeDr();render()}})}
 function mtSave(force){var m=MTP.m,g=function(id){var e=document.getElementById(id);return e?e.value:''};mtApply();var pe=document.getElementById('mt_p'),proj=pe.value,opt=pe.options[pe.selectedIndex],cl=(opt&&opt.dataset.cl)||MTP.client||(proj?'':'Internal'),
     att=[].map.call(document.querySelectorAll('#mt_a .chip.on'),function(c){return c.dataset.pp}).concat(g('mt_x').split(/\s*,\s*/).filter(Boolean)).join(', ');
@@ -911,7 +918,7 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   var ev=t.closest('[data-ev]');if(ev&&WS==='cal'){var id=ev.dataset.ev;if(id[0]==='m'){var mm=cxFind(id);if(mm)cxPanel({m:mm})}else if(id[0]==='t'){taskDr(+id.slice(1))}return}
   var sm=t.closest('[data-setmeet]');if(sm){var a=sm.dataset.setmeet.split(':');if(a[0]==='camp'){var c2=D.campaigns[+a[1]];cxPanel({project:c2.name,client:c2.client||'',lock:true,back:{k:'camp',i:+a[1]}})}else{var pr=JSON.parse(sm.dataset.mp);cxPanel({project:pr.a+' \u00b7 '+pr.p,client:pr.a,lock:true,back:{k:'mus',a:pr.a,p:pr.p}})}return}
   var mf=t.closest('button[data-mf][data-k],button[data-mf][data-a]');if(mf){UI.mf=mf.dataset.mf;if(mf.dataset.k==='camp')campDr(+mf.dataset.i);else mProjDr(mf.dataset.a,mf.dataset.p);return}
-  var cell=t.closest('[data-cxday]');if(cell&&WS==='cal'&&CX.view==='month'&&!t.closest('[data-ev]')){CX.d=parseDue(cell.dataset.cxday);return}
+  var cell=t.closest('[data-cxday]');if(cell&&WS==='cal'&&CX.view==='month'&&!t.closest('[data-ev]')&&!t.closest('button')){CX.d=parseDue(cell.dataset.cxday);cxPanel({date:cell.dataset.cxday});return}
   var col=t.closest('[data-cxcol]');if(col&&WS==='cal'&&!t.closest('[data-ev]')){var r=col.getBoundingClientRect(),mn=HR0*60+Math.floor((e.clientY-r.top)/HPX*2)*30;cxPanel({date:col.dataset.cxcol,time:m2t(mn),end:m2t(mn+60)})}});
 document.addEventListener('dblclick',function(e){var cell=e.target.closest&&e.target.closest('[data-cxday]');if(cell&&WS==='cal'&&CX.view==='month'&&!e.target.closest('[data-ev]'))cxPanel({date:cell.dataset.cxday})});
 document.addEventListener('change',function(e){if(e.target.id==='cxproj'){CX.proj=e.target.value;render()}if(e.target.id==='mt_p'&&MTP){var o=e.target.options[e.target.selectedIndex];MTP.client=(o&&o.dataset.cl)||''}});
@@ -1037,8 +1044,9 @@ function repSugShow(ta){RPT.ta=ta;var pos=ta.selectionStart,m=/[#@][^\s#@]*$/.ex
   if(par){var subs=subsOf(par.name),low=pm[0].toLowerCase(),sc=subs.filter(function(c){return low.indexOf('#'+repTok(c.name).toLowerCase())>-1})[0];
     src=(sc?[]:subs.map(function(c){return{n:c.name,k:'Sub-project',x:c.status||''}})).concat(nextStat(sc||par,!!sc).map(function(t){return{n:gMod(t).v,k:'Status',x:sc?sc.name:par.name}}),
       [{n:'Paid',k:'Payment',x:''},{n:'Unpaid',k:'Payment',x:''}]);
-    if(q&&!sc&&!subs.some(function(c){return repNorm(c.name)===q})&&!gMod(q))src.push({n:m[0].slice(1).replace(/_/g,' '),k:'+ New sub-project',x:'under '+par.name,nw:1})}
-  RPT.sug=src.filter(function(c){return c.nw||!q||c.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,9);RPT.si=0;RPT.at=pos-m[0].length;RPT.ch=ch;
+    src=src.concat(repCands().filter(function(c){return c.k!=='Sub-project'&&repNorm(c.n)!==repNorm(par.name)&&repNorm(c.n)!==repNorm(par.code)}));
+    if(q.length>1&&!sc&&!subs.some(function(c){return repNorm(c.name)===q})&&!gMod(q)&&!repCands().some(function(c){return repNorm(c.n)===q}))RPT.nwc={n:m[0].slice(1).replace(/_/g,' '),k:'+ New sub-project',x:'under '+par.name,nw:1}}
+  RPT.sug=src.filter(function(c){return!q||c.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return(a.n.toLowerCase().indexOf(q)===0?0:1)-(b.n.toLowerCase().indexOf(q)===0?0:1)}).slice(0,8);if(par&&RPT.nwc)RPT.sug.push(RPT.nwc);RPT.nwc=null;RPT.si=0;RPT.at=pos-m[0].length;RPT.ch=ch;
   box.innerHTML=RPT.sug.map(function(c,i){return'<div class="ri'+(i===0?' on':'')+'" data-ri="'+i+'"><span>'+esc(c.n)+'</span><span class="m">'+esc(kDisp(c.k))+(c.x?' · '+esc(c.x):'')+'</span></div>'}).join('');box.style.display=RPT.sug.length?'block':'none'}
 function repPick(i){var c=RPT.sug[i],ta=RPT.ta&&document.body.contains(RPT.ta)?RPT.ta:document.getElementById('rptT');if(!c||!ta)return;
   if(c.nw&&RPT.par){var par=RPT.par,nm=c.n;RPT.sug=[];return askOk('Add "'+nm+'" as a sub-project of '+par.name+'?',{yes:'Add sub-project',title:'New sub-project'}).then(function(ok){if(!ok)return;
