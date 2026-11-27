@@ -14,7 +14,7 @@
   var SHEET_ID = CFG.SHEET_ID, TZ = 'Asia/Manila';
   var BASE = CFG.API_BASE || 'https://sheets.googleapis.com/v4/spreadsheets';
   var SCOPE = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive';
-  var WEB_VERSION = '2026.11.28.0540';   // stamped by release.py
+  var WEB_VERSION = '2026.11.28.0603';   // stamped by release.py
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -333,7 +333,7 @@
     await vBatch([
       { range: 'TASKS!A' + row + ':D' + row, values: [[false, false, task.task, task.forName || 'Internal']] },
       { range: 'TASKS!F' + row + ':J' + row, values: [[task.owner || '', task.due || '', task.dueTime || '', task.notes || '', added]] },
-      { range: 'TASKS!M' + row, values: [[by]] }], 'USER_ENTERED');
+      { range: 'TASKS!M' + row, values: [[by]] }].concat(task.deliv ? [{ range: 'TASKS!K' + row, values: [[true]] }] : []), 'USER_ENTERED');
     return { ok: true, row: row };
   }
   async function completeTask(row, expected, deliverable) {
