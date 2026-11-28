@@ -477,6 +477,7 @@ html[data-theme=light] .sdot[title=Lost]{box-shadow:0 0 0 1.5px rgba(0,0,0,.15)}
   box-shadow:inset calc(var(--dx,0) * -1.5px) calc(var(--dy,-1) * -1.5px) 0 rgba(255,255,255,calc(.18 + var(--li,0) * .3))}
 #rptB:active:not(:disabled),#rptBM:active:not(:disabled),#rptDr:active{transform:scale(.97);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 2px 8px rgba(20,8,50,.35)!important}
 #rptB:disabled{filter:saturate(.4) brightness(.85);cursor:not-allowed}.ghint:empty,.gchips:empty{display:none!important}
+.rthr .rtcomp{margin:4px 0 14px}
 .sdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 25%,transparent);margin-right:7px;vertical-align:1px;flex:none}
 .sdot[title=Lost]{box-shadow:0 0 0 1.5px rgba(255,255,255,.45)}
 .sdot.sg{width:13px;height:13px;margin-right:5px;vertical-align:-1px;font:800 9px/13px system-ui,sans-serif;font-style:normal;text-align:center;color:#fff;letter-spacing:-1px}
@@ -1426,13 +1427,13 @@ function repThread(names){var ns=names.filter(Boolean),hit=function(v){return ns
     mdone=(typeof MUS!=='undefined'&&MUS?MUS.tasks:[]).filter(function(t){return t.status==='Done'&&(hit(t.project)||hit(t.artist))});
   var feed=reps.map(function(r){return{d:r.date,h:'<div class="rmsg'+(eqN(r.by,meName())?' me':'')+'"><div class="m">'+esc(r.by)+' · '+esc(r.date)+' <button class="b mi rrp" data-rreply="'+r.row+'">Reply</button></div><div class="rtx">'+repTx(r.text)+'</div>'+(r.meeting?'<div class="rmt">📅 '+esc(r.meeting)+'</div>':'')+'</div>'}})
     .concat(done.map(function(h){return{d:h.date,h:'<div class="rdone">✓ <b>'+esc(h.by)+'</b> completed <i>'+esc(h.task)+'</i> <span class="m">· '+esc(h.date)+'</span>'+(h.deliv?' <button class="b mi" data-url="'+esc(h.deliv)+'">📎 Deliverable</button>':'')+'</div>'}}))
-    .concat(tagMeets(ns).map(function(m){return{d:m.date,h:'<div class="rmeet">📅 <b>'+esc(m.subject||'Meeting')+'</b> <span class="m">· '+esc(fmt(parseDue(m.date)))+(m.time?' '+esc(m.time):'')+' · '+esc(m.status||'')+'</span>'+(m.outcome?'<div class="m">Outcome: '+esc(m.outcome)+'</div>':'')+'</div>'}}))
-    .sort(function(x,y){return String(x.d).localeCompare(String(y.d))});
+    .concat(tagMeets(ns).map(function(m){return{d:(function(){var x=parseDue(m.date);return x?iso(x):String(m.date)})(),h:'<div class="rmeet">📅 <b>'+esc(m.subject||'Meeting')+'</b> <span class="m">· '+esc(fmt(parseDue(m.date)))+(m.time?' '+esc(m.time):'')+' · '+esc(m.status||'')+'</span>'+(m.outcome?'<div class="m">Outcome: '+esc(m.outcome)+'</div>':'')+'</div>'}}))
+    .map(function(x,i){x.i=i;return x}).sort(function(x,y){return String(y.d).localeCompare(String(x.d))||y.i-x.i});
   var nOpen=open.length+mopen.length;
   return'<div class="rthr">'+(RTHOPEN?'<h3>Open tasks ('+nOpen+')</h3>'+(nOpen?open.map(taskHtml).join('')+mopen.map(mDashRow).join(''):'<div class="m">Nothing open.</div>'):'')+
-    '<h3>Thread ('+feed.length+')</h3>'+(REP===null||HIST===null?'<div class="m">Loading…</div>':'')+(feed.map(function(x){return x.h}).join('')||'<div class="m">No updates yet. Post the first one below.</div>')+
+    '<h3>Thread ('+feed.length+') <span class="m">· newest first</span></h3>'+'<div class="rtcomp"><textarea id="rtT" rows="2" placeholder="Post an update to '+esc(ns[0])+'…  (@ to mention)"></textarea><button class="b" id="rtB">Post</button></div>+(REP===null||HIST===null?'<div class="m">Loading…</div>':'')+(feed.map(function(x){return x.h}).join('')||'<div class="m">No updates yet. Post the first one below.</div>')+
     (mdone.length?'<div class="rdone m">✓ '+mdone.length+' Music task'+(mdone.length>1?'s':'')+' done</div>':'')+
-    '<div class="rtcomp"><textarea id="rtT" rows="2" placeholder="Post an update to '+esc(ns[0])+'…  (@ to mention)"></textarea><button class="b" id="rtB">Post</button></div></div>'}
+    '</div>'}
 var RTHOPEN=true;
 function repAttach(names){RTH=names.filter(Boolean);histLoad();var d=document.getElementById('dr');if(!d||!RTH.length)return;var old=d.querySelector('.rthr');if(old)old.remove();RTHOPEN=!d.querySelector('.t,.mtask');setTimeout(tagSumPlace,0);d.insertAdjacentHTML('beforeend',repThread(RTH));setTimeout(drTabs,0)}
 function repThreadRefresh(){var d=document.getElementById('dr'),el=d&&d.querySelector('.rthr');if(!el||!RTH)return;tagSumPlace();var ta=document.getElementById('rtT'),keep=ta?ta.value:'';el.outerHTML=repThread(RTH);var t2=document.getElementById('rtT');if(t2)t2.value=keep}
