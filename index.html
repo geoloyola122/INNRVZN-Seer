@@ -538,6 +538,11 @@ body.mob #mobbar button:active{transform:scale(.95)}
 body.mob .rtx{font-size:14.5px;line-height:1.5}
 /* light mode: cleaner, cooler base */
 html[data-theme=light] body{background-color:#f3f2fb}
+
+.rtagw input{width:110px;padding:4px 10px;border-radius:999px;border:1px solid var(--gl-edge,var(--line));background:var(--chip);color:var(--text);font:inherit;font-size:12px;margin-left:6px}
+.rtagw input:focus{outline:none;border-color:var(--acc);width:160px}
+.rtagf{margin-left:6px;cursor:pointer}
+body.mob .rtagw input{width:96px}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>if(/^https?:$/.test(location.protocol))document.documentElement.classList.add('web')</script><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -1179,8 +1184,10 @@ function reportBox(full){
   var list=(REP||[]).slice().reverse(),me=meName(),f=RPT.filt;
   if(f==='me')list=list.filter(function(r){return repInvolves(r,me)});
   if(f==='mine')list=list.filter(function(r){return eqN(r.by,me)});
-  var seg='<span class="seg">'+[['all','All'],['me','For me'+(repUnread().length?' ('+repUnread().length+')':'')],['mine','My reports']].map(function(x){return'<button class="chip'+(f===x[0]?' on':'')+'" data-rpf="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</span>';
-  var feed=REP===null?'<div class="m">Loading reports…</div>':(list.slice(0,4).map(repRow).join('')||'<div class="empty">No reports yet. Write the first one above.</div>');
+  if(RPT.tag){var tn=[RPT.tag];projsOf(RPT.tag).forEach(function(p){tn.push(p.name);subsOf(p.name).forEach(function(c){tn.push(c.name)})});subsOf(RPT.tag).forEach(function(c){tn.push(c.name)});list=list.filter(function(r){return repMatch(r,tn)})}
+  var tagf=RPT.tag?'<span class="chip on rtagf" data-rptagx title="Clear tag filter">'+pDot(RPT.tag)+'#'+esc(RPT.tag)+' ✕</span>':'<span class="rtagw"><input id="rptTQ" list="rptTL" placeholder="# filter" autocomplete="off"><datalist id="rptTL">'+repCands().map(function(c){return'<option value="'+esc(c.n)+'">'}).join('')+'</datalist></span>';
+  var seg='<span class="seg">'+[['all','All'],['me','For me'+(repUnread().length?' ('+repUnread().length+')':'')],['mine','My reports']].map(function(x){return'<button class="chip'+(f===x[0]?' on':'')+'" data-rpf="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</span>'+tagf;
+  var feed=REP===null?'<div class="m">Loading reports…</div>':(list.slice(0,RPT.tag?30:4).map(repRow).join('')||'<div class="empty">No reports yet. Write the first one above.</div>');
   return'<div class="pane" id="rptPane"><div class="panehd"><b>Report</b><span class="m">Seer-wide: artists, songs, clients and people</span></div>'+weekStrip()+
     (function(){var ds=doneSug();return ds.length?'<div class="gchips dsugs" style="margin:0 0 8px"><span class="m">Finished this week:</span>'+ds.map(function(h,i){return'<button class="chip" data-dsug="'+i+'">✓ '+esc(h.task)+(h.forName?' · '+esc(h.forName):'')+'</button>'}).join('')+'</div>':''})()+'<div id="rptF" class="rfil2"></div><div style="position:relative" class="rptW"><div id="rptHL" aria-hidden="true">'+rptHLhtml(RPT.text)+'</div><textarea id="rptT" rows="3" placeholder="What happened? One line per item.&#10;#Sony&#10;approved the deck&#10;#Task&#10;send rate card @Ashley fri&#10;#Meeting&#10;call with brand team thu 3pm @Geo&#10;(blank line, then the next #project)   Ctrl+Enter to post">'+esc(RPT.text)+'</textarea><div id="rptS" class="rsug"></div></div><div class="rcc"><b>CC</b><input id="rptCC" placeholder="@name, @name (gets an email copy)" autocomplete="off" value="'+esc(RPT.cc||'')+'"><div id="rptCCS" class="rsug"></div></div><div id="rptH" class="ghint"></div><div id="rptC" class="gchips"></div>'+
     '<div class="bar" style="margin:8px 0 0;align-items:center"><div id="rptP" style="flex:1;display:flex;gap:6px;flex-wrap:wrap;min-width:200px">'+repPrev()+'</div><input type="date" id="rptD" value="'+esc(RPT.date)+'" style="min-width:0;width:auto"><button class="b" data-rattach title="Attach a file (or drop / paste it into the text)">📎</button><button class="b" id="rptDr" title="Keep this on this device and finish it later">Draft</button><button class="b" id="rptB">Report</button></div>'+
@@ -1324,6 +1331,10 @@ document.addEventListener('beforeinput',function(e){var ta=e.target;if((ta.id!==
   else if(repCands().some(function(c){return c.n.toLowerCase().indexOf(repNorm(bm[1])+' ')===0})){e.preventDefault();taSet(ta,ta.value.slice(0,ps)+'_'+ta.value.slice(ps),ps+1)}else return;
   ta.dispatchEvent(new Event('input',{bubbles:true}))});
 document.addEventListener('mousedown',function(e){var r=e.target.closest&&e.target.closest('[data-ri]');if(r){e.preventDefault();repPick(+r.dataset.ri)}});
+function rptTagSet(v){v=String(v||'').replace(/^#/,'').replace(/_/g,' ').trim();if(!v)return;var c=repCands().filter(function(x){return repNorm(x.n)===repNorm(v)})[0];RPT.tag=c?c.n:v;render()}
+document.addEventListener('change',function(e){if(e.target.id==='rptTQ')rptTagSet(e.target.value)});
+document.addEventListener('keydown',function(e){if(e.target.id==='rptTQ'&&e.key==='Enter'){e.preventDefault();rptTagSet(e.target.value)}});
+document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-rptagx]')){RPT.tag='';return render()}});
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('[data-rpf]');if(f){RPT.filt=f.dataset.rpf;return render()}if(e.target.id==='rptB')repSave();if(e.target.id==='rptBM'){RPT.wm=true;repSave()}});
 document.addEventListener('change',function(e){if(e.target.id==='rptD')RPT.date=e.target.value});
 /* ---------- Reports: shared row (Dashboard feed + Reports page), edit/delete (author only), set a meeting from a report ---------- */
