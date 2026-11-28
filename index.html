@@ -493,6 +493,51 @@ html[data-theme=light] .sdot[title=Lost]{box-shadow:0 0 0 1.5px rgba(0,0,0,.15)}
 html[data-theme=light] #rptHL .hk{color:var(--acc3)}html[data-theme=light] #rptHL .hm{color:var(--acc2)}html[data-theme=light] #rptHL .hw{color:var(--ok)}
 .rc.pp{color:var(--ok)}
 header{z-index:60!important}#dr{max-height:calc(100vh - 180px);top:calc(50% + 55px)!important}
+
+/* ---- glass vibe: static only (no blur on lists, no loops) ---- */
+:root{--gl-top:rgba(255,255,255,.10);--gl-edge:rgba(255,255,255,.14);--gl-rim:linear-gradient(120deg,rgba(143,107,255,.55),rgba(240,138,211,.45),rgba(143,216,242,.45))}
+html[data-theme=light]{--gl-top:rgba(255,255,255,.75);--gl-edge:rgba(120,90,200,.16)}
+/* report cards = glass panes */
+.rrow{background:linear-gradient(180deg,var(--gl-top),transparent 60%),var(--chip)!important;border:1px solid var(--gl-edge)!important;border-radius:16px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px -12px rgba(20,8,50,.5)!important;padding:12px 14px!important;position:relative}
+html[data-theme=light] .rrow{box-shadow:inset 0 1px 0 #fff,0 6px 18px -12px rgba(80,50,160,.35)!important}
+/* unread: iridescent strip on the left, no heavy border */
+.rrow.mn{border-color:var(--gl-edge)!important}
+.rrow.mn::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:var(--gl-rim)}
+/* header: name strong, meta quiet */
+.rhd .m{font-size:12px}.rhd .rby{font-size:14px;color:var(--text);margin-right:4px}
+.rnew{background:var(--gl-rim)!important;border-radius:999px!important;padding:1px 7px!important;font-size:9.5px!important;letter-spacing:.04em;text-transform:uppercase}
+/* hashtags: soft tinted, still tight */
+.rtx .rc.ok{background:color-mix(in srgb,var(--acc) 12%,transparent)!important;border-radius:6px!important;padding:0 4px!important}
+/* section labels: subtle iridescent text */
+.rsl{background:linear-gradient(90deg,#a78bfa,#f0a6dc 60%,#9adcf2);-webkit-background-clip:text;background-clip:text;color:transparent!important;font-weight:700;letter-spacing:.08em}
+html[data-theme=light] .rsl{background:linear-gradient(90deg,#6d4fd8,#c0479a 60%,#2a8fb5);-webkit-background-clip:text;background-clip:text}
+/* footer buttons: quiet text buttons, Done gets glass */
+.rft .b.mi{background:transparent!important;border-color:transparent!important;color:var(--mute)}
+.rft .b.mi:active{transform:scale(.96)}
+.rft .b.mi[data-rdone]{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.03)),color-mix(in srgb,var(--acc) 22%,transparent)!important;border:1px solid var(--gl-edge)!important;color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.rft .b.mi.on{color:var(--acc)}
+/* show more: fade into card */
+.rtx.long{-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent)}
+.rtx.long.open,.rrow.open .rtx.long{-webkit-mask-image:none;mask-image:none}
+/* pop-ups: brighter top rim */
+#dr.on,#rply,#rhelp,.askbox{box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 0 1px rgba(255,255,255,.05),0 28px 80px -10px rgba(10,4,30,.6)!important}
+#dr.on::before,#rply::before,#rhelp::before{content:'';position:sticky;display:block;top:0;height:1px;margin:-1px 0 0;background:var(--gl-rim);opacity:.7}
+/* primary buttons inside pop-ups share the glass */
+#rpS,#dr .b.pri,.askbox .b.pri{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.02) 55%),linear-gradient(115deg,rgba(143,107,255,.55),rgba(240,138,211,.45) 55%,rgba(143,216,242,.40))!important;border:1px solid rgba(255,255,255,.25)!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 14px -6px rgba(120,80,255,.5)!important}
+#rpS:active,#dr .b.pri:active,.askbox .b.pri:active{transform:scale(.97)}
+/* header: thin iridescent line */
+header{box-shadow:0 1px 0 rgba(255,255,255,.04)!important}
+header::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--gl-rim);opacity:.55;pointer-events:none}
+/* mobile bottom bar: glass capsule look (solid, no blur) */
+body.mob #mobbar{border-top:0!important;border-radius:22px 22px 0 0;background:linear-gradient(180deg,var(--gl-top),transparent 70%),var(--solid,#101218)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 -8px 24px -12px rgba(10,4,30,.5)}
+body.mob #mobbar::before{content:'';position:absolute;left:18%;right:18%;top:0;height:1px;background:var(--gl-rim);opacity:.6}
+body.mob #mobbar button.on{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.02)),color-mix(in srgb,var(--acc) 16%,transparent)!important;border-radius:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+body.mob #mobbar button:active{transform:scale(.95)}
+/* phones: one step smaller body text */
+body.mob .rtx{font-size:14.5px;line-height:1.5}
+/* light mode: cleaner, cooler base */
+html[data-theme=light] body{background-color:#f3f2fb}
 #signin{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);color:var(--text);text-align:center;padding:24px;font:15px system-ui,-apple-system,Segoe UI,sans-serif}#signin img{width:220px;max-width:70%;height:auto}#signin h1{margin:0;font-size:20px;font-weight:650}#signin p{margin:0;color:var(--mute);max-width:340px;line-height:1.5}#signin button{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer}#signin button:disabled{opacity:.6}#signin-msg{color:var(--amber);min-height:18px;font-size:13px}
 html:has(#splash),body:has(#splash){background:var(--bg)!important}
 </style><script>if(/^https?:$/.test(location.protocol))document.documentElement.classList.add('web')</script><script>(function(){var t='';try{t=localStorage.getItem('ta_theme')||''}catch(e){}if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';document.documentElement.setAttribute('data-theme',t);var b='acrylic';try{b=localStorage.getItem('ta_bd')||'acrylic'}catch(e){}if(b!=='solid')document.documentElement.classList.add('clear')})()</script><script src="config.js"></script><script src="sheets_api.js"></script></head><body><div id="signin"><img data-lg="w" src="logo_word_white.png" alt="INNRVZN"><h1>INNRVZN Seer</h1><p>Sign in with the Google account that has access to the INNRVZN sheet.</p><button id="signin-btn" onclick="window.__signin()">Sign in with Google</button><div id="signin-msg"></div></div>
@@ -1431,7 +1476,7 @@ function repThread(names){var ns=names.filter(Boolean),hit=function(v){return ns
     .map(function(x,i){x.i=i;return x}).sort(function(x,y){return String(y.d).localeCompare(String(x.d))||y.i-x.i});
   var nOpen=open.length+mopen.length;
   return'<div class="rthr">'+(RTHOPEN?'<h3>Open tasks ('+nOpen+')</h3>'+(nOpen?open.map(taskHtml).join('')+mopen.map(mDashRow).join(''):'<div class="m">Nothing open.</div>'):'')+
-    '<h3>Thread ('+feed.length+') <span class="m">· newest first</span></h3>'+'<div class="rtcomp"><textarea id="rtT" rows="2" placeholder="Post an update to '+esc(ns[0])+'…  (@ to mention)"></textarea><button class="b" id="rtB">Post</button></div>+(REP===null||HIST===null?'<div class="m">Loading…</div>':'')+(feed.map(function(x){return x.h}).join('')||'<div class="m">No updates yet. Post the first one below.</div>')+
+    '<h3>Thread ('+feed.length+') <span class="m">· newest first</span></h3>'+'<div class="rtcomp"><textarea id="rtT" rows="2" placeholder="Post an update to '+esc(ns[0])+'…  (@ to mention)"></textarea><button class="b" id="rtB">Post</button></div>'+(REP===null||HIST===null?'<div class="m">Loading…</div>':'')+(feed.map(function(x){return x.h}).join('')||'<div class="m">No updates yet. Post the first one below.</div>')+
     (mdone.length?'<div class="rdone m">✓ '+mdone.length+' Music task'+(mdone.length>1?'s':'')+' done</div>':'')+
     '</div>'}
 var RTHOPEN=true;
